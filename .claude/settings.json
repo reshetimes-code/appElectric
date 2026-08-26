@@ -42,7 +42,13 @@
       "Bash(node fetch-logos.mjs logo-queries2.json)",
       "Bash(node fetch-logos.mjs logo-queries3.json)",
       "Bash(sed -i 's/style=\"fill:#ffffff\"/style=\"fill:#14171a\"/' /c/tmp/logos/samsung-1.svg)",
-      "Bash(sed -i 's/fill:#000000\"/fill:#14171a\"/g; s/style=\"fill:none\"/style=\"fill:none\"/' /c/tmp/logos/samsung-1.svg)"
+      "Bash(sed -i 's/fill:#000000\"/fill:#14171a\"/g; s/style=\"fill:none\"/style=\"fill:none\"/' /c/tmp/logos/samsung-1.svg)",
+      "Bash(nohup npx next dev -p 6500)",
+      "Bash(disown -a)",
+      "Bash(echo \"launched pid $!\")",
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 6500 -ErrorAction SilentlyContinue)",
+      "Bash(timeout 20 bash -c 'until curl -sf http://localhost:6500 >/dev/null; do sleep 1; done')"
     ]
   }
 }

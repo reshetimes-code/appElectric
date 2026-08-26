@@ -1,48 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf8f5;
-  --foreground: #171a19;
+  --background: #f8f1e6;
+  --foreground: #241c14;
 
-  /* Brand green (from logo) */
-  --color-brand-50: #eefaf1;
-  --color-brand-100: #d5f2dd;
-  --color-brand-200: #ade3bd;
-  --color-brand-300: #7ccd97;
-  --color-brand-400: #4bb173;
-  --color-brand-500: #2c9457;
-  --color-brand-600: #1e7a44;
-  --color-brand-700: #1a6138;
-  --color-brand-800: #174d2f;
-  --color-brand-900: #133f27;
+  /* Brand green (from logo) — richer, warmer (olive-leaning, not teal) */
+  --color-brand-50: #f1f8e8;
+  --color-brand-100: #dcedc4;
+  --color-brand-200: #b9db92;
+  --color-brand-300: #8fc35e;
+  --color-brand-400: #66a838;
+  --color-brand-500: #488a24;
+  --color-brand-600: #3a701e;
+  --color-brand-700: #2f591a;
+  --color-brand-800: #274818;
+  --color-brand-900: #213c16;
 
-  /* Charcoal / deep navy-black surfaces */
-  --color-charcoal-50: #f4f5f5;
-  --color-charcoal-100: #e4e6e6;
-  --color-charcoal-200: #c7cbcb;
-  --color-charcoal-300: #a1a7a7;
-  --color-charcoal-400: #767f7f;
-  --color-charcoal-500: #565f5f;
-  --color-charcoal-600: #414848;
-  --color-charcoal-700: #333939;
-  --color-charcoal-800: #21201f;
-  --color-charcoal-900: #14171a;
-  --color-charcoal-950: #0c0e10;
+  /* Charcoal — warm near-black (brown-black, not blue-black) */
+  --color-charcoal-50: #f6f4f1;
+  --color-charcoal-100: #e9e3dc;
+  --color-charcoal-200: #d0c5b8;
+  --color-charcoal-300: #ab9c8a;
+  --color-charcoal-400: #85735f;
+  --color-charcoal-500: #63533f;
+  --color-charcoal-600: #4a3d2d;
+  --color-charcoal-700: #382d21;
+  --color-charcoal-800: #281f16;
+  --color-charcoal-900: #1c150f;
+  --color-charcoal-950: #120d08;
 
-  /* Warm sand / off-white neutrals */
-  --color-sand-50: #fdfcfa;
-  --color-sand-100: #faf8f5;
-  --color-sand-200: #f2ede5;
-  --color-sand-300: #e6ddd0;
-  --color-sand-400: #d4c6b3;
-  --color-sand-500: #bfab8f;
+  /* Warm sand / cream neutrals */
+  --color-sand-50: #fdfaf5;
+  --color-sand-100: #f8f1e6;
+  --color-sand-200: #f0e3cd;
+  --color-sand-300: #e2cca4;
+  --color-sand-400: #cba876;
+  --color-sand-500: #ab8452;
 
   /* Amber accent — sale / discount only */
-  --color-amber-50: #fdf6e9;
-  --color-amber-100: #faebc7;
-  --color-amber-400: #e3a730;
-  --color-amber-500: #cc8f1e;
-  --color-amber-600: #a8751a;
+  --color-amber-50: #fdf3e2;
+  --color-amber-100: #fae2b3;
+  --color-amber-400: #e89a1f;
+  --color-amber-500: #d17f13;
+  --color-amber-600: #a8630f;
 
   --radius-card: 1rem;
   --radius-control: 0.625rem;
@@ -130,7 +130,6 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-brand-600);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 .no-scrollbar::-webkit-scrollbar {

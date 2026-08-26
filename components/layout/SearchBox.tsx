@@ -37,7 +37,7 @@ export function SearchBox({ variant = "header" }: { variant?: "header" | "page" 
 
   return (
     <div ref={containerRef} className="relative w-full">
-      <div className="flex h-11 items-center gap-2 rounded-full border border-sand-300 bg-sand-50 px-4 focus-within:border-brand-500">
+      <div className="flex h-11 items-center gap-2 rounded-full border border-sand-300 bg-sand-50 px-4 transition-colors focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-100">
         <Search size={17} className="shrink-0 text-charcoal-400" />
         <input
           type="search"
@@ -50,7 +50,7 @@ export function SearchBox({ variant = "header" }: { variant?: "header" | "page" 
           onKeyDown={(e) => e.key === "Enter" && submit()}
           placeholder="חיפוש מוצר, מותג או דגם..."
           aria-label="חיפוש מוצרים"
-          className="h-full flex-1 bg-transparent text-sm outline-none placeholder:text-charcoal-400"
+          className="h-full flex-1 bg-transparent text-sm outline-none focus-visible:outline-none placeholder:text-charcoal-400"
         />
         {query && (
           <button type="button" onClick={() => setQuery("")} aria-label="נקה חיפוש" className="text-charcoal-400 hover:text-charcoal-700">

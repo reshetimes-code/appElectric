@@ -48,12 +48,12 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b bg-white/95 backdrop-blur transition-shadow",
+        "sticky top-0 z-50 border-b bg-white backdrop-blur transition-shadow",
         scrolled ? "border-sand-300 shadow-sm" : "border-transparent",
       )}
       onMouseLeave={() => setActiveMenu(null)}
     >
-      <Container className="flex h-16 items-center gap-3 sm:h-20 sm:gap-6">
+      <Container className="relative flex h-20 items-center gap-3 sm:h-24 sm:gap-6">
         <button
           type="button"
           className="flex h-10 w-10 items-center justify-center rounded-full text-charcoal-700 hover:bg-sand-100 lg:hidden"
@@ -63,13 +63,16 @@ export function Header() {
           <Menu size={22} />
         </button>
 
-        <Link href="/" className="shrink-0" aria-label="AppElectric — לעמוד הבית">
-          <Image src="/logo.png" alt="AppElectric" width={150} height={34} className="h-7 w-auto sm:h-8" priority />
+        <Link href="/" className="shrink-0 sm:hidden" aria-label="AppElectric — לעמוד הבית">
+          <Image src="/logo.png" alt="AppElectric" width={150} height={34} className="h-7 w-auto" priority />
         </Link>
-
-        <div className="hidden flex-1 md:block md:max-w-md lg:max-w-lg">
-          <SearchBox />
-        </div>
+        <Link
+          href="/"
+          className="absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 sm:block"
+          aria-label="AppElectric — לעמוד הבית"
+        >
+          <Image src="/logo.png" alt="AppElectric" width={300} height={68} className="h-14 w-auto sm:h-16" priority />
+        </Link>
 
         <div className="ms-auto flex items-center gap-1 sm:gap-1.5">
           <IconLink href="/compare" count={compare.ids.length} label="השוואת מוצרים">
@@ -84,9 +87,11 @@ export function Header() {
         </div>
       </Container>
 
-      <div className="border-t border-sand-200 md:hidden">
-        <Container className="py-2.5">
-          <SearchBox />
+      <div className="border-y border-brand-100 bg-brand-50/70">
+        <Container className="py-3">
+          <div className="mx-auto max-w-xl">
+            <SearchBox />
+          </div>
         </Container>
       </div>
 
