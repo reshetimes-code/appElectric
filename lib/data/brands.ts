@@ -1,16 +1,17 @@
 import type { Brand } from "@/lib/types";
-import { lifestylePhoto } from "@/lib/images";
+import { PHOTOS } from "@/lib/images";
 
-// Demo catalog data. Brand names are used for illustrative/demo purposes only —
-// no official distribution/authorization relationship is implied or configured.
+// Demo catalog data. Brand names/logos are shown for product-identification purposes only
+// (standard retailer practice) — no official distribution/authorization relationship is
+// implied or configured. See IMAGE_SOURCES.md for logo provenance.
 export const brands: Brand[] = [
   {
     id: "miele",
     slug: "miele",
     nameHe: "Miele",
-    logo: "",
+    logo: "/brand-logos/miele.svg",
     description: "מותג גרמני מוביל בטכנולוגיית מטבח ומכשירי חשמל פרימיום, ידוע באיכות ייצור ועמידות ארוכת שנים.",
-    heroImage: lifestylePhoto("appelectric-miele", 1200, 700),
+    heroImage: PHOTOS.cookingWhite,
     premium: true,
   },
   {
@@ -19,7 +20,7 @@ export const brands: Brand[] = [
     nameHe: "V-ZUG",
     logo: "",
     description: "מותג שוויצרי המתמחה במכשירי מטבח משולבים בעיצוב מינימליסטי וטכנולוגיה מתקדמת.",
-    heroImage: lifestylePhoto("appelectric-vzug", 1200, 700),
+    heroImage: PHOTOS.cookingTwoTone,
     premium: true,
   },
   {
@@ -28,34 +29,34 @@ export const brands: Brand[] = [
     nameHe: "Bertazzoni",
     logo: "",
     description: "מותג איטלקי עתיר מסורת, מתמחה בכיריים ותנורים בעיצוב איטלקי קלאסי.",
-    heroImage: lifestylePhoto("appelectric-bertazzoni", 1200, 700),
+    heroImage: PHOTOS.cookingFlame,
     premium: true,
   },
   {
     id: "de-dietrich",
     slug: "de-dietrich",
     nameHe: "De Dietrich",
-    logo: "",
+    logo: "/brand-logos/dedietrich.jpg",
     description: "מותג צרפתי יוקרתי המשלב עיצוב אלגנטי עם חדשנות טכנולוגית במכשירי מטבח בנויים.",
-    heroImage: lifestylePhoto("appelectric-dedietrich", 1200, 700),
+    heroImage: PHOTOS.kitchenWood,
     premium: true,
   },
   {
     id: "electrolux",
     slug: "electrolux",
     nameHe: "Electrolux",
-    logo: "",
+    logo: "/brand-logos/electrolux.svg",
     description: "מותג סקנדינבי מוביל עולמית במכשירי חשמל ביתיים איכותיים ואמינים.",
-    heroImage: lifestylePhoto("appelectric-electrolux", 1200, 700),
+    heroImage: PHOTOS.laundry,
     premium: false,
   },
   {
     id: "samsung",
     slug: "samsung",
     nameHe: "Samsung",
-    logo: "",
+    logo: "/brand-logos/samsung.svg",
     description: "טכנולוגיה חכמה ועיצוב חדשני במגוון רחב של מכשירי חשמל ומולטימדיה.",
-    heroImage: lifestylePhoto("appelectric-samsung", 1200, 700),
+    heroImage: PHOTOS.multimedia,
     premium: false,
   },
 ];

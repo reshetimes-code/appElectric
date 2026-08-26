@@ -1,13 +1,13 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { lifestylePhoto } from "@/lib/images";
+import { PHOTOS } from "@/lib/images";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-charcoal-950">
       <Image
-        src={lifestylePhoto("appelectric-hero-kitchen", 1800, 1000)}
+        src={PHOTOS.heroKitchen}
         alt="מטבח יוקרה עם מכשירי חשמל משולבים"
         fill
         priority

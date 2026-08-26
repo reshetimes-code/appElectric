@@ -23,7 +23,26 @@
       "Bash(nohup npx next dev -p 3100)",
       "Bash(disown)",
       "Bash(timeout 40 bash -c 'until curl -sf http://localhost:3100 >/dev/null; do sleep 1; done')",
-      "Bash(taskkill //PID 30424 //F)"
+      "Bash(taskkill //PID 30424 //F)",
+      "PowerShell(gh --version 2>&1)",
+      "Bash(timeout 30 bash -c 'until curl -sf http://localhost:6500 >/dev/null; do sleep 1; done')",
+      "Bash(jq --version)",
+      "Bash(node fetch-images.mjs img-queries.json)",
+      "Bash(node fetch-images.mjs img-queries2.json)",
+      "Bash(node fetch-images.mjs img-queries3.json)",
+      "Bash(node fetch-images.mjs img-queries4.json)",
+      "Bash(awk '{print $NF, $5}')",
+      "Bash(node fetch-images.mjs img-queries5.json)",
+      "Bash(mkdir -p \"/c/Users/computer/Desktop/appElectric/public/images\")",
+      "Bash(cp kitchen2-1.jpg \"/c/Users/computer/Desktop/appElectric/public/images/hero-kitchen.jpg\")",
+      "Bash(cp kitchen1-1.jpg \"/c/Users/computer/Desktop/appElectric/public/images/kitchen-bright.jpg\")",
+      "Bash(cp kitchen1-2.jpg \"/c/Users/computer/Desktop/appElectric/public/images/cooking-white.jpg\")",
+      "Bash(cp kitchen1-3.jpg \"/c/Users/computer/Desktop/appElectric/public/images/cooking-twotone.jpg\")",
+      "Bash(node fetch-logos.mjs logo-queries.json)",
+      "Bash(node fetch-logos.mjs logo-queries2.json)",
+      "Bash(node fetch-logos.mjs logo-queries3.json)",
+      "Bash(sed -i 's/style=\"fill:#ffffff\"/style=\"fill:#14171a\"/' /c/tmp/logos/samsung-1.svg)",
+      "Bash(sed -i 's/fill:#000000\"/fill:#14171a\"/g; s/style=\"fill:none\"/style=\"fill:none\"/' /c/tmp/logos/samsung-1.svg)"
     ]
   }
 }

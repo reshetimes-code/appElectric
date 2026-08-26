@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { LeadForm } from "@/components/leads/LeadForm";
-import { lifestylePhoto } from "@/lib/images";
+import { PHOTOS } from "@/lib/images";
 import { faqs } from "@/lib/data/faqs";
 import { CheckCircle2 } from "lucide-react";
 
@@ -27,7 +27,7 @@ export default function PersonalImportPage() {
   return (
     <div>
       <section className="relative overflow-hidden bg-charcoal-950">
-        <Image src={lifestylePhoto("appelectric-import-hero", 1800, 900)} alt="ייבוא אישי" fill sizes="100vw" className="object-cover opacity-50" />
+        <Image src={PHOTOS.heroKitchen} alt="ייבוא אישי" fill sizes="100vw" className="object-cover opacity-50" />
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/60 to-transparent" />
         <Container className="relative flex min-h-[320px] flex-col justify-end gap-3 py-12 text-white">
           <p className="text-sm font-semibold text-brand-400">ייבוא אישי</p>

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { lifestylePhoto } from "@/lib/images";
+import { PHOTOS } from "@/lib/images";
 import { CheckCircle2 } from "lucide-react";
 
 const STEPS = ["ייעוץ אישי", "בחירת מוצר", "בדיקת זמינות ומקור", "תיאום ייבוא", "אספקה", "התקנה מקצועית"];
@@ -29,7 +29,7 @@ export function PersonalImportTeaser() {
           </Button>
         </div>
         <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]">
-          <Image src={lifestylePhoto("appelectric-import", 900, 700)} alt="ייבוא אישי של מכשירי חשמל יוקרתיים" fill className="object-cover" />
+          <Image src={PHOTOS.kitchenBright} alt="ייבוא אישי של מכשירי חשמל יוקרתיים" fill className="object-cover" />
         </div>
       </Container>
     </section>

@@ -1,5 +1,5 @@
 import type { Category } from "@/lib/types";
-import { lifestylePhoto } from "@/lib/images";
+import { PHOTOS } from "@/lib/images";
 
 export const categories: Category[] = [
   {
@@ -7,7 +7,7 @@ export const categories: Category[] = [
     slug: "cooling",
     nameHe: "קירור והקפאה",
     departmentId: "cooling",
-    image: lifestylePhoto("appelectric-cooling", 1000, 700),
+    image: PHOTOS.wineFridge,
     filterKind: "cooling",
     subcategories: [
       { id: "fridge-4door", slug: "fridge-4door", nameHe: "מקררי 4 דלתות" },
@@ -26,7 +26,7 @@ export const categories: Category[] = [
     slug: "cooking",
     nameHe: "בישול ואפייה",
     departmentId: "cooking",
-    image: lifestylePhoto("appelectric-cooking", 1000, 700),
+    image: PHOTOS.cookingTwoTone,
     filterKind: "cooking",
     subcategories: [
       { id: "built-in-ovens", slug: "built-in-ovens", nameHe: "תנורים בנויים" },
@@ -45,7 +45,7 @@ export const categories: Category[] = [
     slug: "laundry",
     nameHe: "כביסה וייבוש",
     departmentId: "laundry",
-    image: lifestylePhoto("appelectric-laundry", 1000, 700),
+    image: PHOTOS.laundry,
     filterKind: "laundry",
     subcategories: [
       { id: "washers-front", slug: "washers-front", nameHe: "מכונות כביסה פתח קדמי" },
@@ -59,7 +59,7 @@ export const categories: Category[] = [
     slug: "dishwashers",
     nameHe: "מדיחי כלים",
     departmentId: "dishwashers",
-    image: lifestylePhoto("appelectric-dishwashers", 1000, 700),
+    image: PHOTOS.dishwasher,
     filterKind: "dishwasher",
     subcategories: [
       { id: "dw-full", slug: "fully-integrated", nameHe: "משולב מלא" },
@@ -74,7 +74,7 @@ export const categories: Category[] = [
     slug: "multimedia",
     nameHe: "מולטימדיה",
     departmentId: "multimedia",
-    image: lifestylePhoto("appelectric-multimedia", 1000, 700),
+    image: PHOTOS.multimedia,
     filterKind: "multimedia",
     subcategories: [
       { id: "tv-75plus", slug: "large-screens-75", nameHe: 'מסכים ״75+' },

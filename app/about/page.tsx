@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { WhyUs } from "@/components/home/WhyUs";
-import { lifestylePhoto } from "@/lib/images";
+import { PHOTOS } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "אודות",
@@ -30,7 +30,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]">
-            <Image src={lifestylePhoto("appelectric-about", 900, 700)} alt="שואו-רום AppElectric" fill className="object-cover" />
+            <Image src={PHOTOS.kitchenWood} alt="שואו-רום AppElectric" fill className="object-cover" />
           </div>
         </div>
       </Container>
