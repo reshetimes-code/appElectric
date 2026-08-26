@@ -12,7 +12,18 @@
       "Read(//c/msys64/home/computer/npm-cache/_logs/**)",
       "PowerShell(Move-Item -Path C:\\\\tmp\\\\appelectric-build\\\\node_modules -Destination \"C:\\\\Users\\\\computer\\\\Desktop\\\\appElectric\\\\node_modules\")",
       "Bash(npm run *)",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(chromium-cli --help)",
+      "Bash(npx --yes playwright --version)",
+      "Read(//c//**)",
+      "Bash(nohup npm run dev)",
+      "Bash(echo \"started pid $!\")",
+      "Bash(timeout 40 bash -c 'until curl -sf http://localhost:3000 >/dev/null; do sleep 1; done')",
+      "Bash(wmic process *)",
+      "Bash(nohup npx next dev -p 3100)",
+      "Bash(disown)",
+      "Bash(timeout 40 bash -c 'until curl -sf http://localhost:3100 >/dev/null; do sleep 1; done')",
+      "Bash(taskkill //PID 30424 //F)"
     ]
   }
 }

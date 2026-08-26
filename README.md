@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AppElectric — Premium Appliance Store
 
-## Getting Started
+Hebrew-first, RTL, mobile-first storefront for premium home appliances, built from
+`APPELECTRIC_CLAUDE_BUILD_SPEC.md`. This is **Phase A**: a fully working frontend on
+demo/seed data — every button, filter, and form is real and functional — with no live
+backend/payments/auth yet. See "What's next" below.
 
-First, run the development server:
+## Stack
+
+- Next.js 16 (App Router) + TypeScript + Tailwind CSS v4
+- No database yet — typed seed data in `lib/data/*` + a `lib/repo/*` accessor layer
+  written so a swap to a real DB only touches the repo layer, not the pages
+- Client state (cart, favorites, compare) persisted to `localStorage` via React Context
+- On-brand SVG illustrations for product imagery (`components/product/ApplianceArt.tsx`)
+  instead of stock photography — reliable with zero hotlink risk; swap in real product
+  photos later by populating `Product.images` and updating the Gallery component
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. If port 3000 is already used by another project on your
+machine, run `npx next dev -p 3100` (or any free port) instead.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build   # production build
+npm run lint    # eslint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## What's implemented (Phase A)
 
-## Learn More
+- Home, Shop, Category, Brand, Search, Product detail pages — full URL-driven filtering
+  (brand, price, availability, energy rating, premium, personal import, deals), sorting,
+  pagination, mobile filter bottom-sheet
+- Product comparison (up to 3, localStorage), Favorites, Cart, Checkout (demo/no live
+  payment) → Order confirmation
+- Bundle deals (list + detail + add-whole-bundle-to-cart)
+- Energy savings calculator (transparent, configurable baseline in `lib/energy.ts`)
+- Niche/installation dimension finder (`lib/repo/products.ts: findByNiche`)
+- VIP services, Personal Import, Trade-In pages with working lead forms (persisted to
+  `localStorage`, since no CRM/email is wired yet)
+- WhatsApp deep-links prefilled with product name/model
+- SEO: per-page metadata, Product/Breadcrumb/FAQ/Organization JSON-LD, `sitemap.ts`,
+  `robots.ts`, custom 404
+- Mega menu, mobile nav drawer, sticky mobile buy bar, toast notifications, reduced-motion
+  support, visible focus states throughout
 
-To learn more about Next.js, take a look at the following resources:
+## What's next (not built in this pass)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Admin dashboard** — products/categories/brands/orders/leads/homepage CMS
+- **Real backend** — Postgres (schema sketched from the spec's Product model in
+  `lib/types.ts`), auth/roles, a payment provider behind a server-side abstraction,
+  email/CRM delivery for leads (currently `localStorage` only — see `lib/leads.ts`),
+  image/PDF upload storage (`Product.technicalPdfUrl` etc. are wired but unpopulated)
+- Real product photography in place of the SVG illustrations
+- Full accessibility/perf audit pass and production deploy config
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment variables
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+None are required to run Phase A — there's no backend yet. When Phase C is implemented,
+document required variable **names only** here (e.g. `DATABASE_URL`, payment provider
+keys) via a `.env.example`; never commit actual secrets.
