@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf8f5;
+  --foreground: #171a19;
+
+  /* Brand green (from logo) */
+  --color-brand-50: #eefaf1;
+  --color-brand-100: #d5f2dd;
+  --color-brand-200: #ade3bd;
+  --color-brand-300: #7ccd97;
+  --color-brand-400: #4bb173;
+  --color-brand-500: #2c9457;
+  --color-brand-600: #1e7a44;
+  --color-brand-700: #1a6138;
+  --color-brand-800: #174d2f;
+  --color-brand-900: #133f27;
+
+  /* Charcoal / deep navy-black surfaces */
+  --color-charcoal-50: #f4f5f5;
+  --color-charcoal-100: #e4e6e6;
+  --color-charcoal-200: #c7cbcb;
+  --color-charcoal-300: #a1a7a7;
+  --color-charcoal-400: #767f7f;
+  --color-charcoal-500: #565f5f;
+  --color-charcoal-600: #414848;
+  --color-charcoal-700: #333939;
+  --color-charcoal-800: #21201f;
+  --color-charcoal-900: #14171a;
+  --color-charcoal-950: #0c0e10;
+
+  /* Warm sand / off-white neutrals */
+  --color-sand-50: #fdfcfa;
+  --color-sand-100: #faf8f5;
+  --color-sand-200: #f2ede5;
+  --color-sand-300: #e6ddd0;
+  --color-sand-400: #d4c6b3;
+  --color-sand-500: #bfab8f;
+
+  /* Amber accent — sale / discount only */
+  --color-amber-50: #fdf6e9;
+  --color-amber-100: #faebc7;
+  --color-amber-400: #e3a730;
+  --color-amber-500: #cc8f1e;
+  --color-amber-600: #a8751a;
+
+  --radius-card: 1rem;
+  --radius-control: 0.625rem;
+
+  --font-heading: var(--font-rubik);
+  --font-body: var(--font-rubik);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-brand-50: var(--color-brand-50);
+  --color-brand-100: var(--color-brand-100);
+  --color-brand-200: var(--color-brand-200);
+  --color-brand-300: var(--color-brand-300);
+  --color-brand-400: var(--color-brand-400);
+  --color-brand-500: var(--color-brand-500);
+  --color-brand-600: var(--color-brand-600);
+  --color-brand-700: var(--color-brand-700);
+  --color-brand-800: var(--color-brand-800);
+  --color-brand-900: var(--color-brand-900);
+
+  --color-charcoal-50: var(--color-charcoal-50);
+  --color-charcoal-100: var(--color-charcoal-100);
+  --color-charcoal-200: var(--color-charcoal-200);
+  --color-charcoal-300: var(--color-charcoal-300);
+  --color-charcoal-400: var(--color-charcoal-400);
+  --color-charcoal-500: var(--color-charcoal-500);
+  --color-charcoal-600: var(--color-charcoal-600);
+  --color-charcoal-700: var(--color-charcoal-700);
+  --color-charcoal-800: var(--color-charcoal-800);
+  --color-charcoal-900: var(--color-charcoal-900);
+  --color-charcoal-950: var(--color-charcoal-950);
+
+  --color-sand-50: var(--color-sand-50);
+  --color-sand-100: var(--color-sand-100);
+  --color-sand-200: var(--color-sand-200);
+  --color-sand-300: var(--color-sand-300);
+  --color-sand-400: var(--color-sand-400);
+  --color-sand-500: var(--color-sand-500);
+
+  --color-amber-50: var(--color-amber-50);
+  --color-amber-100: var(--color-amber-100);
+  --color-amber-400: var(--color-amber-400);
+  --color-amber-500: var(--color-amber-500);
+  --color-amber-600: var(--color-amber-600);
+
+  --radius-card: var(--radius-card);
+  --radius-control: var(--radius-control);
+
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
+}
+
+* {
+  border-color: var(--color-sand-300);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-sand-100);
+  color: var(--color-charcoal-900);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Visible focus ring for keyboard users, everywhere */
+:focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar-x {
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+}

@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm -v)"
+      "Bash(npm -v)",
+      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --use-npm --no-git)",
+      "Bash(npx --yes create-next-app@latest appelectric-tmp --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --use-npm --no-git)",
+      "Bash(mkdir -p public/images)",
+      "Bash(cp logoPedi.png public/logo.png)",
+      "Bash(rm -rf \"/c/Users/computer/Desktop/appElectric/node_modules\")",
+      "Bash(mkdir -p /c/tmp/appelectric-build)",
+      "Bash(cp \"/c/Users/computer/Desktop/appElectric/package.json\" \"/c/Users/computer/Desktop/appElectric/package-lock.json\" /c/tmp/appelectric-build/)",
+      "Read(//c/msys64/home/computer/npm-cache/_logs/**)",
+      "PowerShell(Move-Item -Path C:\\\\tmp\\\\appelectric-build\\\\node_modules -Destination \"C:\\\\Users\\\\computer\\\\Desktop\\\\appElectric\\\\node_modules\")",
+      "Bash(npm run *)",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }
