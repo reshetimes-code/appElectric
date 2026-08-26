@@ -72,6 +72,36 @@ export function sortProducts(list: Product[], sort: ProductFilters["sort"]) {
   }
 }
 
+type SearchParamsLike = { [key: string]: string | string[] | undefined };
+
+/** Parses the URL search params (as received by a Server Component page) into ProductFilters. */
+export function parseFilters(sp: SearchParamsLike): ProductFilters {
+  const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+  const list = (v: string | string[] | undefined) => {
+    const value = str(v);
+    return value ? value.split(",").filter(Boolean) : undefined;
+  };
+  const num = (v: string | string[] | undefined) => {
+    const value = str(v);
+    return value ? Number(value) : undefined;
+  };
+  return {
+    subcategory: str(sp.subcategory),
+    brand: list(sp.brand),
+    priceMin: num(sp.priceMin),
+    priceMax: num(sp.priceMax),
+    availability: list(sp.availability),
+    energyRating: list(sp.energyRating),
+    premium: str(sp.premium) === "1",
+    personalImport: str(sp.personalImport) === "1",
+    deals: str(sp.deals) === "1",
+    widthMin: num(sp.widthMin),
+    widthMax: num(sp.widthMax),
+    q: str(sp.q),
+    sort: (str(sp.sort) as ProductFilters["sort"]) ?? "relevance",
+  };
+}
+
 export function getProducts(filters: ProductFilters = {}): Product[] {
   const filtered = products.filter((p) => matchesFilters(p, filters));
   return sortProducts(filtered, filters.sort);
