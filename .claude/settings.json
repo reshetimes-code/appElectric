@@ -48,7 +48,8 @@
       "Bash(echo \"launched pid $!\")",
       "PowerShell(Get-Process node -ErrorAction SilentlyContinue)",
       "PowerShell(Get-NetTCPConnection -LocalPort 6500 -ErrorAction SilentlyContinue)",
-      "Bash(timeout 20 bash -c 'until curl -sf http://localhost:6500 >/dev/null; do sleep 1; done')"
+      "Bash(timeout 20 bash -c 'until curl -sf http://localhost:6500 >/dev/null; do sleep 1; done')",
+      "WebFetch(domain:www.kubiz.co.il)"
     ]
   }
 }

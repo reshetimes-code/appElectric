@@ -59,6 +59,33 @@ export const brands: Brand[] = [
     heroImage: PHOTOS.multimedia,
     premium: false,
   },
+  {
+    id: "bosch",
+    slug: "bosch",
+    nameHe: "Bosch",
+    logo: "",
+    description: "מותג גרמני ותיק המוכר באמינות הנדסית גבוהה ובמגוון רחב של מכשירי מטבח וכביסה.",
+    heroImage: PHOTOS.kitchenBright,
+    premium: false,
+  },
+  {
+    id: "lg",
+    slug: "lg",
+    nameHe: "LG",
+    logo: "",
+    description: "מותג קוריאני מוביל בטכנולוגיות כביסה, קירור ומולטימדיה חכמה.",
+    heroImage: PHOTOS.laundry,
+    premium: false,
+  },
+  {
+    id: "blomberg",
+    slug: "blomberg",
+    nameHe: "Blomberg",
+    logo: "",
+    description: "מותג סקנדינבי המתמחה במכשירי חשמל פרקטיים ואיכותיים במחיר משתלם.",
+    heroImage: PHOTOS.cookingOven,
+    premium: false,
+  },
 ];
 
 export function getBrandBySlug(slug: string) {
