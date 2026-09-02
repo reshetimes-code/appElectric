@@ -8,6 +8,7 @@ import { ToastProvider } from "@/components/ui/ToastProvider";
 import { CartProvider } from "@/lib/context/CartContext";
 import { FavoritesProvider } from "@/lib/context/FavoritesContext";
 import { CompareProvider } from "@/lib/context/CompareContext";
+import { CatalogProvider } from "@/lib/context/CatalogContext";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="he" dir="rtl" className={`${rubik.variable} h-full`}>
       <body className="flex min-h-full flex-col bg-sand-100 font-sans antialiased">
         <ToastProvider>
+          <CatalogProvider>
           <CartProvider>
             <FavoritesProvider>
               <CompareProvider>
@@ -53,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </CompareProvider>
             </FavoritesProvider>
           </CartProvider>
+          </CatalogProvider>
         </ToastProvider>
       </body>
     </html>

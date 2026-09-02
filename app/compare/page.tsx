@@ -7,7 +7,7 @@ import { ApplianceArt } from "@/components/product/ApplianceArt";
 import { AvailabilityBadge } from "@/components/product/AvailabilityBadge";
 import { Button } from "@/components/ui/Button";
 import { useCompare } from "@/lib/context/CompareContext";
-import { getProductsByIds } from "@/lib/data/products";
+import { useCatalog } from "@/lib/context/CatalogContext";
 import { getBrandBySlug } from "@/lib/data/brands";
 import { brands } from "@/lib/data/brands";
 import { formatPrice, AVAILABILITY_LABELS } from "@/lib/utils";
@@ -50,6 +50,7 @@ const ROWS: Row[] = [
 
 export default function ComparePage() {
   const compare = useCompare();
+  const { getProductsByIds } = useCatalog();
   const products = getProductsByIds(compare.ids);
 
   if (!compare.hydrated) return null;

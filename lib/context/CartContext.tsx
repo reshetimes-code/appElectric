@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
-import { getProductsByIds } from "@/lib/data/products";
+import { useCatalog } from "@/lib/context/CatalogContext";
 import { genId } from "@/lib/utils";
 import type { CartLine, CartServiceSelection } from "@/lib/types";
 
@@ -22,6 +22,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines, hydrated] = useLocalStorage<CartLine[]>("appelectric:cart", []);
+  const { getProductsByIds } = useCatalog();
 
   const addItem: CartContextValue["addItem"] = (productId, quantity = 1, services = []) => {
     setLines((prev) => {
@@ -68,6 +69,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       subtotal += line.services.reduce((sum, s) => sum + s.price, 0) * line.quantity;
     }
     return { count, subtotal };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lines]);
 
   const value: CartContextValue = {

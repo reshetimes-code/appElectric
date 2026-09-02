@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { CheckCircle2, PartyPopper } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { getProductsByIds } from "@/lib/data/products";
+import { useCatalog } from "@/lib/context/CatalogContext";
 import { formatPrice } from "@/lib/utils";
 import { getOrder, type DemoOrder } from "@/lib/orders";
 
@@ -13,6 +13,7 @@ function OrderConfirmationContent() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get("order") ?? "";
   const [order, setOrder] = useState<DemoOrder | null | undefined>(undefined);
+  const { getProductsByIds } = useCatalog();
 
   useEffect(() => {
     setOrder(orderNumber ? getOrder(orderNumber) ?? null : null);

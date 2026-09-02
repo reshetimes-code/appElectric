@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingBag, Tag, Truck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { ApplianceArt } from "@/components/product/ApplianceArt";
 import { useCart } from "@/lib/context/CartContext";
-import { getProductsByIds } from "@/lib/data/products";
+import { useCatalog } from "@/lib/context/CatalogContext";
 import { formatPrice } from "@/lib/utils";
 
 const VALID_COUPON = "APPELECTRIC10";
 
 export default function CartPage() {
   const cart = useCart();
+  const { getProductsByIds } = useCatalog();
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [couponError, setCouponError] = useState("");
@@ -56,8 +58,12 @@ export default function CartPage() {
             const servicesTotal = line.services.reduce((s, sv) => s + sv.price, 0);
             return (
               <div key={line.id} className="flex gap-4 rounded-[var(--radius-card)] border border-sand-300 p-4">
-                <Link href={`/product/${product.slug}`} className="shrink-0">
-                  <ApplianceArt kind={product.artKind} className="h-24 w-24 rounded-lg" />
+                <Link href={`/product/${product.slug}`} className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg">
+                  {product.images[0] ? (
+                    <Image src={product.images[0]} alt={product.nameHe} fill className="object-cover" />
+                  ) : (
+                    <ApplianceArt kind={product.artKind} className="h-full w-full" />
+                  )}
                 </Link>
                 <div className="flex flex-1 flex-col gap-1">
                   <div className="flex items-start justify-between gap-2">

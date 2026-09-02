@@ -12,8 +12,9 @@ import { PriceTag } from "@/components/ui/PriceTag";
 import { Badge } from "@/components/ui/Badge";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Container } from "@/components/ui/Container";
-import { products, getProductBySlug } from "@/lib/data/products";
+import { products } from "@/lib/data/products";
 import { getRelatedProducts } from "@/lib/repo/products";
+import { getAllProducts } from "@/lib/server/adminProducts";
 import { categories } from "@/lib/data/categories";
 import { getBrandBySlug } from "@/lib/data/brands";
 import { productJsonLd, breadcrumbJsonLd } from "@/lib/seo";
@@ -25,7 +26,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = getAllProducts().find((p) => p.slug === slug);
   if (!product) return {};
   return {
     title: product.seoTitle ?? product.nameHe,
@@ -35,12 +36,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const allProducts = getAllProducts();
+  const product = allProducts.find((p) => p.slug === slug);
   if (!product) notFound();
 
   const productBrand = getBrandBySlug(product.brandId) ?? { nameHe: "", slug: "" };
   const category = categories.find((c) => c.id === product.categoryId);
-  const related = getRelatedProducts(product, 4);
+  const related = getRelatedProducts(product, 4, allProducts);
 
   const jsonLd = productJsonLd(product);
   const crumbs = breadcrumbJsonLd([
@@ -62,7 +64,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         />
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-          <Gallery artKind={product.artKind} name={product.nameHe} />
+          <Gallery artKind={product.artKind} images={product.images} name={product.nameHe} />
 
           <div className="flex flex-col gap-5">
             <div>

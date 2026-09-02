@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
 import { getProducts, parseFilters } from "@/lib/repo/products";
+import { getAllProducts } from "@/lib/server/adminProducts";
 
 export const metadata: Metadata = { title: "תוצאות חיפוש" };
 
@@ -11,7 +12,7 @@ export default async function SearchPage({
 }) {
   const sp = await searchParams;
   const filters = parseFilters(sp);
-  const products = getProducts(filters);
+  const products = getProducts(filters, getAllProducts());
   const page = sp.page ? Number(Array.isArray(sp.page) ? sp.page[0] : sp.page) : 1;
   const q = Array.isArray(sp.q) ? sp.q[0] : sp.q ?? "";
 

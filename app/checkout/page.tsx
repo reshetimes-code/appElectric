@@ -6,7 +6,7 @@ import { ShieldCheck, Info } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/lib/context/CartContext";
-import { getProductsByIds } from "@/lib/data/products";
+import { useCatalog } from "@/lib/context/CatalogContext";
 import { formatPrice } from "@/lib/utils";
 import { saveOrder } from "@/lib/orders";
 
@@ -25,6 +25,7 @@ const INITIAL: FormState = { name: "", phone: "", email: "", address: "", city: 
 
 export default function CheckoutPage() {
   const cart = useCart();
+  const { getProductsByIds } = useCatalog();
   const router = useRouter();
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});

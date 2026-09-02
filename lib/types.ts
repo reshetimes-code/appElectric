@@ -224,3 +224,34 @@ export interface LeadPayload {
   };
   createdAt: string;
 }
+
+// ---- Admin: suppliers & purchase orders ----
+
+export interface Supplier {
+  id: string;
+  name: string;
+  email: string;
+  whatsapp: string; // international format, digits only (e.g. 972500000000)
+  createdAt: string;
+}
+
+export type PurchaseOrderStatus = "draft" | "sent" | "confirmed" | "shipped";
+
+export interface PurchaseOrder {
+  id: string;
+  poNumber: string;
+  supplierId: string;
+  supplierName: string;
+  supplierEmail: string;
+  supplierWhatsapp: string;
+  productName: string;
+  costPrice: number;
+  deliveryAddress: string;
+  quantity: number;
+  notes?: string;
+  status: PurchaseOrderStatus;
+  createdAt: string;
+  sentAt?: string;
+  updatedAt: string;
+  sentVia?: ("whatsapp" | "email")[];
+}

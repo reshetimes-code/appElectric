@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
 import { getCategoryBySlug, categories } from "@/lib/data/categories";
 import { getProducts, parseFilters } from "@/lib/repo/products";
+import { getAllProducts } from "@/lib/server/adminProducts";
 
 export function generateStaticParams() {
   return categories.map((c) => ({ slug: c.slug }));
@@ -31,7 +32,7 @@ export default async function CategoryDetailPage({
 
   const sp = await searchParams;
   const filters = { ...parseFilters(sp), category: slug };
-  const products = getProducts(filters);
+  const products = getProducts(filters, getAllProducts());
   const page = sp.page ? Number(Array.isArray(sp.page) ? sp.page[0] : sp.page) : 1;
 
   const buildPageHref = (p: number) => {

@@ -49,7 +49,11 @@
       "PowerShell(Get-Process node -ErrorAction SilentlyContinue)",
       "PowerShell(Get-NetTCPConnection -LocalPort 6500 -ErrorAction SilentlyContinue)",
       "Bash(timeout 20 bash -c 'until curl -sf http://localhost:6500 >/dev/null; do sleep 1; done')",
-      "WebFetch(domain:www.kubiz.co.il)"
+      "WebFetch(domain:www.kubiz.co.il)",
+      "Bash(node fetch-product-images.mjs product-image-queries.json)",
+      "Bash(node -e ' *)",
+      "Bash(node fetch-product-images.mjs product-image-queries2.json)",
+      "Bash(node fetch-product-images.mjs product-image-queries3.json)"
     ]
   }
 }

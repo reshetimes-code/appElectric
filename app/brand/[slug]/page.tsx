@@ -4,6 +4,7 @@ import Image from "next/image";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
 import { getBrandBySlug, brands } from "@/lib/data/brands";
 import { getProducts, parseFilters } from "@/lib/repo/products";
+import { getAllProducts } from "@/lib/server/adminProducts";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { BrandLogo } from "@/components/brand/BrandLogo";
@@ -32,7 +33,7 @@ export default async function BrandDetailPage({
 
   const sp = await searchParams;
   const filters = { ...parseFilters(sp), brand: [slug] };
-  const products = getProducts(filters);
+  const products = getProducts(filters, getAllProducts());
   const page = sp.page ? Number(Array.isArray(sp.page) ? sp.page[0] : sp.page) : 1;
 
   const buildPageHref = (p: number) => (p > 1 ? `/brand/${slug}?page=${p}` : `/brand/${slug}`);

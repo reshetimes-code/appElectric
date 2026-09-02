@@ -5,10 +5,11 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { useFavorites } from "@/lib/context/FavoritesContext";
-import { getProductsByIds } from "@/lib/data/products";
+import { useCatalog } from "@/lib/context/CatalogContext";
 
 export default function FavoritesPage() {
   const favorites = useFavorites();
+  const { getProductsByIds } = useCatalog();
   const products = getProductsByIds(favorites.ids);
 
   if (!favorites.hydrated) return null;

@@ -102,33 +102,38 @@ export function parseFilters(sp: SearchParamsLike): ProductFilters {
   };
 }
 
-export function getProducts(filters: ProductFilters = {}): Product[] {
-  const filtered = products.filter((p) => matchesFilters(p, filters));
+// Every lookup below accepts an optional `list` override (defaulting to the
+// static demo catalog) so Server Components can pass in the static catalog
+// merged with admin-added products (see lib/server/adminProducts.ts) without
+// this file — which is also imported by client components — ever touching fs.
+
+export function getProducts(filters: ProductFilters = {}, list: Product[] = products): Product[] {
+  const filtered = list.filter((p) => matchesFilters(p, filters));
   return sortProducts(filtered, filters.sort);
 }
 
-export function getFeaturedProducts(limit = 8) {
-  return products.filter((p) => p.featured && p.active).slice(0, limit);
+export function getFeaturedProducts(limit = 8, list: Product[] = products) {
+  return list.filter((p) => p.featured && p.active).slice(0, limit);
 }
 
-export function getPriceBounds() {
-  const prices = products.map((p) => p.price);
+export function getPriceBounds(list: Product[] = products) {
+  const prices = list.map((p) => p.price);
   return { min: Math.min(...prices), max: Math.max(...prices) };
 }
 
-export function searchProducts(query: string, limit = 8) {
+export function searchProducts(query: string, limit = 8, list: Product[] = products) {
   const q = query.trim().toLowerCase();
   if (!q) return [];
-  return products
+  return list
     .filter((p) => p.active && `${p.nameHe} ${p.model} ${p.sku} ${p.shortDescriptionHe}`.toLowerCase().includes(q))
     .slice(0, limit);
 }
 
-export function getRelatedProducts(product: Product, limit = 4) {
+export function getRelatedProducts(product: Product, limit = 4, list: Product[] = products) {
   const explicit = product.relatedProductIds ?? [];
-  const explicitProducts = explicit.map((id) => products.find((p) => p.id === id)).filter(Boolean) as Product[];
+  const explicitProducts = explicit.map((id) => list.find((p) => p.id === id)).filter(Boolean) as Product[];
   if (explicitProducts.length >= limit) return explicitProducts.slice(0, limit);
-  const sameCategory = products.filter(
+  const sameCategory = list.filter(
     (p) => p.id !== product.id && p.categoryId === product.categoryId && p.active,
   );
   const merged = [...explicitProducts];
@@ -148,9 +153,9 @@ export interface NicheQuery {
 }
 
 /** Matches products whose *installation niche* dimensions fit the entered opening. */
-export function findByNiche(query: NicheQuery): Product[] {
+export function findByNiche(query: NicheQuery, list: Product[] = products): Product[] {
   const tolerance = query.toleranceMm ?? 10;
-  return products.filter((p) => {
+  return list.filter((p) => {
     if (!p.active) return false;
     if (query.categorySlug && categorySlug(p.categoryId) !== query.categorySlug) return false;
     const niche = p.nicheDimensions ?? p.dimensions;

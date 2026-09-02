@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Heart, Scale, ShoppingBag } from "lucide-react";
 import { ApplianceArt } from "@/components/product/ApplianceArt";
 import { AvailabilityBadge } from "@/components/product/AvailabilityBadge";
@@ -38,8 +39,18 @@ export function ProductCard({ product, className }: { product: Product; classNam
       )}
     >
       <div className="relative">
-        <Link href={`/product/${product.slug}`} className="block">
-          <ApplianceArt kind={product.artKind} className="aspect-[4/3] transition-transform duration-300 group-hover:scale-[1.03]" />
+        <Link href={`/product/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden">
+          {product.images[0] ? (
+            <Image
+              src={product.images[0]}
+              alt={product.nameHe}
+              fill
+              sizes="(min-width: 1280px) 22vw, (min-width: 768px) 30vw, 45vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            />
+          ) : (
+            <ApplianceArt kind={product.artKind} className="h-full w-full transition-transform duration-300 group-hover:scale-[1.03]" />
+          )}
         </Link>
         <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
           {product.compareAtPrice ? <Badge tone="amber">מבצע</Badge> : <span />}
