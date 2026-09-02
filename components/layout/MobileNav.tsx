@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { ChevronDown, X, MessageCircle } from "lucide-react";
 import { categories } from "@/lib/data/categories";
@@ -9,10 +10,29 @@ import { SECONDARY_NAV_LINKS } from "@/lib/nav";
 
 export function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  if (!open) return null;
+  useEffect(() => setMounted(true), []);
 
-  return (
+  // Lock background scroll while the drawer is open.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  if (!open || !mounted) return null;
+
+  // Rendered via a portal straight into <body> — the header this button lives
+  // in uses backdrop-blur, which (like `filter`/`transform`) creates a CSS
+  // containing block for `position: fixed` descendants. Left inline, this
+  // drawer's "fixed inset-0" would resolve against the header's own (much
+  // shorter) box instead of the viewport, so it'd only cover the top slice of
+  // the screen instead of the full height. The portal sidesteps that entirely.
+  return createPortal(
     <div className="fixed inset-0 z-[70] lg:hidden">
       <div className="absolute inset-0 bg-charcoal-950/50" onClick={onClose} />
       <div className="absolute inset-y-0 start-0 flex w-[86%] max-w-sm flex-col overflow-y-auto bg-white shadow-2xl">
@@ -80,6 +100,7 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
           ייעוץ VIP בוואטסאפ
         </a>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

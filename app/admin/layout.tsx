@@ -33,7 +33,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <AdminLogoutButton />
       </aside>
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center gap-4 overflow-x-auto border-b border-sand-300 bg-white px-4 py-3 lg:hidden">
           {NAV.map((item) => (
             <Link key={item.href} href={item.href} className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-charcoal-700">
@@ -41,12 +41,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {item.label}
             </Link>
           ))}
-          <Link href="/" className="mr-auto flex shrink-0 items-center gap-1.5 text-sm text-charcoal-500">
+          <Link href="/" className="ms-auto flex shrink-0 items-center gap-1.5 text-sm text-charcoal-500">
             <ExternalLink size={14} />
             לאתר
           </Link>
         </div>
-        <main className="flex-1 p-5 sm:p-8">{children}</main>
+        <main className="min-w-0 flex-1 p-5 sm:p-8">{children}</main>
       </div>
     </div>
   );
