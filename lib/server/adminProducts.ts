@@ -1,4 +1,5 @@
 import { readJson, writeJson } from "@/lib/server/fileStore";
+import { getProductImageOverrides, setProductImages } from "@/lib/server/productImages";
 import { genId, slugify } from "@/lib/utils";
 import { categories } from "@/lib/data/categories";
 import { brands } from "@/lib/data/brands";
@@ -6,6 +7,7 @@ import { products as seedProducts } from "@/lib/data/products";
 import type { Product } from "@/lib/types";
 
 const FILE = "admin-products.json";
+const isSeedId = (id: string) => !id.startsWith("admin-");
 
 export function getAdminProducts(): Product[] {
   return readJson<Product[]>(FILE, []);
@@ -19,9 +21,45 @@ export function getAdminProductBySlug(slug: string): Product | undefined {
   return getAdminProducts().find((p) => p.slug === slug);
 }
 
-/** Static demo catalog + admin-added products, for use in Server Components/pages. */
+/**
+ * Static demo catalog (with any uploaded-image overrides applied) + admin-added
+ * products, for use in Server Components/pages. This is what customers see.
+ */
 export function getAllProducts(): Product[] {
-  return [...seedProducts, ...getAdminProducts()];
+  const imageOverrides = getProductImageOverrides();
+  const seedWithImages = seedProducts.map((p) =>
+    imageOverrides[p.id] ? { ...p, images: imageOverrides[p.id] } : p,
+  );
+  return [...seedWithImages, ...getAdminProducts()];
+}
+
+/** Any product (seed or admin-added), with image overrides applied — for the admin UI. */
+export function getAnyProductById(id: string): Product | undefined {
+  return getAllProducts().find((p) => p.id === id);
+}
+
+/**
+ * Updates only the images of a product, whichever kind it is: for a seed
+ * product this writes a lightweight image override (data-store/product-images.json)
+ * without touching any of its other fields (dimensions, spec groups, energy
+ * rating, etc. all stay exactly as defined in code); for an admin-added
+ * product it patches that product's own record directly.
+ */
+export function updateProductImages(id: string, images: string[]): Product | undefined {
+  if (isSeedId(id)) {
+    if (!seedProducts.some((p) => p.id === id)) return undefined;
+    setProductImages(id, images);
+    return getAnyProductById(id);
+  }
+  const all = getAdminProducts();
+  const existing = all.find((p) => p.id === id);
+  if (!existing) return undefined;
+  const updated = { ...existing, images };
+  writeJson(
+    FILE,
+    all.map((p) => (p.id === id ? updated : p)),
+  );
+  return updated;
 }
 
 export interface AdminProductInput {
