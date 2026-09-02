@@ -2,8 +2,14 @@ import { getSuppliers } from "@/lib/server/suppliers";
 import { PurchaseOrderForm } from "@/components/admin/PurchaseOrderForm";
 import { Button } from "@/components/ui/Button";
 
-export default async function NewPurchaseOrderPage() {
+export default async function NewPurchaseOrderPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const suppliers = getSuppliers();
+  const sp = await searchParams;
+  const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
 
   if (suppliers.length === 0) {
     return (
@@ -17,7 +23,12 @@ export default async function NewPurchaseOrderPage() {
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       <h1 className="font-heading text-2xl font-semibold text-charcoal-900">הזמנת רכש חדשה</h1>
-      <PurchaseOrderForm suppliers={suppliers} />
+      <PurchaseOrderForm
+        suppliers={suppliers}
+        initialProductName={str(sp.productName)}
+        initialDeliveryAddress={str(sp.deliveryAddress)}
+        initialNotes={str(sp.notes)}
+      />
     </div>
   );
 }

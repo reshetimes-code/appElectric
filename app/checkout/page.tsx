@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/Button";
 import { useCart } from "@/lib/context/CartContext";
 import { useCatalog } from "@/lib/context/CatalogContext";
 import { formatPrice } from "@/lib/utils";
-import { saveOrder } from "@/lib/orders";
 
 interface FormState {
   name: string;
@@ -54,17 +53,27 @@ export default function CheckoutPage() {
     return Object.keys(next).length === 0;
   }
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
-    const order = saveOrder({
-      lines: cart.lines,
-      subtotal: cart.subtotal,
-      deliveryOption: form.delivery === "standard" ? "משלוח סטנדרטי" : "משלוח מתואם",
-      customer: { name: form.name, phone: form.phone, email: form.email || undefined, address: form.address, city: form.city },
-      notes: form.notes || undefined,
+    const res = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lines: cart.lines,
+        subtotal: cart.subtotal,
+        deliveryOption: form.delivery === "standard" ? "משלוח סטנדרטי" : "משלוח מתואם",
+        customer: { name: form.name, phone: form.phone, email: form.email || undefined, address: form.address, city: form.city },
+        notes: form.notes || undefined,
+      }),
     });
+    setSubmitting(false);
+    if (!res.ok) {
+      setErrors((prev) => ({ ...prev, terms: "שליחת ההזמנה נכשלה, נסו שוב" }));
+      return;
+    }
+    const { order } = await res.json();
     cart.clear();
     router.push(`/order-confirmation?order=${order.orderNumber}`);
   }

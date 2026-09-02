@@ -7,16 +7,23 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { useCatalog } from "@/lib/context/CatalogContext";
 import { formatPrice } from "@/lib/utils";
-import { getOrder, type DemoOrder } from "@/lib/orders";
+import type { CustomerOrder } from "@/lib/types";
 
 function OrderConfirmationContent() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get("order") ?? "";
-  const [order, setOrder] = useState<DemoOrder | null | undefined>(undefined);
+  const [order, setOrder] = useState<CustomerOrder | null | undefined>(undefined);
   const { getProductsByIds } = useCatalog();
 
   useEffect(() => {
-    setOrder(orderNumber ? getOrder(orderNumber) ?? null : null);
+    if (!orderNumber) {
+      setOrder(null);
+      return;
+    }
+    fetch(`/api/orders/${orderNumber}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setOrder(data?.order ?? null))
+      .catch(() => setOrder(null));
   }, [orderNumber]);
 
   if (order === undefined) return null;

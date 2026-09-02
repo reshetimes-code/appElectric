@@ -6,14 +6,24 @@ import { Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import type { Supplier } from "@/lib/types";
 
-export function PurchaseOrderForm({ suppliers }: { suppliers: Supplier[] }) {
+export function PurchaseOrderForm({
+  suppliers,
+  initialProductName = "",
+  initialDeliveryAddress = "",
+  initialNotes = "",
+}: {
+  suppliers: Supplier[];
+  initialProductName?: string;
+  initialDeliveryAddress?: string;
+  initialNotes?: string;
+}) {
   const router = useRouter();
   const [supplierId, setSupplierId] = useState(suppliers[0]?.id ?? "");
-  const [productName, setProductName] = useState("");
+  const [productName, setProductName] = useState(initialProductName);
   const [costPrice, setCostPrice] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [notes, setNotes] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState(initialDeliveryAddress);
+  const [notes, setNotes] = useState(initialNotes);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 

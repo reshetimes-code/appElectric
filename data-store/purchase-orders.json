@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "po-mtjzxfnb-co6g7i",
+    "poNumber": "PO-1001",
+    "supplierId": "sup-mtjygvcv-qu2djj",
+    "supplierName": "בדיקה",
+    "supplierEmail": "oren1@gmail.com",
+    "supplierWhatsapp": "0523715599",
+    "productName": "אאאא",
+    "costPrice": 1000,
+    "quantity": 1,
+    "deliveryAddress": "דדגדג",
+    "notes": "דגדג",
+    "status": "draft",
+    "createdAt": "2026-09-02T11:11:41.687Z",
+    "updatedAt": "2026-09-02T11:11:41.687Z"
+  }
+]

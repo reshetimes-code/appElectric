@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, Package, Truck, ClipboardList, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Package, Truck, ClipboardList, ExternalLink, ShoppingBag } from "lucide-react";
 import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
 
 // The whole admin area reads data-store/*.json at request time (products,
@@ -13,6 +13,7 @@ export const dynamic = "force-dynamic";
 
 const NAV = [
   { href: "/admin", label: "דשבורד", icon: LayoutDashboard },
+  { href: "/admin/orders", label: "הזמנות", icon: ShoppingBag },
   { href: "/admin/products", label: "מוצרים", icon: Package },
   { href: "/admin/suppliers", label: "ספקים", icon: Truck },
   { href: "/admin/purchase-orders", label: "הזמנות רכש", icon: ClipboardList },

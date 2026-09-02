@@ -203,6 +203,20 @@ export interface CartLine {
   bundleId?: string;
 }
 
+export type OrderStatus = "new" | "processing" | "fulfilled";
+
+export interface CustomerOrder {
+  id: string;
+  orderNumber: string;
+  createdAt: string;
+  lines: CartLine[];
+  subtotal: number;
+  deliveryOption: string;
+  customer: { name: string; phone: string; email?: string; address: string; city: string };
+  notes?: string;
+  status: OrderStatus;
+}
+
 export type LeadSource = "vip" | "personal-import" | "trade-in" | "contact";
 
 export interface LeadPayload {
