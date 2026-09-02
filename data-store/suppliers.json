@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "sup-mtjygvcv-qu2djj",
+    "name": "בדיקה",
+    "email": "oren1@gmail.com",
+    "whatsapp": "0523715599",
+    "createdAt": "2026-09-02T10:30:49.279Z"
+  },
+  {
+    "id": "sup-mtjyhc59-qhh9c6",
+    "name": "בדיקנ",
+    "email": "oren1@gmail.com",
+    "whatsapp": "0523715599",
+    "createdAt": "2026-09-02T10:31:11.037Z"
+  }
+]

@@ -2,6 +2,15 @@ import Link from "next/link";
 import { LayoutDashboard, Package, Truck, ClipboardList, ExternalLink } from "lucide-react";
 import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
 
+// The whole admin area reads data-store/*.json at request time (products,
+// suppliers, purchase orders). Without this, Next.js's automatic static
+// optimization prerenders these pages once at build time (they call no
+// fetch(), read no cookies/headers directly) and then serves that frozen
+// snapshot forever from `next start` — so anything added after the build
+// (a supplier, a PO, a product) would never show up. This forces every page
+// under /admin to render fresh on each request instead.
+export const dynamic = "force-dynamic";
+
 const NAV = [
   { href: "/admin", label: "דשבורד", icon: LayoutDashboard },
   { href: "/admin/products", label: "מוצרים", icon: Package },
