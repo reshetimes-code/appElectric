@@ -22,6 +22,17 @@ const AVAILABILITY_OPTIONS: Product["availabilityStatus"][] = [
   "out-of-stock",
 ];
 
+// There's no manual "כמות במלאי" field in the form anymore — availability
+// status is the single source of truth, and stock quantity (still needed
+// for the admin low-stock alert, see app/admin/(dashboard)/page.tsx) is
+// derived from it. "limited" lands at the low-stock threshold on purpose.
+function stockQuantityForStatus(status: Product["availabilityStatus"], previous: number): number {
+  if (status === "out-of-stock") return 0;
+  if (status === "limited") return 3;
+  if (status === "personal-import") return 0;
+  return previous > 0 ? previous : 20;
+}
+
 export function ProductForm({
   brands,
   categories,
@@ -60,7 +71,6 @@ export function ProductForm({
   const [creatingSubcategory, setCreatingSubcategory] = useState(false);
   const [price, setPrice] = useState(initial?.price ?? 0);
   const [compareAtPrice, setCompareAtPrice] = useState(initial?.compareAtPrice ?? 0);
-  const [stockQuantity, setStockQuantity] = useState(initial?.stockQuantity ?? 0);
   const [availabilityStatus, setAvailabilityStatus] = useState<Product["availabilityStatus"]>(
     initial?.availabilityStatus ?? "in-stock",
   );
@@ -164,7 +174,7 @@ export function ProductForm({
       price: Number(price),
       compareAtPrice: compareAtPrice ? Number(compareAtPrice) : undefined,
       ...(mode === "full" ? { images } : {}),
-      stockQuantity: Number(stockQuantity),
+      stockQuantity: stockQuantityForStatus(availabilityStatus, initial?.stockQuantity ?? 0),
       availabilityStatus,
     };
     const url =
