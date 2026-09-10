@@ -11,7 +11,13 @@ const ADMIN_COOKIE = "appelectric_admin";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAdminArea = pathname.startsWith("/admin") && pathname !== "/admin/login";
-  const isAdminApi = pathname.startsWith("/api/admin") && pathname !== "/api/admin/login";
+  const isAdminApi =
+    pathname.startsWith("/api/admin") &&
+    pathname !== "/api/admin/login" &&
+    // Guarded by its own x-migration-secret check, not the admin cookie — it
+    // must be callable once, right after a fresh deploy, before anyone has
+    // logged into /admin.
+    pathname !== "/api/admin/migrate-to-firestore";
 
   if (!isAdminArea && !isAdminApi) return NextResponse.next();
 
