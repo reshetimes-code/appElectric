@@ -11,6 +11,6 @@ export async function POST(request: Request) {
   if (!body.customer?.name || !body.customer?.phone || !body.customer?.address || !body.lines?.length) {
     return NextResponse.json({ error: "פרטי הזמנה חסרים" }, { status: 400 });
   }
-  const order = createOrder(body);
+  const order = await createOrder(body);
   return NextResponse.json({ order }, { status: 201 });
 }

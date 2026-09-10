@@ -6,7 +6,7 @@ import { getOrderByNumber } from "@/lib/server/orders";
 // a guest checkout confirmation page).
 export async function GET(_request: Request, { params }: { params: Promise<{ orderNumber: string }> }) {
   const { orderNumber } = await params;
-  const order = getOrderByNumber(orderNumber);
+  const order = await getOrderByNumber(orderNumber);
   if (!order) return NextResponse.json({ error: "הזמנה לא נמצאה" }, { status: 404 });
   return NextResponse.json({ order });
 }

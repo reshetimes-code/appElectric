@@ -1,7 +1,7 @@
 import { ProductForm } from "@/components/admin/ProductForm";
 import { listBrandsAndCategoriesForForm } from "@/lib/server/adminProducts";
 
-export default function NewAdminProductPage() {
+export default async function NewAdminProductPage() {
   const { brands, categories } = listBrandsAndCategoriesForForm();
   return (
     <div className="flex max-w-3xl flex-col gap-6">

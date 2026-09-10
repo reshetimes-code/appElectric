@@ -17,7 +17,7 @@ const STATUS_TONE: Record<OrderStatus, "info" | "warning" | "success"> = {
 };
 
 export default async function AdminOrdersPage() {
-  const orders = getOrders();
+  const orders = await getOrders();
 
   return (
     <div className="flex flex-col gap-6">

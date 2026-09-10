@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSuppliers, createSupplier, type SupplierInput } from "@/lib/server/suppliers";
 
 export async function GET() {
-  return NextResponse.json({ suppliers: getSuppliers() });
+  return NextResponse.json({ suppliers: await getSuppliers() });
 }
 
 export async function POST(request: Request) {
@@ -10,6 +10,6 @@ export async function POST(request: Request) {
   if (!body.name?.trim() || !body.email?.trim() || !body.whatsapp?.trim()) {
     return NextResponse.json({ error: "יש למלא שם, מייל ווואטסאפ" }, { status: 400 });
   }
-  const supplier = createSupplier(body);
+  const supplier = await createSupplier(body);
   return NextResponse.json({ supplier }, { status: 201 });
 }

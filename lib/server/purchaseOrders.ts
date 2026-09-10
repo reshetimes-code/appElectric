@@ -4,12 +4,12 @@ import type { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types";
 
 const FILE = "purchase-orders.json";
 
-export function getPurchaseOrders(): PurchaseOrder[] {
-  return readJson<PurchaseOrder[]>(FILE, []).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
+  return (await readJson<PurchaseOrder[]>(FILE, [])).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }
 
-export function getPurchaseOrderById(id: string): PurchaseOrder | undefined {
-  return getPurchaseOrders().find((po) => po.id === id);
+export async function getPurchaseOrderById(id: string): Promise<PurchaseOrder | undefined> {
+  return (await getPurchaseOrders()).find((po) => po.id === id);
 }
 
 export interface PurchaseOrderInput {
@@ -26,8 +26,8 @@ export interface PurchaseOrderInput {
 
 let poCounter = 1000;
 
-export function createPurchaseOrder(input: PurchaseOrderInput): PurchaseOrder {
-  const all = readJson<PurchaseOrder[]>(FILE, []);
+export async function createPurchaseOrder(input: PurchaseOrderInput): Promise<PurchaseOrder> {
+  const all = await readJson<PurchaseOrder[]>(FILE, []);
   poCounter = Math.max(poCounter, all.length + 1000);
   const now = new Date().toISOString();
   const po: PurchaseOrder = {
@@ -38,16 +38,16 @@ export function createPurchaseOrder(input: PurchaseOrderInput): PurchaseOrder {
     createdAt: now,
     updatedAt: now,
   };
-  writeJson(FILE, [...all, po]);
+  await writeJson(FILE, [...all, po]);
   return po;
 }
 
-export function updatePurchaseOrderStatus(
+export async function updatePurchaseOrderStatus(
   id: string,
   status: PurchaseOrderStatus,
   sentVia?: "whatsapp" | "email",
-): PurchaseOrder | undefined {
-  const all = readJson<PurchaseOrder[]>(FILE, []);
+): Promise<PurchaseOrder | undefined> {
+  const all = await readJson<PurchaseOrder[]>(FILE, []);
   const existing = all.find((po) => po.id === id);
   if (!existing) return undefined;
   const updated: PurchaseOrder = {
@@ -57,17 +57,17 @@ export function updatePurchaseOrderStatus(
     sentAt: status === "sent" && !existing.sentAt ? new Date().toISOString() : existing.sentAt,
     sentVia: sentVia ? Array.from(new Set([...(existing.sentVia ?? []), sentVia])) : existing.sentVia,
   };
-  writeJson(
+  await writeJson(
     FILE,
     all.map((po) => (po.id === id ? updated : po)),
   );
   return updated;
 }
 
-export function deletePurchaseOrder(id: string): boolean {
-  const all = readJson<PurchaseOrder[]>(FILE, []);
+export async function deletePurchaseOrder(id: string): Promise<boolean> {
+  const all = await readJson<PurchaseOrder[]>(FILE, []);
   const next = all.filter((po) => po.id !== id);
   const changed = next.length !== all.length;
-  if (changed) writeJson(FILE, next);
+  if (changed) await writeJson(FILE, next);
   return changed;
 }

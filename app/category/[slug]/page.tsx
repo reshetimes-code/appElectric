@@ -32,7 +32,7 @@ export default async function CategoryDetailPage({
 
   const sp = await searchParams;
   const filters = { ...parseFilters(sp), category: slug };
-  const products = getProducts(filters, getAllProducts());
+  const products = getProducts(filters, await getAllProducts());
   const page = sp.page ? Number(Array.isArray(sp.page) ? sp.page[0] : sp.page) : 1;
 
   const buildPageHref = (p: number) => {

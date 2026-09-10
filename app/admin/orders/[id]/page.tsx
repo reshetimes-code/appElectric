@@ -14,10 +14,10 @@ const STATUS_TONE: Record<OrderStatus, "info" | "warning" | "success"> = { new: 
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const order = getOrderById(id);
+  const order = await getOrderById(id);
   if (!order) notFound();
 
-  const allProducts = getAllProducts();
+  const allProducts = await getAllProducts();
   const productMap = new Map(allProducts.map((p) => [p.id, p]));
   const address = `${order.customer.address}, ${order.customer.city}`;
 

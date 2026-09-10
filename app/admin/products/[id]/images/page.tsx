@@ -5,7 +5,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
 export default async function ProductImagesPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = getAnyProductById(id);
+  const product = await getAnyProductById(id);
   if (!product) notFound();
 
   return (

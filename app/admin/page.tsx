@@ -8,10 +8,10 @@ import { products as seedProducts } from "@/lib/data/products";
 import { formatPrice } from "@/lib/utils";
 
 export default async function AdminDashboardPage() {
-  const adminProducts = getAdminProducts();
-  const suppliers = getSuppliers();
-  const purchaseOrders = getPurchaseOrders();
-  const orders = getOrders();
+  const adminProducts = await getAdminProducts();
+  const suppliers = await getSuppliers();
+  const purchaseOrders = await getPurchaseOrders();
+  const orders = await getOrders();
   const totalProducts = adminProducts.length + seedProducts.length;
   const lowStock = [...adminProducts, ...seedProducts].filter((p) => p.manageStock && p.stockQuantity > 0 && p.stockQuantity <= 3);
   const openPOs = purchaseOrders.filter((po) => po.status !== "shipped");

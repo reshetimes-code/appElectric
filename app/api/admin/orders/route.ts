@@ -2,5 +2,5 @@ import { NextResponse } from "next/server";
 import { getOrders } from "@/lib/server/orders";
 
 export async function GET() {
-  return NextResponse.json({ orders: getOrders() });
+  return NextResponse.json({ orders: await getOrders() });
 }

@@ -6,7 +6,7 @@ import { formatPrice } from "@/lib/utils";
 
 export default async function PurchaseOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const po = getPurchaseOrderById(id);
+  const po = await getPurchaseOrderById(id);
   if (!po) notFound();
 
   return (

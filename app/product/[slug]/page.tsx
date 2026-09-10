@@ -20,13 +20,21 @@ import { getBrandBySlug } from "@/lib/data/brands";
 import { productJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { ShieldCheck, Info } from "lucide-react";
 
+// Product data now lives in Firestore (admin-added products, image overrides)
+// rather than the local filesystem, so it can change at any time without a
+// redeploy — same reason app/admin/layout.tsx forces dynamic rendering for
+// the admin section. Pre-rendering all product slugs at build time would
+// both require live Firestore credentials during the build and freeze pages
+// at their build-time snapshot, so this route renders per-request instead.
+export const dynamic = "force-dynamic";
+
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getAllProducts().find((p) => p.slug === slug);
+  const product = (await getAllProducts()).find((p) => p.slug === slug);
   if (!product) return {};
   return {
     title: product.seoTitle ?? product.nameHe,
@@ -36,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const allProducts = getAllProducts();
+  const allProducts = await getAllProducts();
   const product = allProducts.find((p) => p.slug === slug);
   if (!product) notFound();
 

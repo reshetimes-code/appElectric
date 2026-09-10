@@ -7,7 +7,7 @@ export default async function NewPurchaseOrderPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const suppliers = getSuppliers();
+  const suppliers = await getSuppliers();
   const sp = await searchParams;
   const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
 

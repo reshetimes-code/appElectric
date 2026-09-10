@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAdminProducts, createAdminProduct, type AdminProductInput } from "@/lib/server/adminProducts";
 
 export async function GET() {
-  return NextResponse.json({ products: getAdminProducts() });
+  return NextResponse.json({ products: await getAdminProducts() });
 }
 
 export async function POST(request: Request) {
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "מחיר לא תקין" }, { status: 400 });
   }
 
-  const product = createAdminProduct({
+  const product = await createAdminProduct({
     ...body,
     images: body.images ?? [],
     stockQuantity: body.stockQuantity ?? 0,

@@ -8,8 +8,8 @@ import { formatPrice } from "@/lib/utils";
 import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
 
 export default async function AdminProductsPage() {
-  const adminProducts = getAdminProducts();
-  const allProducts = getAllProducts();
+  const adminProducts = await getAdminProducts();
+  const allProducts = await getAllProducts();
 
   return (
     <div className="flex flex-col gap-6">

@@ -9,33 +9,33 @@ import type { Product } from "@/lib/types";
 const FILE = "admin-products.json";
 const isSeedId = (id: string) => !id.startsWith("admin-");
 
-export function getAdminProducts(): Product[] {
+export async function getAdminProducts(): Promise<Product[]> {
   return readJson<Product[]>(FILE, []);
 }
 
-export function getAdminProductById(id: string): Product | undefined {
-  return getAdminProducts().find((p) => p.id === id);
+export async function getAdminProductById(id: string): Promise<Product | undefined> {
+  return (await getAdminProducts()).find((p) => p.id === id);
 }
 
-export function getAdminProductBySlug(slug: string): Product | undefined {
-  return getAdminProducts().find((p) => p.slug === slug);
+export async function getAdminProductBySlug(slug: string): Promise<Product | undefined> {
+  return (await getAdminProducts()).find((p) => p.slug === slug);
 }
 
 /**
  * Static demo catalog (with any uploaded-image overrides applied) + admin-added
  * products, for use in Server Components/pages. This is what customers see.
  */
-export function getAllProducts(): Product[] {
-  const imageOverrides = getProductImageOverrides();
+export async function getAllProducts(): Promise<Product[]> {
+  const imageOverrides = await getProductImageOverrides();
   const seedWithImages = seedProducts.map((p) =>
     imageOverrides[p.id] ? { ...p, images: imageOverrides[p.id] } : p,
   );
-  return [...seedWithImages, ...getAdminProducts()];
+  return [...seedWithImages, ...(await getAdminProducts())];
 }
 
 /** Any product (seed or admin-added), with image overrides applied — for the admin UI. */
-export function getAnyProductById(id: string): Product | undefined {
-  return getAllProducts().find((p) => p.id === id);
+export async function getAnyProductById(id: string): Promise<Product | undefined> {
+  return (await getAllProducts()).find((p) => p.id === id);
 }
 
 /**
@@ -45,17 +45,17 @@ export function getAnyProductById(id: string): Product | undefined {
  * rating, etc. all stay exactly as defined in code); for an admin-added
  * product it patches that product's own record directly.
  */
-export function updateProductImages(id: string, images: string[]): Product | undefined {
+export async function updateProductImages(id: string, images: string[]): Promise<Product | undefined> {
   if (isSeedId(id)) {
     if (!seedProducts.some((p) => p.id === id)) return undefined;
-    setProductImages(id, images);
+    await setProductImages(id, images);
     return getAnyProductById(id);
   }
-  const all = getAdminProducts();
+  const all = await getAdminProducts();
   const existing = all.find((p) => p.id === id);
   if (!existing) return undefined;
   const updated = { ...existing, images };
-  writeJson(
+  await writeJson(
     FILE,
     all.map((p) => (p.id === id ? updated : p)),
   );
@@ -114,32 +114,32 @@ function buildFromInput(id: string, slug: string, input: AdminProductInput, crea
   };
 }
 
-export function createAdminProduct(input: AdminProductInput): Product {
-  const all = getAdminProducts();
+export async function createAdminProduct(input: AdminProductInput): Promise<Product> {
+  const all = await getAdminProducts();
   const id = `admin-${genId()}`;
   const slug = slugify(`${input.nameHe}-${input.sku}`) || id;
   const product = buildFromInput(id, slug, input, new Date().toISOString());
-  writeJson(FILE, [...all, product]);
+  await writeJson(FILE, [...all, product]);
   return product;
 }
 
-export function updateAdminProduct(id: string, input: AdminProductInput): Product | undefined {
-  const all = getAdminProducts();
+export async function updateAdminProduct(id: string, input: AdminProductInput): Promise<Product | undefined> {
+  const all = await getAdminProducts();
   const existing = all.find((p) => p.id === id);
   if (!existing) return undefined;
   const updated = buildFromInput(id, existing.slug, input, existing.createdAt);
-  writeJson(
+  await writeJson(
     FILE,
     all.map((p) => (p.id === id ? updated : p)),
   );
   return updated;
 }
 
-export function deleteAdminProduct(id: string): boolean {
-  const all = getAdminProducts();
+export async function deleteAdminProduct(id: string): Promise<boolean> {
+  const all = await getAdminProducts();
   const next = all.filter((p) => p.id !== id);
   const changed = next.length !== all.length;
-  if (changed) writeJson(FILE, next);
+  if (changed) await writeJson(FILE, next);
   return changed;
 }
 

@@ -20,7 +20,7 @@ const STATUS_TONE: Record<PurchaseOrderStatus, "muted" | "info" | "warning" | "s
 };
 
 export default async function AdminPurchaseOrdersPage() {
-  const purchaseOrders = getPurchaseOrders();
+  const purchaseOrders = await getPurchaseOrders();
 
   return (
     <div className="flex flex-col gap-6">

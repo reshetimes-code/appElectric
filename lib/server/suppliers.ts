@@ -4,12 +4,12 @@ import type { Supplier } from "@/lib/types";
 
 const FILE = "suppliers.json";
 
-export function getSuppliers(): Supplier[] {
+export async function getSuppliers(): Promise<Supplier[]> {
   return readJson<Supplier[]>(FILE, []);
 }
 
-export function getSupplierById(id: string): Supplier | undefined {
-  return getSuppliers().find((s) => s.id === id);
+export async function getSupplierById(id: string): Promise<Supplier | undefined> {
+  return (await getSuppliers()).find((s) => s.id === id);
 }
 
 export interface SupplierInput {
@@ -18,17 +18,17 @@ export interface SupplierInput {
   whatsapp: string;
 }
 
-export function createSupplier(input: SupplierInput): Supplier {
-  const all = getSuppliers();
+export async function createSupplier(input: SupplierInput): Promise<Supplier> {
+  const all = await getSuppliers();
   const supplier: Supplier = { id: genId("sup"), ...input, createdAt: new Date().toISOString() };
-  writeJson(FILE, [...all, supplier]);
+  await writeJson(FILE, [...all, supplier]);
   return supplier;
 }
 
-export function deleteSupplier(id: string): boolean {
-  const all = getSuppliers();
+export async function deleteSupplier(id: string): Promise<boolean> {
+  const all = await getSuppliers();
   const next = all.filter((s) => s.id !== id);
   const changed = next.length !== all.length;
-  if (changed) writeJson(FILE, next);
+  if (changed) await writeJson(FILE, next);
   return changed;
 }

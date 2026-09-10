@@ -7,7 +7,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (!Array.isArray(body.images)) {
     return NextResponse.json({ error: "רשימת תמונות לא תקינה" }, { status: 400 });
   }
-  const product = updateProductImages(id, body.images);
+  const product = await updateProductImages(id, body.images);
   if (!product) return NextResponse.json({ error: "מוצר לא נמצא" }, { status: 404 });
   return NextResponse.json({ product });
 }

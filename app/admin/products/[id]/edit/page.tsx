@@ -4,7 +4,7 @@ import { getAdminProductById, listBrandsAndCategoriesForForm } from "@/lib/serve
 
 export default async function EditAdminProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = getAdminProductById(id);
+  const product = await getAdminProductById(id);
   if (!product) notFound();
 
   const { brands, categories } = listBrandsAndCategoriesForForm();

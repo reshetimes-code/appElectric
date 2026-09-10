@@ -4,16 +4,16 @@ import type { CustomerOrder, CartLine, OrderStatus } from "@/lib/types";
 
 const FILE = "orders.json";
 
-export function getOrders(): CustomerOrder[] {
-  return readJson<CustomerOrder[]>(FILE, []).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+export async function getOrders(): Promise<CustomerOrder[]> {
+  return (await readJson<CustomerOrder[]>(FILE, [])).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }
 
-export function getOrderByNumber(orderNumber: string): CustomerOrder | undefined {
-  return getOrders().find((o) => o.orderNumber === orderNumber);
+export async function getOrderByNumber(orderNumber: string): Promise<CustomerOrder | undefined> {
+  return (await getOrders()).find((o) => o.orderNumber === orderNumber);
 }
 
-export function getOrderById(id: string): CustomerOrder | undefined {
-  return getOrders().find((o) => o.id === id);
+export async function getOrderById(id: string): Promise<CustomerOrder | undefined> {
+  return (await getOrders()).find((o) => o.id === id);
 }
 
 export interface OrderInput {
@@ -24,8 +24,8 @@ export interface OrderInput {
   notes?: string;
 }
 
-export function createOrder(input: OrderInput): CustomerOrder {
-  const all = readJson<CustomerOrder[]>(FILE, []);
+export async function createOrder(input: OrderInput): Promise<CustomerOrder> {
+  const all = await readJson<CustomerOrder[]>(FILE, []);
   const order: CustomerOrder = {
     id: genId("order"),
     orderNumber: genId("AE").toUpperCase(),
@@ -33,16 +33,16 @@ export function createOrder(input: OrderInput): CustomerOrder {
     status: "new",
     ...input,
   };
-  writeJson(FILE, [...all, order]);
+  await writeJson(FILE, [...all, order]);
   return order;
 }
 
-export function updateOrderStatus(id: string, status: OrderStatus): CustomerOrder | undefined {
-  const all = readJson<CustomerOrder[]>(FILE, []);
+export async function updateOrderStatus(id: string, status: OrderStatus): Promise<CustomerOrder | undefined> {
+  const all = await readJson<CustomerOrder[]>(FILE, []);
   const existing = all.find((o) => o.id === id);
   if (!existing) return undefined;
   const updated = { ...existing, status };
-  writeJson(
+  await writeJson(
     FILE,
     all.map((o) => (o.id === id ? updated : o)),
   );

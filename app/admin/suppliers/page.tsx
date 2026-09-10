@@ -4,7 +4,7 @@ import { DeleteSupplierButton } from "@/components/admin/DeleteSupplierButton";
 import { Truck } from "lucide-react";
 
 export default async function AdminSuppliersPage() {
-  const suppliers = getSuppliers();
+  const suppliers = await getSuppliers();
 
   return (
     <div className="flex flex-col gap-6">

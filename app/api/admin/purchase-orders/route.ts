@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getPurchaseOrders, createPurchaseOrder, type PurchaseOrderInput } from "@/lib/server/purchaseOrders";
 
 export async function GET() {
-  return NextResponse.json({ purchaseOrders: getPurchaseOrders() });
+  return NextResponse.json({ purchaseOrders: await getPurchaseOrders() });
 }
 
 export async function POST(request: Request) {
@@ -13,6 +13,6 @@ export async function POST(request: Request) {
   if (!Number.isFinite(body.costPrice) || body.costPrice < 0) {
     return NextResponse.json({ error: "מחיר עלות לא תקין" }, { status: 400 });
   }
-  const po = createPurchaseOrder({ ...body, quantity: body.quantity || 1 });
+  const po = await createPurchaseOrder({ ...body, quantity: body.quantity || 1 });
   return NextResponse.json({ purchaseOrder: po }, { status: 201 });
 }

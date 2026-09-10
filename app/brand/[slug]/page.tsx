@@ -33,7 +33,7 @@ export default async function BrandDetailPage({
 
   const sp = await searchParams;
   const filters = { ...parseFilters(sp), brand: [slug] };
-  const products = getProducts(filters, getAllProducts());
+  const products = getProducts(filters, await getAllProducts());
   const page = sp.page ? Number(Array.isArray(sp.page) ? sp.page[0] : sp.page) : 1;
 
   const buildPageHref = (p: number) => (p > 1 ? `/brand/${slug}?page=${p}` : `/brand/${slug}`);
