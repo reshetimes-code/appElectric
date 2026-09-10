@@ -7,7 +7,7 @@ import {
 } from "@/lib/server/productDetailOverrides";
 import { genId, slugify } from "@/lib/utils";
 import { getAllCategories } from "@/lib/server/adminCategories";
-import { brands } from "@/lib/data/brands";
+import { getAllBrands } from "@/lib/server/adminBrands";
 import { products as seedProducts } from "@/lib/data/products";
 import type { Product } from "@/lib/types";
 
@@ -204,7 +204,7 @@ export async function deleteAdminProduct(id: string): Promise<boolean> {
 }
 
 export async function listBrandsAndCategoriesForForm() {
-  const categories = await getAllCategories();
+  const [brands, categories] = await Promise.all([getAllBrands(), getAllCategories()]);
   return {
     brands: brands.map((b) => ({ id: b.id, nameHe: b.nameHe })),
     categories: categories.map((c) => ({

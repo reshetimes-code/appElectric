@@ -1,5 +1,6 @@
 import { readJson, writeJson } from "@/lib/server/fileStore";
 import { categories as seedCategories } from "@/lib/data/categories";
+import { getAdminSubcategories } from "@/lib/server/adminSubcategories";
 import { PHOTOS } from "@/lib/images";
 import { genId, slugify } from "@/lib/utils";
 import type { Category } from "@/lib/types";
@@ -17,10 +18,16 @@ export async function getAdminCategories(): Promise<Category[]> {
   return readJson<Category[]>(FILE, []);
 }
 
-/** Static catalog categories + admin-added ones — what customers browse
- * (nav, category pages) and what the product form offers. */
+/** Static catalog categories + admin-added ones, each with any admin-added
+ * subcategories merged in — what customers browse (nav, category pages) and
+ * what the product form offers. */
 export async function getAllCategories(): Promise<Category[]> {
-  return [...seedCategories, ...(await getAdminCategories())];
+  const [adminCategories, adminSubcategories] = await Promise.all([getAdminCategories(), getAdminSubcategories()]);
+  return [...seedCategories, ...adminCategories].map((c) =>
+    adminSubcategories[c.id]?.length
+      ? { ...c, subcategories: [...c.subcategories, ...adminSubcategories[c.id]] }
+      : c,
+  );
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {

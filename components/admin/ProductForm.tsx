@@ -44,13 +44,20 @@ export function ProductForm({
   const [model, setModel] = useState(initial?.model ?? "");
   const [shortDescriptionHe, setShortDescriptionHe] = useState(initial?.shortDescriptionHe ?? "");
   const [descriptionHe, setDescriptionHe] = useState(initial?.descriptionHe ?? "");
+  const [brandList, setBrandList] = useState<FormBrand[]>(brands);
   const [brandId, setBrandId] = useState(initial?.brandId ?? brands[0]?.id ?? "");
+  const [addingBrand, setAddingBrand] = useState(false);
+  const [newBrandName, setNewBrandName] = useState("");
+  const [creatingBrand, setCreatingBrand] = useState(false);
   const [categoryList, setCategoryList] = useState<FormCategory[]>(categories);
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? categories[0]?.id ?? "");
   const [subcategoryId, setSubcategoryId] = useState(initial?.subcategoryId ?? categories[0]?.subcategories[0]?.id ?? "");
   const [addingCategory, setAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [creatingCategory, setCreatingCategory] = useState(false);
+  const [addingSubcategory, setAddingSubcategory] = useState(false);
+  const [newSubcategoryName, setNewSubcategoryName] = useState("");
+  const [creatingSubcategory, setCreatingSubcategory] = useState(false);
   const [price, setPrice] = useState(initial?.price ?? 0);
   const [compareAtPrice, setCompareAtPrice] = useState(initial?.compareAtPrice ?? 0);
   const [stockQuantity, setStockQuantity] = useState(initial?.stockQuantity ?? 0);
@@ -62,6 +69,56 @@ export function ProductForm({
   const showSpinner = useDelayedPending(saving, 500);
 
   const activeCategory = categoryList.find((c) => c.id === categoryId);
+
+  async function createBrand() {
+    if (!newBrandName.trim()) {
+      showError("יש להזין שם מותג");
+      return;
+    }
+    setCreatingBrand(true);
+    const res = await fetch("/api/admin/brands", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nameHe: newBrandName }),
+    });
+    setCreatingBrand(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      showError(data.error || "יצירת המותג נכשלה");
+      return;
+    }
+    const { brand } = await res.json();
+    setBrandList((prev) => [...prev, brand]);
+    setBrandId(brand.id);
+    setNewBrandName("");
+    setAddingBrand(false);
+  }
+
+  async function createSubcategory() {
+    if (!newSubcategoryName.trim()) {
+      showError("יש להזין שם תת-קטגוריה");
+      return;
+    }
+    setCreatingSubcategory(true);
+    const res = await fetch("/api/admin/subcategories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ categoryId, nameHe: newSubcategoryName }),
+    });
+    setCreatingSubcategory(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      showError(data.error || "יצירת תת-הקטגוריה נכשלה");
+      return;
+    }
+    const { subcategory } = await res.json();
+    setCategoryList((prev) =>
+      prev.map((c) => (c.id === categoryId ? { ...c, subcategories: [...c.subcategories, subcategory] } : c)),
+    );
+    setSubcategoryId(subcategory.id);
+    setNewSubcategoryName("");
+    setAddingSubcategory(false);
+  }
 
   async function createCategory() {
     if (!newCategoryName.trim()) {
@@ -173,10 +230,50 @@ export function ProductForm({
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">מותג *</label>
             <select value={brandId} onChange={(e) => setBrandId(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm">
-              {brands.map((b) => (
+              {brandList.map((b) => (
                 <option key={b.id} value={b.id}>{b.nameHe}</option>
               ))}
             </select>
+            {!addingBrand ? (
+              <button
+                type="button"
+                onClick={() => setAddingBrand(true)}
+                className="mt-1.5 flex items-center gap-1 text-xs font-medium text-brand-700 hover:text-brand-800"
+              >
+                <Plus size={13} />
+                מותג חדש
+              </button>
+            ) : (
+              <div className="mt-1.5 flex items-center gap-1.5">
+                <input
+                  value={newBrandName}
+                  onChange={(e) => setNewBrandName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      createBrand();
+                    }
+                  }}
+                  placeholder="שם המותג החדש"
+                  autoFocus
+                  className="h-9 flex-1 rounded-[var(--radius-control)] border border-sand-300 px-2.5 text-sm"
+                />
+                <Button type="button" onClick={createBrand} size="sm" disabled={creatingBrand}>
+                  {creatingBrand ? <Spinner size={15} /> : "הוסף"}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddingBrand(false);
+                    setNewBrandName("");
+                  }}
+                  aria-label="ביטול"
+                  className="rounded-full p-1.5 text-charcoal-400 hover:bg-sand-100"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            )}
           </div>
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">קטגוריה *</label>
@@ -186,6 +283,8 @@ export function ProductForm({
                 setCategoryId(e.target.value);
                 const cat = categoryList.find((c) => c.id === e.target.value);
                 setSubcategoryId(cat?.subcategories[0]?.id ?? "");
+                setAddingSubcategory(false);
+                setNewSubcategoryName("");
               }}
               className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm"
             >
@@ -241,13 +340,53 @@ export function ProductForm({
                 <option key={s.id} value={s.id}>{s.nameHe}</option>
               ))}
             </select>
+            {!addingSubcategory ? (
+              <button
+                type="button"
+                onClick={() => setAddingSubcategory(true)}
+                className="mt-1.5 flex items-center gap-1 text-xs font-medium text-brand-700 hover:text-brand-800"
+              >
+                <Plus size={13} />
+                תת-קטגוריה חדשה
+              </button>
+            ) : (
+              <div className="mt-1.5 flex items-center gap-1.5">
+                <input
+                  value={newSubcategoryName}
+                  onChange={(e) => setNewSubcategoryName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      createSubcategory();
+                    }
+                  }}
+                  placeholder="שם תת-הקטגוריה החדשה"
+                  autoFocus
+                  className="h-9 flex-1 rounded-[var(--radius-control)] border border-sand-300 px-2.5 text-sm"
+                />
+                <Button type="button" onClick={createSubcategory} size="sm" disabled={creatingSubcategory}>
+                  {creatingSubcategory ? <Spinner size={15} /> : "הוסף"}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddingSubcategory(false);
+                    setNewSubcategoryName("");
+                  }}
+                  aria-label="ביטול"
+                  className="rounded-full p-1.5 text-charcoal-400 hover:bg-sand-100"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       <div className="rounded-[var(--radius-card)] border border-sand-300 bg-white p-5">
         <h2 className="mb-4 font-heading text-base font-semibold text-charcoal-900">מחיר ומלאי</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">מחיר (₪) *</label>
             <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
@@ -255,10 +394,6 @@ export function ProductForm({
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">מחיר קודם (מבצע)</label>
             <input type="number" value={compareAtPrice} onChange={(e) => setCompareAtPrice(Number(e.target.value))} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm text-charcoal-600">כמות במלאי</label>
-            <input type="number" value={stockQuantity} onChange={(e) => setStockQuantity(Number(e.target.value))} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
           </div>
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">זמינות</label>
