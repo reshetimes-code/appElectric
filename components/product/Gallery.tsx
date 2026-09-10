@@ -28,7 +28,7 @@ export function Gallery({
               alt={name}
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              className="object-contain p-4 transition-transform duration-500 group-hover:scale-105 sm:p-6"
             />
           </div>
         ) : (
@@ -42,7 +42,7 @@ export function Gallery({
       </div>
 
       {images.length > 1 && (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {images.map((src, i) => (
             <button
               key={src}
@@ -50,11 +50,11 @@ export function Gallery({
               onClick={() => setActive(i)}
               aria-label={`תמונה ${i + 1}`}
               className={cn(
-                "relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2",
+                "relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 bg-white sm:h-16 sm:w-16",
                 i === active ? "border-brand-600" : "border-sand-300",
               )}
             >
-              <Image src={src} alt="" fill className="object-cover" />
+              <Image src={src} alt="" fill sizes="64px" className="object-contain p-1.5" />
             </button>
           ))}
         </div>
