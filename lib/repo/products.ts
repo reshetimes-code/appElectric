@@ -1,7 +1,7 @@
 import { products } from "@/lib/data/products";
 import { categories } from "@/lib/data/categories";
 import { brands } from "@/lib/data/brands";
-import type { Product } from "@/lib/types";
+import type { Category, Product } from "@/lib/types";
 
 export interface ProductFilters {
   category?: string; // category slug
@@ -24,16 +24,20 @@ function brandSlug(brandId: string) {
   return brands.find((b) => b.id === brandId)?.slug ?? brandId;
 }
 
-function categorySlug(categoryId: string) {
-  return categories.find((c) => c.id === categoryId)?.slug ?? categoryId;
+function categorySlug(categoryId: string, categoryList: Category[] = categories) {
+  return categoryList.find((c) => c.id === categoryId)?.slug ?? categoryId;
 }
 
-export function matchesFilters(product: Product, filters: ProductFilters): boolean {
+// categoryList defaults to the static seed categories but, like the `list`
+// param above for products, accepts the seed catalog merged with
+// admin-added categories (see lib/server/adminCategories.ts) so filtering
+// works correctly for products filed under an admin-added category too.
+export function matchesFilters(product: Product, filters: ProductFilters, categoryList: Category[] = categories): boolean {
   if (!product.active) return false;
-  if (filters.category && categorySlug(product.categoryId) !== filters.category) return false;
+  if (filters.category && categorySlug(product.categoryId, categoryList) !== filters.category) return false;
   if (filters.subcategory && product.subcategoryId !== filters.subcategory) {
     // subcategory ids are stable slugs used directly (see categories.ts subcategory.id)
-    const category = categories.find((c) => c.id === product.categoryId);
+    const category = categoryList.find((c) => c.id === product.categoryId);
     const sub = category?.subcategories.find((s) => s.slug === filters.subcategory);
     if (!sub || sub.id !== product.subcategoryId) return false;
   }
@@ -107,8 +111,12 @@ export function parseFilters(sp: SearchParamsLike): ProductFilters {
 // merged with admin-added products (see lib/server/adminProducts.ts) without
 // this file — which is also imported by client components — ever touching fs.
 
-export function getProducts(filters: ProductFilters = {}, list: Product[] = products): Product[] {
-  const filtered = list.filter((p) => matchesFilters(p, filters));
+export function getProducts(
+  filters: ProductFilters = {},
+  list: Product[] = products,
+  categoryList: Category[] = categories,
+): Product[] {
+  const filtered = list.filter((p) => matchesFilters(p, filters, categoryList));
   return sortProducts(filtered, filters.sort);
 }
 
@@ -153,11 +161,11 @@ export interface NicheQuery {
 }
 
 /** Matches products whose *installation niche* dimensions fit the entered opening. */
-export function findByNiche(query: NicheQuery, list: Product[] = products): Product[] {
+export function findByNiche(query: NicheQuery, list: Product[] = products, categoryList: Category[] = categories): Product[] {
   const tolerance = query.toleranceMm ?? 10;
   return list.filter((p) => {
     if (!p.active) return false;
-    if (query.categorySlug && categorySlug(p.categoryId) !== query.categorySlug) return false;
+    if (query.categorySlug && categorySlug(p.categoryId, categoryList) !== query.categorySlug) return false;
     const niche = p.nicheDimensions ?? p.dimensions;
     if (!niche.widthMm) return false;
     const fitsWidth = niche.widthMm <= query.widthMm + tolerance;

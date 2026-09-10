@@ -15,7 +15,7 @@ import { Container } from "@/components/ui/Container";
 import { products } from "@/lib/data/products";
 import { getRelatedProducts } from "@/lib/repo/products";
 import { getAllProducts } from "@/lib/server/adminProducts";
-import { categories } from "@/lib/data/categories";
+import { getAllCategories } from "@/lib/server/adminCategories";
 import { getBrandBySlug } from "@/lib/data/brands";
 import { productJsonLd, breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo";
 import { ShieldCheck, Info } from "lucide-react";
@@ -49,7 +49,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   if (!product) notFound();
 
   const productBrand = getBrandBySlug(product.brandId) ?? { nameHe: "", slug: "" };
-  const category = categories.find((c) => c.id === product.categoryId);
+  const category = (await getAllCategories()).find((c) => c.id === product.categoryId);
   const related = getRelatedProducts(product, 4, allProducts);
 
   const jsonLd = productJsonLd(product);
@@ -85,7 +85,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 {product.premium && <Badge tone="brand">פרימיום</Badge>}
               </div>
               <h1 className="font-heading text-2xl font-bold text-charcoal-900 sm:text-3xl">{product.nameHe}</h1>
-              <p className="mt-1 text-sm text-charcoal-500">דגם {product.model} · מק&quot;ט {product.sku}</p>
+              <p className="mt-1 text-sm text-charcoal-500">דגם {product.model}</p>
             </div>
 
             <p className="leading-relaxed text-charcoal-600">{product.shortDescriptionHe}</p>

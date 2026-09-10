@@ -2,11 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { MessageCircle, Mail, CheckCircle2, PackageCheck, Info } from "lucide-react";
+import { MessageCircle, Mail, Link2, CheckCircle2, PackageCheck, Info } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
+import { useToast } from "@/components/ui/ToastProvider";
 import { formatPrice } from "@/lib/utils";
 import type { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types";
 
@@ -23,15 +24,17 @@ const STATUS_TONE: Record<PurchaseOrderStatus, "muted" | "info" | "warning" | "s
   shipped: "success",
 };
 
+function poDocumentLink(po: PurchaseOrder) {
+  return `${window.location.origin}/po/${po.id}`;
+}
+
 function buildMessage(po: PurchaseOrder) {
   return [
-    `הזמנת רכש ${po.poNumber}`,
-    `מוצר: ${po.productName}`,
-    `כמות: ${po.quantity}`,
-    `מחיר עלות ליחידה: ${formatPrice(po.costPrice)}`,
+    `הזמנת רכש ${po.poNumber} מ-AppElectric`,
+    `מוצר: ${po.productName} (כמות: ${po.quantity})`,
     `סה"כ: ${formatPrice(po.costPrice * po.quantity)}`,
-    `כתובת להספקה: ${po.deliveryAddress}`,
-    po.notes ? `הערות: ${po.notes}` : "",
+    "",
+    `למסמך ההזמנה המלא: ${poDocumentLink(po)}`,
     "",
     "אנא אשרו קבלת ההזמנה ומועד אספקה משוער.",
     "— AppElectric",
@@ -42,6 +45,7 @@ function buildMessage(po: PurchaseOrder) {
 
 export function PurchaseOrderActions({ po }: { po: PurchaseOrder }) {
   const router = useRouter();
+  const toast = useToast();
   const [busy, setBusy] = useState(false);
   const showSpinner = useDelayedPending(busy, 500);
 
@@ -69,6 +73,15 @@ export function PurchaseOrderActions({ po }: { po: PurchaseOrder }) {
     if (po.status === "draft") setStatus("sent", "email");
   }
 
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(poDocumentLink(po));
+      toast.show("הקישור למסמך ההזמנה הועתק");
+    } catch {
+      toast.show("העתקה נכשלה — נסו שוב");
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3 rounded-[var(--radius-card)] border border-sand-300 bg-white p-5">
@@ -90,9 +103,14 @@ export function PurchaseOrderActions({ po }: { po: PurchaseOrder }) {
             {showSpinner ? <Spinner size={17} /> : <Mail size={17} />}
             שליחה במייל
           </Button>
+          <Button onClick={copyLink} variant="secondary" disabled={busy}>
+            <Link2 size={17} />
+            העתקת קישור למסמך
+          </Button>
         </div>
         <p className="mt-3 text-xs text-charcoal-400">
-          כל כפתור פותח הודעה מוכנה מראש עם כל פרטי ההזמנה — נותר רק ללחוץ שליחה בוואטסאפ/במייל שלך.
+          וואטסאפ ומייל פותחים הודעה מוכנה מראש עם קישור למסמך ההזמנה המעוצב — נותר רק ללחוץ שליחה. כפתור הקישור מעתיק את
+          קישור המסמך עצמו, לשליחה בכל ערוץ אחר.
         </p>
       </div>
 

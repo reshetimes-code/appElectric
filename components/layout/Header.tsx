@@ -8,8 +8,8 @@ import { Container } from "@/components/ui/Container";
 import { SearchBox } from "@/components/layout/SearchBox";
 import { MegaMenu } from "@/components/layout/MegaMenu";
 import { MobileNav } from "@/components/layout/MobileNav";
-import { categories } from "@/lib/data/categories";
 import { SECONDARY_NAV_LINKS } from "@/lib/nav";
+import { useCatalog } from "@/lib/context/CatalogContext";
 import { useCart } from "@/lib/context/CartContext";
 import { useFavorites } from "@/lib/context/FavoritesContext";
 import { useCompare } from "@/lib/context/CompareContext";
@@ -35,6 +35,7 @@ export function Header() {
   const cart = useCart();
   const favorites = useFavorites();
   const compare = useCompare();
+  const { categories } = useCatalog();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);

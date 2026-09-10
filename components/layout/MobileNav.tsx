@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { ChevronDown, X, MessageCircle } from "lucide-react";
-import { categories } from "@/lib/data/categories";
+import { useCatalog } from "@/lib/context/CatalogContext";
 import { cn } from "@/lib/utils";
 import { SECONDARY_NAV_LINKS } from "@/lib/nav";
 
 export function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { categories } = useCatalog();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 

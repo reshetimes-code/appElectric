@@ -10,12 +10,16 @@ import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
  * — a sidebar, no storefront branding. Since it's nested under this single root
  * layout, without this check it would render *underneath* the storefront's own
  * header/footer/WhatsApp button, stacking two unrelated chromes on the same page.
+ *
+ * /po/** is the public purchase-order document shared with suppliers — a
+ * standalone printable page, not a storefront page, so it gets the same bare
+ * treatment.
  */
 export function ConditionalChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith("/admin");
+  const isBareShell = pathname?.startsWith("/admin") || pathname?.startsWith("/po/");
 
-  if (isAdmin) return <>{children}</>;
+  if (isBareShell) return <>{children}</>;
 
   return (
     <>

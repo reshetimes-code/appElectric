@@ -9,26 +9,50 @@ import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { showError } from "@/lib/alert";
 import type { Supplier } from "@/lib/types";
 
+export interface OrderOption {
+  value: string;
+  label: string;
+  productName: string;
+  quantity: number;
+  deliveryAddress: string;
+  notes: string;
+}
+
 export function PurchaseOrderForm({
   suppliers,
+  orderOptions = [],
   initialProductName = "",
   initialDeliveryAddress = "",
   initialNotes = "",
 }: {
   suppliers: Supplier[];
+  orderOptions?: OrderOption[];
   initialProductName?: string;
   initialDeliveryAddress?: string;
   initialNotes?: string;
 }) {
   const router = useRouter();
   const [supplierId, setSupplierId] = useState(suppliers[0]?.id ?? "");
+  const [sourceOrder, setSourceOrder] = useState("");
   const [productName, setProductName] = useState(initialProductName);
-  const [costPrice, setCostPrice] = useState(0);
-  const [quantity, setQuantity] = useState(1);
+  const [costPrice, setCostPrice] = useState("");
+  const [quantity, setQuantity] = useState("1");
   const [deliveryAddress, setDeliveryAddress] = useState(initialDeliveryAddress);
   const [notes, setNotes] = useState(initialNotes);
   const [saving, setSaving] = useState(false);
   const showSpinner = useDelayedPending(saving, 500);
+
+  function applyOrderOption(value: string) {
+    setSourceOrder(value);
+    const opt = orderOptions.find((o) => o.value === value);
+    if (!opt) return;
+    // Fills in everything the customer order tells us — cost price is left
+    // untouched since only the admin knows what the supplier actually charges.
+    setProductName(opt.productName);
+    setQuantity(String(opt.quantity));
+    setDeliveryAddress(opt.deliveryAddress);
+    setNotes(opt.notes);
+  }
 
   const supplier = suppliers.find((s) => s.id === supplierId);
 
@@ -48,7 +72,7 @@ export function PurchaseOrderForm({
         supplierEmail: supplier.email,
         supplierWhatsapp: supplier.whatsapp,
         productName,
-        costPrice: Number(costPrice),
+        costPrice: Number(costPrice) || 0,
         quantity: Number(quantity) || 1,
         deliveryAddress,
         notes: notes || undefined,
@@ -66,6 +90,24 @@ export function PurchaseOrderForm({
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-sand-300 bg-white p-6">
+      {orderOptions.length > 0 && (
+        <div>
+          <label className="mb-1 block text-sm text-charcoal-600">מילוי אוטומטי מהזמנת לקוח (אופציונלי)</label>
+          <select
+            value={sourceOrder}
+            onChange={(e) => applyOrderOption(e.target.value)}
+            className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm"
+          >
+            <option value="">מילוי ידני</option>
+            {orderOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-charcoal-400">
+            בחירת פריט מהזמנת לקוח תמלא אוטומטית את שם המוצר, הכמות, כתובת ההספקה וההערות — מחיר העלות תמיד נשאר לקביעה ידנית.
+          </p>
+        </div>
+      )}
       <div>
         <label className="mb-1 block text-sm text-charcoal-600">ספק *</label>
         <select value={supplierId} onChange={(e) => setSupplierId(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm">
@@ -82,11 +124,11 @@ export function PurchaseOrderForm({
         </div>
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">מחיר עלות (₪) *</label>
-          <input type="number" value={costPrice} onChange={(e) => setCostPrice(Number(e.target.value))} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
+          <input type="number" placeholder="0" value={costPrice} onChange={(e) => setCostPrice(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
         </div>
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">כמות</label>
-          <input type="number" min={1} value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
+          <input type="number" min={1} value={quantity} onChange={(e) => setQuantity(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
         </div>
         <div className="sm:col-span-2">
           <label className="mb-1 block text-sm text-charcoal-600">כתובת להספקה *</label>

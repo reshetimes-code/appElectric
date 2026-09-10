@@ -1,10 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/Container";
-import { categories } from "@/lib/data/categories";
+import { useCatalog } from "@/lib/context/CatalogContext";
 
 export function DepartmentCards() {
+  const { categories } = useCatalog();
   return (
     <section className="py-16 sm:py-20">
       <Container className="flex flex-col gap-8">

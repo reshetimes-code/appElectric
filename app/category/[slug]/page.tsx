@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
-import { getCategoryBySlug, categories } from "@/lib/data/categories";
+import { categories } from "@/lib/data/categories";
+import { getCategoryBySlug, getAllCategories } from "@/lib/server/adminCategories";
 import { getProducts, parseFilters } from "@/lib/repo/products";
 import { getAllProducts } from "@/lib/server/adminProducts";
+
+// Categories can now be created ad-hoc by an admin (from the product form),
+// stored in Firestore rather than in code — same reason app/product/[slug]/page.tsx
+// and app/admin/layout.tsx render per-request instead of at build time.
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return categories.map((c) => ({ slug: c.slug }));
@@ -11,7 +17,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) return {};
   return {
     title: category.nameHe,
@@ -27,12 +33,13 @@ export default async function CategoryDetailPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
   const sp = await searchParams;
   const filters = { ...parseFilters(sp), category: slug };
-  const products = getProducts(filters, await getAllProducts());
+  const [allProducts, allCategories] = await Promise.all([getAllProducts(), getAllCategories()]);
+  const products = getProducts(filters, allProducts, allCategories);
   const page = sp.page ? Number(Array.isArray(sp.page) ? sp.page[0] : sp.page) : 1;
 
   const buildPageHref = (p: number) => {

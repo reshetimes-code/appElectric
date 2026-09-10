@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save } from "lucide-react";
+import { Save, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
@@ -45,8 +45,12 @@ export function ProductForm({
   const [shortDescriptionHe, setShortDescriptionHe] = useState(initial?.shortDescriptionHe ?? "");
   const [descriptionHe, setDescriptionHe] = useState(initial?.descriptionHe ?? "");
   const [brandId, setBrandId] = useState(initial?.brandId ?? brands[0]?.id ?? "");
+  const [categoryList, setCategoryList] = useState<FormCategory[]>(categories);
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? categories[0]?.id ?? "");
   const [subcategoryId, setSubcategoryId] = useState(initial?.subcategoryId ?? categories[0]?.subcategories[0]?.id ?? "");
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [creatingCategory, setCreatingCategory] = useState(false);
   const [price, setPrice] = useState(initial?.price ?? 0);
   const [compareAtPrice, setCompareAtPrice] = useState(initial?.compareAtPrice ?? 0);
   const [stockQuantity, setStockQuantity] = useState(initial?.stockQuantity ?? 0);
@@ -57,7 +61,32 @@ export function ProductForm({
   const [saving, setSaving] = useState(false);
   const showSpinner = useDelayedPending(saving, 500);
 
-  const activeCategory = categories.find((c) => c.id === categoryId);
+  const activeCategory = categoryList.find((c) => c.id === categoryId);
+
+  async function createCategory() {
+    if (!newCategoryName.trim()) {
+      showError("יש להזין שם קטגוריה");
+      return;
+    }
+    setCreatingCategory(true);
+    const res = await fetch("/api/admin/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nameHe: newCategoryName }),
+    });
+    setCreatingCategory(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      showError(data.error || "יצירת הקטגוריה נכשלה");
+      return;
+    }
+    const { category } = await res.json();
+    setCategoryList((prev) => [...prev, category]);
+    setCategoryId(category.id);
+    setSubcategoryId(category.subcategories[0]?.id ?? "");
+    setNewCategoryName("");
+    setAddingCategory(false);
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -155,15 +184,55 @@ export function ProductForm({
               value={categoryId}
               onChange={(e) => {
                 setCategoryId(e.target.value);
-                const cat = categories.find((c) => c.id === e.target.value);
+                const cat = categoryList.find((c) => c.id === e.target.value);
                 setSubcategoryId(cat?.subcategories[0]?.id ?? "");
               }}
               className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm"
             >
-              {categories.map((c) => (
+              {categoryList.map((c) => (
                 <option key={c.id} value={c.id}>{c.nameHe}</option>
               ))}
             </select>
+            {!addingCategory ? (
+              <button
+                type="button"
+                onClick={() => setAddingCategory(true)}
+                className="mt-1.5 flex items-center gap-1 text-xs font-medium text-brand-700 hover:text-brand-800"
+              >
+                <Plus size={13} />
+                קטגוריה חדשה
+              </button>
+            ) : (
+              <div className="mt-1.5 flex items-center gap-1.5">
+                <input
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      createCategory();
+                    }
+                  }}
+                  placeholder="שם הקטגוריה החדשה"
+                  autoFocus
+                  className="h-9 flex-1 rounded-[var(--radius-control)] border border-sand-300 px-2.5 text-sm"
+                />
+                <Button type="button" onClick={createCategory} size="sm" disabled={creatingCategory}>
+                  {creatingCategory ? <Spinner size={15} /> : "הוסף"}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddingCategory(false);
+                    setNewCategoryName("");
+                  }}
+                  aria-label="ביטול"
+                  className="rounded-full p-1.5 text-charcoal-400 hover:bg-sand-100"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            )}
           </div>
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">תת-קטגוריה *</label>

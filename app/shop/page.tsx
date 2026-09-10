@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
 import { getProducts, parseFilters } from "@/lib/repo/products";
 import { getAllProducts } from "@/lib/server/adminProducts";
+import { getAllCategories } from "@/lib/server/adminCategories";
 
 export const metadata: Metadata = {
   title: "כל המוצרים",
@@ -15,7 +16,8 @@ export default async function ShopPage({
 }) {
   const sp = await searchParams;
   const filters = parseFilters(sp);
-  const products = getProducts(filters, await getAllProducts());
+  const [allProducts, allCategories] = await Promise.all([getAllProducts(), getAllCategories()]);
+  const products = getProducts(filters, allProducts, allCategories);
   const page = sp.page ? Number(Array.isArray(sp.page) ? sp.page[0] : sp.page) : 1;
 
   const buildPageHref = (p: number) => {

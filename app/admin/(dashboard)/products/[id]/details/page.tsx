@@ -8,7 +8,7 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
   const product = await getAnyProductById(id);
   if (!product) notFound();
 
-  const { brands, categories } = listBrandsAndCategoriesForForm();
+  const { brands, categories } = await listBrandsAndCategoriesForForm();
   return (
     <div className="flex max-w-3xl flex-col gap-6">
       <Breadcrumbs items={[{ label: "מוצרים", href: "/admin/products" }, { label: product.nameHe }]} />

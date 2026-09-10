@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LayoutDashboard, Package, Truck, ClipboardList, ExternalLink, ShoppingBag } from "lucide-react";
 import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
+import { OrderNotificationBell } from "@/components/admin/OrderNotificationBell";
 
 // The whole admin area reads data-store/*.json at request time (products,
 // suppliers, purchase orders). Without this, Next.js's automatic static
@@ -23,7 +24,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="flex min-h-screen">
       <aside className="hidden w-60 shrink-0 flex-col border-e border-sand-300 bg-charcoal-950 p-5 text-charcoal-200 lg:flex">
-        <p className="mb-6 font-heading text-lg font-semibold text-white">ניהול AppElectric</p>
+        <div className="mb-6 flex items-center justify-between gap-2">
+          <p className="font-heading text-lg font-semibold text-white">ניהול AppElectric</p>
+          <OrderNotificationBell className="text-charcoal-200 hover:text-white" />
+        </div>
         <nav className="flex flex-1 flex-col gap-1">
           {NAV.map((item) => (
             <Link
@@ -55,6 +59,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <ExternalLink size={14} />
             לאתר
           </Link>
+          <OrderNotificationBell className="shrink-0 text-charcoal-700" />
         </div>
         <main className="min-w-0 flex-1 p-5 sm:p-8">{children}</main>
       </div>

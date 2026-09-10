@@ -37,6 +37,30 @@ export function showValidationErrors(messages: string[], title = "יש לתקן 
   });
 }
 
+/**
+ * Admin-only: pops up when a new customer order is detected (see
+ * components/admin/OrderNotificationBell.tsx). Unlike showSuccess it doesn't
+ * auto-dismiss — it's reporting something that just happened elsewhere, not
+ * confirming an action the admin took, so it should stay until acknowledged.
+ * Resolves true if the admin clicked through to view the order.
+ */
+export async function notifyNewOrder(opts: { orderNumber: string; customerName: string; total: string }) {
+  const result = await base.fire({
+    icon: "info",
+    title: "התקבלה הזמנה חדשה! 🛒",
+    html: `<div style="text-align:start">
+      <p style="margin:0 0 .25em"><b>מספר הזמנה:</b> ${opts.orderNumber}</p>
+      <p style="margin:0 0 .25em"><b>לקוח:</b> ${opts.customerName}</p>
+      <p style="margin:0"><b>סה"כ:</b> ${opts.total}</p>
+    </div>`,
+    confirmButtonText: "צפייה בהזמנה",
+    showCancelButton: true,
+    cancelButtonText: "סגור",
+    reverseButtons: true,
+  });
+  return result.isConfirmed;
+}
+
 /** Replaces window.confirm() for a destructive action; resolves true if the user confirmed. */
 export async function confirmDelete(message: string, title = "לאשר מחיקה?") {
   const result = await base.fire({

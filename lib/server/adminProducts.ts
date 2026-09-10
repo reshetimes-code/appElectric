@@ -6,7 +6,7 @@ import {
   type ProductDetailOverride,
 } from "@/lib/server/productDetailOverrides";
 import { genId, slugify } from "@/lib/utils";
-import { categories } from "@/lib/data/categories";
+import { getAllCategories } from "@/lib/server/adminCategories";
 import { brands } from "@/lib/data/brands";
 import { products as seedProducts } from "@/lib/data/products";
 import type { Product } from "@/lib/types";
@@ -35,10 +35,12 @@ export async function getAllProducts(): Promise<Product[]> {
     getProductImageOverrides(),
     getProductDetailOverrides(),
   ]);
-  const seedWithOverrides = seedProducts.map((p) => {
-    const withDetails = detailOverrides[p.id] ? applyDetailOverride(p, detailOverrides[p.id]) : p;
-    return imageOverrides[p.id] ? { ...withDetails, images: imageOverrides[p.id] } : withDetails;
-  });
+  const seedWithOverrides = await Promise.all(
+    seedProducts.map(async (p) => {
+      const withDetails = detailOverrides[p.id] ? await applyDetailOverride(p, detailOverrides[p.id]) : p;
+      return imageOverrides[p.id] ? { ...withDetails, images: imageOverrides[p.id] } : withDetails;
+    }),
+  );
   return [...seedWithOverrides, ...(await getAdminProducts())];
 }
 
@@ -88,8 +90,8 @@ export interface AdminProductInput {
   warrantyText?: string;
 }
 
-function buildFromInput(id: string, slug: string, input: AdminProductInput, createdAt: string): Product {
-  const category = categories.find((c) => c.id === input.categoryId);
+async function buildFromInput(id: string, slug: string, input: AdminProductInput, createdAt: string): Promise<Product> {
+  const category = (await getAllCategories()).find((c) => c.id === input.categoryId);
   return {
     id,
     slug,
@@ -126,8 +128,8 @@ function buildFromInput(id: string, slug: string, input: AdminProductInput, crea
 /** Applies an editable-fields patch (see ProductDetailOverride) on top of a
  * seed product — everything structural that only lives in code (dimensions,
  * spec groups, feature ids, reviews, images...) stays exactly as defined. */
-function applyDetailOverride(product: Product, override: ProductDetailOverride): Product {
-  const category = categories.find((c) => c.id === override.categoryId);
+async function applyDetailOverride(product: Product, override: ProductDetailOverride): Promise<Product> {
+  const category = (await getAllCategories()).find((c) => c.id === override.categoryId);
   return {
     ...product,
     nameHe: override.nameHe,
@@ -164,7 +166,7 @@ export async function updateProductDetails(id: string, input: ProductDetailOverr
   const all = await getAdminProducts();
   const existing = all.find((p) => p.id === id);
   if (!existing) return undefined;
-  const updated = buildFromInput(id, existing.slug, { ...input, images: existing.images }, existing.createdAt);
+  const updated = await buildFromInput(id, existing.slug, { ...input, images: existing.images }, existing.createdAt);
   await writeJson(
     FILE,
     all.map((p) => (p.id === id ? updated : p)),
@@ -176,7 +178,7 @@ export async function createAdminProduct(input: AdminProductInput): Promise<Prod
   const all = await getAdminProducts();
   const id = `admin-${genId()}`;
   const slug = slugify(`${input.nameHe}-${input.sku}`) || id;
-  const product = buildFromInput(id, slug, input, new Date().toISOString());
+  const product = await buildFromInput(id, slug, input, new Date().toISOString());
   await writeJson(FILE, [...all, product]);
   return product;
 }
@@ -185,7 +187,7 @@ export async function updateAdminProduct(id: string, input: AdminProductInput): 
   const all = await getAdminProducts();
   const existing = all.find((p) => p.id === id);
   if (!existing) return undefined;
-  const updated = buildFromInput(id, existing.slug, input, existing.createdAt);
+  const updated = await buildFromInput(id, existing.slug, input, existing.createdAt);
   await writeJson(
     FILE,
     all.map((p) => (p.id === id ? updated : p)),
@@ -201,7 +203,8 @@ export async function deleteAdminProduct(id: string): Promise<boolean> {
   return changed;
 }
 
-export function listBrandsAndCategoriesForForm() {
+export async function listBrandsAndCategoriesForForm() {
+  const categories = await getAllCategories();
   return {
     brands: brands.map((b) => ({ id: b.id, nameHe: b.nameHe })),
     categories: categories.map((c) => ({
