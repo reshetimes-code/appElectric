@@ -25,8 +25,9 @@ export default async function AdminProductsPage() {
       </div>
 
       <p className="rounded-[var(--radius-control)] bg-brand-50 p-3 text-sm text-charcoal-700">
-        לכל מוצר — כולל 68 מוצרי הדמו — אפשר ללחוץ <strong>&quot;תמונות&quot;</strong> כדי להעלות תמונות אמיתיות משלכם.
-        זה לא נוגע לשום שדה אחר של המוצר. עריכה מלאה של שאר הפרטים זמינה רק למוצרים שהוספתם בעצמכם.
+        לכל מוצר — כולל 68 מוצרי הדמו — אפשר ללחוץ <strong>&quot;תמונות&quot;</strong> כדי להעלות תמונות אמיתיות משלכם,
+        ו<strong>&quot;פרטים&quot;</strong> כדי לערוך שם, מחיר, תיאור, סיווג, מלאי וזמינות. שדות מובנים (מפרט, מידות וכו&apos;)
+        נשארים כפי שהם מוגדרים במערכת.
       </p>
 
       <div className="overflow-hidden rounded-[var(--radius-card)] border border-sand-300 bg-white">
@@ -62,6 +63,11 @@ export default async function AdminProductsPage() {
                 <Link href={`/admin/products/${p.id}/images`} className="text-sm text-charcoal-600 hover:underline">
                   תמונות
                 </Link>
+                {!isAdminOwned && (
+                  <Link href={`/admin/products/${p.id}/details`} className="text-sm text-charcoal-600 hover:underline">
+                    פרטים
+                  </Link>
+                )}
                 {isAdminOwned && (
                   <>
                     <Link href={`/admin/products/${p.id}/edit`} className="text-sm text-charcoal-600 hover:underline">

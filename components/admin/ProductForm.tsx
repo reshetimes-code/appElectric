@@ -27,11 +27,16 @@ export function ProductForm({
   categories,
   initial,
   productId,
+  mode = "full",
 }: {
   brands: FormBrand[];
   categories: FormCategory[];
   initial?: Product;
   productId?: string;
+  /** "full" (default): create/edit an admin-added product, images included.
+   * "details": edit only the non-image fields of any product (used for the
+   * 68 seed products, whose images have their own dedicated page/endpoint). */
+  mode?: "full" | "details";
 }) {
   const router = useRouter();
   const [nameHe, setNameHe] = useState(initial?.nameHe ?? "");
@@ -72,12 +77,18 @@ export function ProductForm({
       subcategoryId,
       price: Number(price),
       compareAtPrice: compareAtPrice ? Number(compareAtPrice) : undefined,
-      images,
+      ...(mode === "full" ? { images } : {}),
       stockQuantity: Number(stockQuantity),
       availabilityStatus,
     };
-    const res = await fetch(productId ? `/api/admin/products/${productId}` : "/api/admin/products", {
-      method: productId ? "PATCH" : "POST",
+    const url =
+      mode === "details"
+        ? `/api/admin/products/${productId}/details`
+        : productId
+          ? `/api/admin/products/${productId}`
+          : "/api/admin/products";
+    const res = await fetch(url, {
+      method: productId || mode === "details" ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
@@ -93,11 +104,13 @@ export function ProductForm({
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-6">
-      <div className="rounded-[var(--radius-card)] border border-sand-300 bg-white p-5">
-        <h2 className="mb-4 font-heading text-base font-semibold text-charcoal-900">תמונות המוצר</h2>
-        <ImageUploader images={images} onChange={setImages} />
-        <p className="mt-2 text-xs text-charcoal-400">התמונה הראשונה תוצג ככרטיס המוצר הראשי.</p>
-      </div>
+      {mode === "full" && (
+        <div className="rounded-[var(--radius-card)] border border-sand-300 bg-white p-5">
+          <h2 className="mb-4 font-heading text-base font-semibold text-charcoal-900">תמונות המוצר</h2>
+          <ImageUploader images={images} onChange={setImages} />
+          <p className="mt-2 text-xs text-charcoal-400">התמונה הראשונה תוצג ככרטיס המוצר הראשי.</p>
+        </div>
+      )}
 
       <div className="rounded-[var(--radius-card)] border border-sand-300 bg-white p-5">
         <h2 className="mb-4 font-heading text-base font-semibold text-charcoal-900">פרטי מוצר</h2>

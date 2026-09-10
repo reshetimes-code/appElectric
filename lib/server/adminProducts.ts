@@ -1,5 +1,10 @@
 import { readJson, writeJson } from "@/lib/server/fileStore";
 import { getProductImageOverrides, setProductImages } from "@/lib/server/productImages";
+import {
+  getProductDetailOverrides,
+  setProductDetails,
+  type ProductDetailOverride,
+} from "@/lib/server/productDetailOverrides";
 import { genId, slugify } from "@/lib/utils";
 import { categories } from "@/lib/data/categories";
 import { brands } from "@/lib/data/brands";
@@ -26,11 +31,15 @@ export async function getAdminProductBySlug(slug: string): Promise<Product | und
  * products, for use in Server Components/pages. This is what customers see.
  */
 export async function getAllProducts(): Promise<Product[]> {
-  const imageOverrides = await getProductImageOverrides();
-  const seedWithImages = seedProducts.map((p) =>
-    imageOverrides[p.id] ? { ...p, images: imageOverrides[p.id] } : p,
-  );
-  return [...seedWithImages, ...(await getAdminProducts())];
+  const [imageOverrides, detailOverrides] = await Promise.all([
+    getProductImageOverrides(),
+    getProductDetailOverrides(),
+  ]);
+  const seedWithOverrides = seedProducts.map((p) => {
+    const withDetails = detailOverrides[p.id] ? applyDetailOverride(p, detailOverrides[p.id]) : p;
+    return imageOverrides[p.id] ? { ...withDetails, images: imageOverrides[p.id] } : withDetails;
+  });
+  return [...seedWithOverrides, ...(await getAdminProducts())];
 }
 
 /** Any product (seed or admin-added), with image overrides applied — for the admin UI. */
@@ -112,6 +121,55 @@ function buildFromInput(id: string, slug: string, input: AdminProductInput, crea
     reviews: [],
     createdAt,
   };
+}
+
+/** Applies an editable-fields patch (see ProductDetailOverride) on top of a
+ * seed product — everything structural that only lives in code (dimensions,
+ * spec groups, feature ids, reviews, images...) stays exactly as defined. */
+function applyDetailOverride(product: Product, override: ProductDetailOverride): Product {
+  const category = categories.find((c) => c.id === override.categoryId);
+  return {
+    ...product,
+    nameHe: override.nameHe,
+    sku: override.sku,
+    model: override.model,
+    shortDescriptionHe: override.shortDescriptionHe,
+    descriptionHe: override.descriptionHe || override.shortDescriptionHe,
+    brandId: override.brandId,
+    categoryId: override.categoryId,
+    subcategoryId: override.subcategoryId,
+    departmentId: category?.departmentId ?? product.departmentId,
+    price: override.price,
+    compareAtPrice: override.compareAtPrice,
+    installmentsMonths: override.price >= 4000 ? 12 : override.price >= 1500 ? 6 : undefined,
+    warrantyText: override.warrantyText || product.warrantyText,
+    stockQuantity: override.stockQuantity,
+    availabilityStatus: override.availabilityStatus,
+  };
+}
+
+/**
+ * Updates the editable details (name, sku, price, category, stock...) of a
+ * product, whichever kind it is: for a seed product this writes a detail
+ * override (parallel to the images override) without touching the
+ * code-defined structural fields; for an admin-added product it patches that
+ * product's own record directly, keeping its existing images.
+ */
+export async function updateProductDetails(id: string, input: ProductDetailOverride): Promise<Product | undefined> {
+  if (isSeedId(id)) {
+    if (!seedProducts.some((p) => p.id === id)) return undefined;
+    await setProductDetails(id, input);
+    return getAnyProductById(id);
+  }
+  const all = await getAdminProducts();
+  const existing = all.find((p) => p.id === id);
+  if (!existing) return undefined;
+  const updated = buildFromInput(id, existing.slug, { ...input, images: existing.images }, existing.createdAt);
+  await writeJson(
+    FILE,
+    all.map((p) => (p.id === id ? updated : p)),
+  );
+  return updated;
 }
 
 export async function createAdminProduct(input: AdminProductInput): Promise<Product> {
