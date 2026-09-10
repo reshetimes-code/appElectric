@@ -4,18 +4,20 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
+import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
+import { showError } from "@/lib/alert";
 
 function LoginForm() {
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const showSpinner = useDelayedPending(loading, 500);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setError("");
     const res = await fetch("/api/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -27,7 +29,7 @@ function LoginForm() {
       router.refresh();
     } else {
       const data = await res.json().catch(() => ({}));
-      setError(data.error || "שגיאה בהתחברות");
+      showError(data.error || "שגיאה בהתחברות");
     }
   }
 
@@ -49,8 +51,8 @@ function LoginForm() {
           autoFocus
           className="mb-3 h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm"
         />
-        {error && <p className="mb-3 text-sm text-red-500">{error}</p>}
-        <Button type="submit" size="lg" fullWidth disabled={loading}>
+        <Button type="submit" size="lg" fullWidth disabled={loading} className="mt-3">
+          {showSpinner && <Spinner size={16} />}
           {loading ? "מתחבר..." : "כניסה"}
         </Button>
       </form>

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { CheckCircle2, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { saveLead } from "@/lib/leads";
+import { cn } from "@/lib/utils";
+import { showValidationErrors } from "@/lib/alert";
 
 interface FormState {
   name: string;
@@ -44,6 +46,7 @@ export function TradeInForm() {
     if (!form.brand.trim()) next.brand = "נא לציין מותג";
     if (!form.consent) next.consent = "יש לאשר יצירת קשר";
     setErrors(next);
+    if (Object.keys(next).length > 0) showValidationErrors(Object.values(next) as string[]);
     return Object.keys(next).length === 0;
   }
 
@@ -77,29 +80,30 @@ export function TradeInForm() {
   }
 
   const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  const inputClass = (key: keyof FormState) =>
+    cn(
+      "h-11 w-full rounded-[var(--radius-control)] border px-3 text-sm",
+      errors[key] ? "border-red-400" : "border-sand-300",
+    );
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-sand-300 bg-white p-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">שם מלא</label>
-          <input value={form.name} onChange={set("name")} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-          {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+          <input value={form.name} onChange={set("name")} className={inputClass("name")} />
         </div>
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">טלפון</label>
-          <input value={form.phone} onChange={set("phone")} dir="ltr" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-          {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
+          <input value={form.phone} onChange={set("phone")} dir="ltr" className={inputClass("phone")} />
         </div>
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">סוג המכשיר הקיים</label>
-          <input value={form.category} onChange={set("category")} placeholder="לדוגמה: מקרר 4 דלתות" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-          {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category}</p>}
+          <input value={form.category} onChange={set("category")} placeholder="לדוגמה: מקרר 4 דלתות" className={inputClass("category")} />
         </div>
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">מותג</label>
-          <input value={form.brand} onChange={set("brand")} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-          {errors.brand && <p className="mt-1 text-xs text-red-500">{errors.brand}</p>}
+          <input value={form.brand} onChange={set("brand")} className={inputClass("brand")} />
         </div>
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">דגם (אם ידוע)</label>
@@ -124,10 +128,14 @@ export function TradeInForm() {
       </div>
 
       <label className="flex items-start gap-2.5 text-sm text-charcoal-600">
-        <input type="checkbox" checked={form.consent} onChange={(e) => setForm((f) => ({ ...f, consent: e.target.checked }))} className="mt-0.5 h-4 w-4 rounded border-sand-400 text-brand-600" />
+        <input
+          type="checkbox"
+          checked={form.consent}
+          onChange={(e) => setForm((f) => ({ ...f, consent: e.target.checked }))}
+          className={cn("mt-0.5 h-4 w-4 rounded text-brand-600", errors.consent ? "border-red-400" : "border-sand-400")}
+        />
         אני מבין/ה שמדובר בבקשה ראשונית בלבד וכי לא נקבע ערך טרייד-אין סופי בשלב זה.
       </label>
-      {errors.consent && <p className="text-xs text-red-500">{errors.consent}</p>}
 
       <Button type="submit" size="lg" className="self-start">
         <Send size={16} />

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { CheckCircle2, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { saveLead } from "@/lib/leads";
+import { cn } from "@/lib/utils";
+import { showValidationErrors } from "@/lib/alert";
 import type { LeadSource } from "@/lib/types";
 
 interface FormState {
@@ -40,6 +42,7 @@ export function LeadForm({
     if (form.email && !/^\S+@\S+\.\S+$/.test(form.email)) next.email = "כתובת אימייל לא תקינה";
     if (!form.consent) next.consent = "יש לאשר יצירת קשר";
     setErrors(next);
+    if (Object.keys(next).length > 0) showValidationErrors(Object.values(next) as string[]);
     return Object.keys(next).length === 0;
   }
 
@@ -72,24 +75,26 @@ export function LeadForm({
     value: form[key],
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm((f) => ({ ...f, [key]: e.target.value })),
   });
+  const inputClass = (key: keyof FormState) =>
+    cn(
+      "h-11 w-full rounded-[var(--radius-control)] border px-3 text-sm",
+      errors[key] ? "border-red-400" : "border-sand-300",
+    );
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-sand-300 bg-white p-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">שם מלא</label>
-          <input {...field("name")} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-          {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+          <input {...field("name")} className={inputClass("name")} />
         </div>
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">טלפון</label>
-          <input {...field("phone")} dir="ltr" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-          {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
+          <input {...field("phone")} dir="ltr" className={inputClass("phone")} />
         </div>
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">אימייל (אופציונלי)</label>
-          <input {...field("email")} dir="ltr" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-          {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
+          <input {...field("email")} dir="ltr" className={inputClass("email")} />
         </div>
         <div>
           <label className="mb-1 block text-sm text-charcoal-600">{productOrCategoryLabel}</label>
@@ -110,11 +115,10 @@ export function LeadForm({
           type="checkbox"
           checked={form.consent}
           onChange={(e) => setForm((f) => ({ ...f, consent: e.target.checked }))}
-          className="mt-0.5 h-4 w-4 rounded border-sand-400 text-brand-600"
+          className={cn("mt-0.5 h-4 w-4 rounded text-brand-600", errors.consent ? "border-red-400" : "border-sand-400")}
         />
         אני מאשר/ת ל-AppElectric ליצור עמי קשר בנוגע לפנייה זו.
       </label>
-      {errors.consent && <p className="text-xs text-red-500">{errors.consent}</p>}
 
       <Button type="submit" size="lg" className="self-start">
         <Send size={16} />

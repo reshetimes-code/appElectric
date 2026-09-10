@@ -4,17 +4,17 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { Upload, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { showError } from "@/lib/alert";
 
 export function ImageUploader({ images, onChange }: { images: string[]; onChange: (urls: string[]) => void }) {
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function uploadFiles(files: FileList | File[]) {
-    setError("");
     setUploading(true);
     const uploaded: string[] = [];
+    const errors: string[] = [];
     for (const file of Array.from(files)) {
       const formData = new FormData();
       formData.append("file", file);
@@ -24,11 +24,12 @@ export function ImageUploader({ images, onChange }: { images: string[]; onChange
         if (!res.ok) throw new Error(data.error || "העלאה נכשלה");
         uploaded.push(data.url);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "העלאה נכשלה");
+        errors.push(e instanceof Error ? e.message : "העלאה נכשלה");
       }
     }
     setUploading(false);
     if (uploaded.length) onChange([...images, ...uploaded]);
+    if (errors.length) showError(errors.join("\n"), "העלאת תמונה נכשלה");
   }
 
   return (
@@ -66,8 +67,6 @@ export function ImageUploader({ images, onChange }: { images: string[]; onChange
         <p className="text-sm font-medium text-charcoal-700">גררו תמונות לכאן או לחצו לבחירה</p>
         <p className="text-xs text-charcoal-400">JPG, PNG, WEBP או GIF — עד 8MB לתמונה</p>
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
-
       {images.length > 0 && (
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
           {images.map((url, i) => (

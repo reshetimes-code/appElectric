@@ -4,11 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Clock3, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
+import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import type { OrderStatus } from "@/lib/types";
 
 export function OrderStatusControls({ orderId, status }: { orderId: string; status: OrderStatus }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const showSpinner = useDelayedPending(busy, 500);
 
   async function setStatus(next: OrderStatus) {
     setBusy(true);
@@ -26,11 +29,11 @@ export function OrderStatusControls({ orderId, status }: { orderId: string; stat
       <h2 className="mb-3 font-heading text-sm font-semibold text-charcoal-900">עדכון סטטוס הזמנה</h2>
       <div className="flex flex-wrap gap-3">
         <Button onClick={() => setStatus("processing")} variant="secondary" disabled={busy || status !== "new"}>
-          <Clock3 size={16} />
+          {showSpinner ? <Spinner size={16} /> : <Clock3 size={16} />}
           סמן כבטיפול
         </Button>
         <Button onClick={() => setStatus("fulfilled")} variant="secondary" disabled={busy || status === "fulfilled"}>
-          <CheckCircle2 size={16} />
+          {showSpinner ? <Spinner size={16} /> : <CheckCircle2 size={16} />}
           סמן כטופלה
         </Button>
       </div>

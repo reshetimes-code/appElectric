@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 import { ShieldCheck, Info } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
+import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { useCart } from "@/lib/context/CartContext";
 import { useCatalog } from "@/lib/context/CatalogContext";
-import { formatPrice } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
+import { showError, showValidationErrors } from "@/lib/alert";
 
 interface FormState {
   name: string;
@@ -29,6 +32,7 @@ export default function CheckoutPage() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
+  const showSpinner = useDelayedPending(submitting, 500);
 
   const productMap = new Map(getProductsByIds(cart.lines.map((l) => l.productId)).map((p) => [p.id, p]));
 
@@ -50,6 +54,7 @@ export default function CheckoutPage() {
     if (!form.city.trim()) next.city = "נא להזין עיר";
     if (!form.terms) next.terms = "יש לאשר את תנאי השימוש";
     setErrors(next);
+    if (Object.keys(next).length > 0) showValidationErrors(Object.values(next) as string[]);
     return Object.keys(next).length === 0;
   }
 
@@ -70,7 +75,7 @@ export default function CheckoutPage() {
     });
     setSubmitting(false);
     if (!res.ok) {
-      setErrors((prev) => ({ ...prev, terms: "שליחת ההזמנה נכשלה, נסו שוב" }));
+      showError("שליחת ההזמנה נכשלה, נסו שוב");
       return;
     }
     const { order } = await res.json();
@@ -82,6 +87,11 @@ export default function CheckoutPage() {
     value: form[key] as string,
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm((f) => ({ ...f, [key]: e.target.value })),
   });
+  const inputClass = (key: keyof FormState) =>
+    cn(
+      "h-11 w-full rounded-[var(--radius-control)] border px-3 text-sm",
+      errors[key] ? "border-red-400" : "border-sand-300",
+    );
 
   return (
     <Container className="flex flex-col gap-8 py-8 sm:py-10">
@@ -98,18 +108,15 @@ export default function CheckoutPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-sm text-charcoal-600">שם מלא</label>
-                <input {...field("name")} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-                {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+                <input {...field("name")} className={inputClass("name")} />
               </div>
               <div>
                 <label className="mb-1 block text-sm text-charcoal-600">טלפון</label>
-                <input {...field("phone")} dir="ltr" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-                {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
+                <input {...field("phone")} dir="ltr" className={inputClass("phone")} />
               </div>
               <div className="sm:col-span-2">
                 <label className="mb-1 block text-sm text-charcoal-600">אימייל (אופציונלי)</label>
-                <input {...field("email")} dir="ltr" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-                {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
+                <input {...field("email")} dir="ltr" className={inputClass("email")} />
               </div>
             </div>
           </section>
@@ -119,13 +126,11 @@ export default function CheckoutPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label className="mb-1 block text-sm text-charcoal-600">כתובת</label>
-                <input {...field("address")} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-                {errors.address && <p className="mt-1 text-xs text-red-500">{errors.address}</p>}
+                <input {...field("address")} className={inputClass("address")} />
               </div>
               <div>
                 <label className="mb-1 block text-sm text-charcoal-600">עיר</label>
-                <input {...field("city")} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-                {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city}</p>}
+                <input {...field("city")} className={inputClass("city")} />
               </div>
             </div>
           </section>
@@ -148,10 +153,14 @@ export default function CheckoutPage() {
           </section>
 
           <label className="flex items-start gap-2.5 text-sm text-charcoal-600">
-            <input type="checkbox" checked={form.terms} onChange={(e) => setForm((f) => ({ ...f, terms: e.target.checked }))} className="mt-0.5 h-4 w-4 rounded border-sand-400 text-brand-600" />
+            <input
+              type="checkbox"
+              checked={form.terms}
+              onChange={(e) => setForm((f) => ({ ...f, terms: e.target.checked }))}
+              className={cn("mt-0.5 h-4 w-4 rounded text-brand-600", errors.terms ? "border-red-400" : "border-sand-400")}
+            />
             קראתי ואני מסכימ/ה ל<a href="/terms" className="text-brand-700 hover:underline">תקנון האתר</a> ול<a href="/privacy" className="text-brand-700 hover:underline">מדיניות הפרטיות</a>
           </label>
-          {errors.terms && <p className="text-xs text-red-500">{errors.terms}</p>}
         </div>
 
         <aside className="h-fit flex flex-col gap-4 rounded-[var(--radius-card)] border border-sand-300 bg-sand-50 p-5">
@@ -173,7 +182,7 @@ export default function CheckoutPage() {
             <span className="font-heading text-xl font-bold text-charcoal-900">{formatPrice(cart.subtotal)}</span>
           </div>
           <Button type="submit" size="lg" fullWidth disabled={submitting}>
-            <ShieldCheck size={17} />
+            {showSpinner ? <Spinner size={17} /> : <ShieldCheck size={17} />}
             {submitting ? "מבצע הזמנה..." : "בצע הזמנה"}
           </Button>
         </aside>

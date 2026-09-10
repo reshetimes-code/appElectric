@@ -4,20 +4,22 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
+import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
+import { showError, showSuccess } from "@/lib/alert";
 
 export function SupplierForm() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const showSpinner = useDelayedPending(saving, 500);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
     if (!name.trim() || !/^\S+@\S+\.\S+$/.test(email) || !/^\d{9,15}$/.test(whatsapp.replace(/[\s-+]/g, ""))) {
-      setError("יש למלא שם, מייל תקין ומספר וואטסאפ תקין (עם קידומת מדינה, ללא +)");
+      showError("יש למלא שם, מייל תקין ומספר וואטסאפ תקין (עם קידומת מדינה, ללא +)");
       return;
     }
     setSaving(true);
@@ -31,10 +33,11 @@ export function SupplierForm() {
       setName("");
       setEmail("");
       setWhatsapp("");
+      showSuccess("הספק נוסף בהצלחה");
       router.refresh();
     } else {
       const data = await res.json().catch(() => ({}));
-      setError(data.error || "שמירה נכשלה");
+      showError(data.error || "שמירה נכשלה");
     }
   }
 
@@ -53,9 +56,8 @@ export function SupplierForm() {
         <label className="mb-1 block text-sm text-charcoal-600">וואטסאפ (קידומת מדינה, ללא +)</label>
         <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} dir="ltr" placeholder="972501234567" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
       <Button type="submit" disabled={saving}>
-        <UserPlus size={16} />
+        {showSpinner ? <Spinner size={16} /> : <UserPlus size={16} />}
         {saving ? "שומר..." : "הוספת ספק"}
       </Button>
     </form>

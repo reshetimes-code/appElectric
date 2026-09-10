@@ -10,6 +10,7 @@ import { ApplianceArt } from "@/components/product/ApplianceArt";
 import { useCart } from "@/lib/context/CartContext";
 import { useCatalog } from "@/lib/context/CatalogContext";
 import { formatPrice } from "@/lib/utils";
+import { showError } from "@/lib/alert";
 
 const VALID_COUPON = "APPELECTRIC10";
 
@@ -18,7 +19,6 @@ export default function CartPage() {
   const { getProductsByIds } = useCatalog();
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
-  const [couponError, setCouponError] = useState("");
 
   if (!cart.hydrated) return null;
 
@@ -29,9 +29,8 @@ export default function CartPage() {
   function applyCoupon() {
     if (couponInput.trim().toUpperCase() === VALID_COUPON) {
       setAppliedCoupon(VALID_COUPON);
-      setCouponError("");
     } else {
-      setCouponError("קוד קופון לא תקין.");
+      showError("קוד קופון לא תקין.");
     }
   }
 
@@ -134,7 +133,6 @@ export default function CartPage() {
               החל
             </Button>
           </div>
-          {couponError && <p className="text-xs text-red-500">{couponError}</p>}
           {appliedCoupon && <p className="text-xs text-brand-700">קופון {appliedCoupon} הופעל (10% הנחה)</p>}
 
           <div className="flex flex-col gap-2 border-t border-sand-300 pt-4 text-sm">

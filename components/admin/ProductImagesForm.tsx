@@ -4,19 +4,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
+import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { showError, showSuccess } from "@/lib/alert";
 
 export function ProductImagesForm({ productId, initialImages }: { productId: string; initialImages: string[] }) {
   const router = useRouter();
   const [images, setImages] = useState<string[]>(initialImages);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState("");
+  const showSpinner = useDelayedPending(saving, 500);
 
   async function save() {
     setSaving(true);
-    setError("");
-    setSaved(false);
     const res = await fetch(`/api/admin/products/${productId}/images`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -24,11 +24,11 @@ export function ProductImagesForm({ productId, initialImages }: { productId: str
     });
     setSaving(false);
     if (res.ok) {
-      setSaved(true);
+      showSuccess("התמונות נשמרו בהצלחה");
       router.refresh();
     } else {
       const data = await res.json().catch(() => ({}));
-      setError(data.error || "השמירה נכשלה");
+      showError(data.error || "השמירה נכשלה");
     }
   }
 
@@ -36,11 +36,9 @@ export function ProductImagesForm({ productId, initialImages }: { productId: str
     <div className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-sand-300 bg-white p-6">
       <ImageUploader images={images} onChange={setImages} />
       <p className="text-xs text-charcoal-400">התמונה הראשונה תוצג ככרטיס המוצר הראשי בחנות.</p>
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      {saved && <p className="text-sm text-brand-700">נשמר בהצלחה.</p>}
       <div className="flex gap-3">
         <Button onClick={save} size="lg" disabled={saving}>
-          <Save size={17} />
+          {showSpinner ? <Spinner size={17} /> : <Save size={17} />}
           {saving ? "שומר..." : "שמירת תמונות"}
         </Button>
         <Button href="/admin/products" variant="secondary" size="lg">

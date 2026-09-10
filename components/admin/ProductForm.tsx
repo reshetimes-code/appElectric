@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
+import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { showError } from "@/lib/alert";
 import { AVAILABILITY_LABELS } from "@/lib/utils";
 import type { Product } from "@/lib/types";
 
@@ -47,15 +50,14 @@ export function ProductForm({
   );
   const [images, setImages] = useState<string[]>(initial?.images ?? []);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const showSpinner = useDelayedPending(saving, 500);
 
   const activeCategory = categories.find((c) => c.id === categoryId);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
     if (!nameHe.trim() || !sku.trim() || !brandId || !categoryId || !subcategoryId) {
-      setError("יש למלא את כל שדות החובה");
+      showError("יש למלא את כל שדות החובה");
       return;
     }
     setSaving(true);
@@ -85,7 +87,7 @@ export function ProductForm({
       router.refresh();
     } else {
       const data = await res.json().catch(() => ({}));
-      setError(data.error || "שמירה נכשלה");
+      showError(data.error || "שמירה נכשלה");
     }
   }
 
@@ -187,11 +189,9 @@ export function ProductForm({
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
-
       <div className="flex gap-3">
         <Button type="submit" size="lg" disabled={saving}>
-          <Save size={17} />
+          {showSpinner ? <Spinner size={17} /> : <Save size={17} />}
           {saving ? "שומר..." : "שמירת מוצר"}
         </Button>
         <Button href="/admin/products" variant="secondary" size="lg">

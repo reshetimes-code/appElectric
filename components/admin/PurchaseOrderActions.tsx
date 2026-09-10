@@ -5,6 +5,8 @@ import { useState } from "react";
 import { MessageCircle, Mail, CheckCircle2, PackageCheck, Info } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { Spinner } from "@/components/ui/Spinner";
+import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { formatPrice } from "@/lib/utils";
 import type { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types";
 
@@ -41,6 +43,7 @@ function buildMessage(po: PurchaseOrder) {
 export function PurchaseOrderActions({ po }: { po: PurchaseOrder }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const showSpinner = useDelayedPending(busy, 500);
 
   async function setStatus(status: PurchaseOrderStatus, sentVia?: "whatsapp" | "email") {
     setBusy(true);
@@ -80,11 +83,11 @@ export function PurchaseOrderActions({ po }: { po: PurchaseOrder }) {
         <h2 className="mb-3 font-heading text-sm font-semibold text-charcoal-900">שליחה לספק</h2>
         <div className="flex flex-wrap gap-3">
           <Button onClick={sendWhatsapp} disabled={busy}>
-            <MessageCircle size={17} />
+            {showSpinner ? <Spinner size={17} /> : <MessageCircle size={17} />}
             שליחה בוואטסאפ
           </Button>
           <Button onClick={sendEmail} variant="secondary" disabled={busy}>
-            <Mail size={17} />
+            {showSpinner ? <Spinner size={17} /> : <Mail size={17} />}
             שליחה במייל
           </Button>
         </div>
@@ -97,11 +100,11 @@ export function PurchaseOrderActions({ po }: { po: PurchaseOrder }) {
         <h2 className="mb-3 font-heading text-sm font-semibold text-charcoal-900">עדכון סטטוס</h2>
         <div className="flex flex-wrap gap-3">
           <Button onClick={() => setStatus("confirmed")} variant="secondary" disabled={busy || po.status === "confirmed" || po.status === "shipped"}>
-            <CheckCircle2 size={17} />
+            {showSpinner ? <Spinner size={17} /> : <CheckCircle2 size={17} />}
             סמן כאושרה ע&quot;י הספק
           </Button>
           <Button onClick={() => setStatus("shipped")} variant="secondary" disabled={busy || po.status === "shipped"}>
-            <PackageCheck size={17} />
+            {showSpinner ? <Spinner size={17} /> : <PackageCheck size={17} />}
             סמן כנשלחה אליי
           </Button>
         </div>

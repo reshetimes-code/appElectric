@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
+import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
+import { showError } from "@/lib/alert";
 import type { Supplier } from "@/lib/types";
 
 export function PurchaseOrderForm({
@@ -24,16 +27,15 @@ export function PurchaseOrderForm({
   const [quantity, setQuantity] = useState(1);
   const [deliveryAddress, setDeliveryAddress] = useState(initialDeliveryAddress);
   const [notes, setNotes] = useState(initialNotes);
-  const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const showSpinner = useDelayedPending(saving, 500);
 
   const supplier = suppliers.find((s) => s.id === supplierId);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
     if (!supplier || !productName.trim() || !deliveryAddress.trim()) {
-      setError("יש למלא ספק, שם מוצר וכתובת להספקה");
+      showError("יש למלא ספק, שם מוצר וכתובת להספקה");
       return;
     }
     setSaving(true);
@@ -58,7 +60,7 @@ export function PurchaseOrderForm({
       router.push(`/admin/purchase-orders/${data.purchaseOrder.id}`);
     } else {
       const data = await res.json().catch(() => ({}));
-      setError(data.error || "יצירת ההזמנה נכשלה");
+      showError(data.error || "יצירת ההזמנה נכשלה");
     }
   }
 
@@ -96,10 +98,8 @@ export function PurchaseOrderForm({
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
-
       <Button type="submit" size="lg" disabled={saving} className="self-start">
-        <Send size={17} />
+        {showSpinner ? <Spinner size={17} /> : <Send size={17} />}
         {saving ? "יוצר..." : "יצירת הזמנת רכש"}
       </Button>
     </form>
