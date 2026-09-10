@@ -1,6 +1,18 @@
 import type { Product } from "@/lib/types";
 import { brands } from "@/lib/data/brands";
 
+/**
+ * Props for a `<script type="application/ld+json" dangerouslySetInnerHTML=.../>`.
+ * JSON.stringify does NOT escape "<" — a product name/description (admin-
+ * editable) containing a literal "</script>" would otherwise close the tag
+ * early and let anything after it run as HTML/JS on every visitor's page.
+ * Replacing every "<" with its unicode escape keeps the JSON perfectly
+ * valid (parsers treat it identically) while making that breakout impossible.
+ */
+export function jsonLdScriptProps(data: unknown) {
+  return { __html: JSON.stringify(data).replace(/</g, "\\u003c") };
+}
+
 export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",

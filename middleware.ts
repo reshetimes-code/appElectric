@@ -1,28 +1,23 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { verifySessionToken } from "@/lib/adminSession";
 
-// Minimal password gate for /admin — protects the admin UI and its API routes
-// so they're not wide open. This is intentionally simple (a single shared
-// password in an env var, a signed-nothing session cookie) and is NOT
-// production-grade authentication: no per-user accounts, no roles, no
-// hashing/rotation. Real admin auth (roles, real sessions) is a Phase C item
-// once there's a real backend/DB — see README.md.
+// Password gate for /admin — protects the admin UI and its API routes so
+// they're not wide open. The session cookie is an HMAC-signed, self-expiring
+// token (see lib/adminSession.ts) rather than a guessable constant, so it
+// can't be forged without knowing SESSION_SECRET. Still not full
+// production-grade auth (single shared password, no per-user accounts/roles)
+// — see README "What's next" for that.
 const ADMIN_COOKIE = "appelectric_admin";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAdminArea = pathname.startsWith("/admin") && pathname !== "/admin/login";
-  const isAdminApi =
-    pathname.startsWith("/api/admin") &&
-    pathname !== "/api/admin/login" &&
-    // Guarded by its own x-migration-secret check, not the admin cookie — it
-    // must be callable once, right after a fresh deploy, before anyone has
-    // logged into /admin.
-    pathname !== "/api/admin/migrate-to-firestore";
+  const isAdminApi = pathname.startsWith("/api/admin") && pathname !== "/api/admin/login";
 
   if (!isAdminArea && !isAdminApi) return NextResponse.next();
 
   const cookie = request.cookies.get(ADMIN_COOKIE)?.value;
-  if (cookie === "ok") return NextResponse.next();
+  if (await verifySessionToken(cookie)) return NextResponse.next();
 
   if (isAdminApi) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

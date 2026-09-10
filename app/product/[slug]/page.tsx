@@ -17,7 +17,7 @@ import { getRelatedProducts } from "@/lib/repo/products";
 import { getAllProducts } from "@/lib/server/adminProducts";
 import { categories } from "@/lib/data/categories";
 import { getBrandBySlug } from "@/lib/data/brands";
-import { productJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { productJsonLd, breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo";
 import { ShieldCheck, Info } from "lucide-react";
 
 // Product data now lives in Firestore (admin-added products, image overrides)
@@ -60,8 +60,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScriptProps(jsonLd)} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScriptProps(crumbs)} />
 
       <Container className="flex flex-col gap-6 py-6 pb-28 sm:py-10 lg:pb-10">
         <Breadcrumbs

@@ -12,14 +12,14 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { getFeaturedProducts } from "@/lib/repo/products";
-import { organizationJsonLd } from "@/lib/seo";
+import { organizationJsonLd, jsonLdScriptProps } from "@/lib/seo";
 
 export default function Home() {
   const featured = getFeaturedProducts(8);
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScriptProps(organizationJsonLd())} />
       <Hero />
       <BrandStrip />
       <DepartmentCards />

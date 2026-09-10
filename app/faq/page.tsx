@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { faqs } from "@/lib/data/faqs";
+import { jsonLdScriptProps } from "@/lib/seo";
 
 export const metadata: Metadata = { title: "שאלות נפוצות" };
 
@@ -32,7 +33,7 @@ export default function FaqPage() {
 
   return (
     <Container className="flex flex-col gap-8 py-8 sm:py-12">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScriptProps(jsonLd)} />
       <Breadcrumbs items={[{ label: "שאלות נפוצות" }]} />
       <h1 className="font-heading text-3xl font-bold text-charcoal-900 sm:text-4xl">שאלות נפוצות</h1>
 
