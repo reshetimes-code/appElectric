@@ -48,7 +48,7 @@ export default async function AdminProductsPage() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-charcoal-900">{p.nameHe}</p>
                   <p className="text-xs text-charcoal-500">
-                    מק&quot;ט {p.sku} {isAdminOwned && <span className="text-brand-600">· נוסף על ידך</span>}
+                    {p.model || "—"} {isAdminOwned && <span className="text-brand-600">· נוסף על ידך</span>}
                   </p>
                 </div>
               </div>

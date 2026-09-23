@@ -51,7 +51,6 @@ export function ProductForm({
 }) {
   const router = useRouter();
   const [nameHe, setNameHe] = useState(initial?.nameHe ?? "");
-  const [sku, setSku] = useState(initial?.sku ?? "");
   const [model, setModel] = useState(initial?.model ?? "");
   const [shortDescriptionHe, setShortDescriptionHe] = useState(initial?.shortDescriptionHe ?? "");
   const [descriptionHe, setDescriptionHe] = useState(initial?.descriptionHe ?? "");
@@ -157,14 +156,13 @@ export function ProductForm({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!nameHe.trim() || !sku.trim() || !brandId || !categoryId || !subcategoryId) {
+    if (!nameHe.trim() || !brandId || !categoryId || !subcategoryId) {
       showError("יש למלא את כל שדות החובה");
       return;
     }
     setSaving(true);
     const payload = {
       nameHe,
-      sku,
       model,
       shortDescriptionHe,
       descriptionHe,
@@ -214,10 +212,6 @@ export function ProductForm({
           <div className="sm:col-span-2">
             <label className="mb-1 block text-sm text-charcoal-600">שם המוצר *</label>
             <input value={nameHe} onChange={(e) => setNameHe(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm text-charcoal-600">מק&quot;ט (SKU) *</label>
-            <input value={sku} onChange={(e) => setSku(e.target.value)} dir="ltr" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
           </div>
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">דגם</label>

@@ -9,7 +9,6 @@ const FILE = "product-detail-overrides.json";
  * feature ids, reviews...). */
 export interface ProductDetailOverride {
   nameHe: string;
-  sku: string;
   model: string;
   shortDescriptionHe: string;
   descriptionHe?: string;

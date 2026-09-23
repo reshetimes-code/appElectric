@@ -75,7 +75,6 @@ export async function updateProductImages(id: string, images: string[]): Promise
 
 export interface AdminProductInput {
   nameHe: string;
-  sku: string;
   model: string;
   shortDescriptionHe: string;
   descriptionHe?: string;
@@ -90,12 +89,18 @@ export interface AdminProductInput {
   warrantyText?: string;
 }
 
-async function buildFromInput(id: string, slug: string, input: AdminProductInput, createdAt: string): Promise<Product> {
+async function buildFromInput(
+  id: string,
+  slug: string,
+  input: AdminProductInput,
+  createdAt: string,
+  sku: string,
+): Promise<Product> {
   const category = (await getAllCategories()).find((c) => c.id === input.categoryId);
   return {
     id,
     slug,
-    sku: input.sku,
+    sku,
     model: input.model,
     nameHe: input.nameHe,
     shortDescriptionHe: input.shortDescriptionHe,
@@ -133,7 +138,6 @@ async function applyDetailOverride(product: Product, override: ProductDetailOver
   return {
     ...product,
     nameHe: override.nameHe,
-    sku: override.sku,
     model: override.model,
     shortDescriptionHe: override.shortDescriptionHe,
     descriptionHe: override.descriptionHe || override.shortDescriptionHe,
@@ -151,7 +155,7 @@ async function applyDetailOverride(product: Product, override: ProductDetailOver
 }
 
 /**
- * Updates the editable details (name, sku, price, category, stock...) of a
+ * Updates the editable details (name, price, category, stock...) of a
  * product, whichever kind it is: for a seed product this writes a detail
  * override (parallel to the images override) without touching the
  * code-defined structural fields; for an admin-added product it patches that
@@ -166,7 +170,13 @@ export async function updateProductDetails(id: string, input: ProductDetailOverr
   const all = await getAdminProducts();
   const existing = all.find((p) => p.id === id);
   if (!existing) return undefined;
-  const updated = await buildFromInput(id, existing.slug, { ...input, images: existing.images }, existing.createdAt);
+  const updated = await buildFromInput(
+    id,
+    existing.slug,
+    { ...input, images: existing.images },
+    existing.createdAt,
+    existing.sku,
+  );
   await writeJson(
     FILE,
     all.map((p) => (p.id === id ? updated : p)),
@@ -177,8 +187,15 @@ export async function updateProductDetails(id: string, input: ProductDetailOverr
 export async function createAdminProduct(input: AdminProductInput): Promise<Product> {
   const all = await getAdminProducts();
   const id = `admin-${genId()}`;
-  const slug = slugify(`${input.nameHe}-${input.sku}`) || id;
-  const product = await buildFromInput(id, slug, input, new Date().toISOString());
+  const existingSlugs = new Set([...seedProducts, ...all].map((p) => p.slug));
+  const baseSlug = slugify(input.nameHe) || id;
+  let slug = baseSlug;
+  let n = 2;
+  while (existingSlugs.has(slug)) slug = `${baseSlug}-${n++}`;
+  // SKU is no longer collected from the admin — it was only ever used
+  // internally for the slug/search/SEO, so it's derived from the id instead.
+  const sku = id.toUpperCase();
+  const product = await buildFromInput(id, slug, input, new Date().toISOString(), sku);
   await writeJson(FILE, [...all, product]);
   return product;
 }
@@ -187,7 +204,7 @@ export async function updateAdminProduct(id: string, input: AdminProductInput): 
   const all = await getAdminProducts();
   const existing = all.find((p) => p.id === id);
   if (!existing) return undefined;
-  const updated = await buildFromInput(id, existing.slug, input, existing.createdAt);
+  const updated = await buildFromInput(id, existing.slug, input, existing.createdAt, existing.sku);
   await writeJson(
     FILE,
     all.map((p) => (p.id === id ? updated : p)),

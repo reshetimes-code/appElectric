@@ -14,7 +14,7 @@ export default async function ProductImagesPage({ params }: { params: Promise<{ 
       <div>
         <h1 className="font-heading text-2xl font-semibold text-charcoal-900">תמונות — {product.nameHe}</h1>
         <p className="mt-1 text-sm text-charcoal-500">
-          מק&quot;ט {product.sku} · דגם {product.model}. שינוי כאן משפיע רק על התמונות של המוצר הזה — כל שאר הפרטים (מפרט, מידות, מחיר וכו&apos;) נשארים כמו שהם.
+          דגם {product.model}. שינוי כאן משפיע רק על התמונות של המוצר הזה — כל שאר הפרטים (מפרט, מידות, מחיר וכו&apos;) נשארים כמו שהם.
         </p>
       </div>
       <ProductImagesForm productId={product.id} initialImages={product.images} />

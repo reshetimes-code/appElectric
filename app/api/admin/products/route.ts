@@ -8,7 +8,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const body = (await request.json()) as AdminProductInput;
 
-  if (!body.nameHe?.trim() || !body.sku?.trim() || !body.brandId || !body.categoryId || !body.subcategoryId) {
+  if (!body.nameHe?.trim() || !body.brandId || !body.categoryId || !body.subcategoryId) {
     return NextResponse.json({ error: "יש למלא את כל שדות החובה" }, { status: 400 });
   }
   if (!Number.isFinite(body.price) || body.price <= 0) {
