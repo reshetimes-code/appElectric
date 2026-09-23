@@ -34,7 +34,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const product = (await getAllProducts()).find((p) => p.slug === slug);
+  const product = (await getAllProducts()).find((p) => p.slug === decodeURIComponent(slug));
   if (!product) return {};
   return {
     title: product.seoTitle ?? product.nameHe,
@@ -43,7 +43,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  // Slugs can contain non-ASCII (Hebrew) characters — see slugify() in lib/utils.ts,
+  // used for every admin-created product/category. The framework doesn't reliably
+  // decode a percent-encoded dynamic-segment value by the time it reaches this
+  // Server Component body (unlike generateMetadata, which does), so without this
+  // the page 404s for any real visitor whose browser sent an encoded URL — while
+  // the <title>/meta tags (from generateMetadata above) still looked correct.
+  const slug = decodeURIComponent(rawSlug);
   const allProducts = await getAllProducts();
   const product = allProducts.find((p) => p.slug === slug);
   if (!product) notFound();

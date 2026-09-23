@@ -17,7 +17,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  const category = await getCategoryBySlug(decodeURIComponent(slug));
   if (!category) return {};
   return {
     title: category.nameHe,
@@ -32,7 +32,11 @@ export default async function CategoryDetailPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  // See the identical comment in app/product/[slug]/page.tsx — category slugs
+  // can contain Hebrew too (any admin-created category), and the raw
+  // percent-encoded segment doesn't arrive decoded here by default.
+  const slug = decodeURIComponent(rawSlug);
   const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
