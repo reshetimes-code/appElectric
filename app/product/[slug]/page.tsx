@@ -108,7 +108,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </p>
             )}
 
-            <PriceTag price={product.price} compareAtPrice={product.compareAtPrice} installmentsMonths={product.installmentsMonths} size="lg" />
+            {product.availabilityStatus === "call-me-back" ? (
+              <p className="font-heading text-lg font-semibold text-charcoal-900">צרו קשר לקבלת מחיר</p>
+            ) : (
+              <PriceTag price={product.price} compareAtPrice={product.compareAtPrice} installmentsMonths={product.installmentsMonths} size="lg" />
+            )}
 
             <FeatureIcons featureIds={product.featureIds} />
 

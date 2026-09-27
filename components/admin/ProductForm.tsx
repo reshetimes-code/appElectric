@@ -20,6 +20,7 @@ const AVAILABILITY_OPTIONS: Product["availabilityStatus"][] = [
   "limited",
   "personal-import",
   "out-of-stock",
+  "call-me-back",
 ];
 
 // There's no manual "כמות במלאי" field in the form anymore — availability
@@ -30,18 +31,21 @@ function stockQuantityForStatus(status: Product["availabilityStatus"], previous:
   if (status === "out-of-stock") return 0;
   if (status === "limited") return 3;
   if (status === "personal-import") return 0;
+  if (status === "call-me-back") return 0;
   return previous > 0 ? previous : 20;
 }
 
 export function ProductForm({
   brands,
   categories,
+  screenSizes,
   initial,
   productId,
   mode = "full",
 }: {
   brands: FormBrand[];
   categories: FormCategory[];
+  screenSizes: number[];
   initial?: Product;
   productId?: string;
   /** "full" (default): create/edit an admin-added product, images included.
@@ -73,6 +77,11 @@ export function ProductForm({
   const [availabilityStatus, setAvailabilityStatus] = useState<Product["availabilityStatus"]>(
     initial?.availabilityStatus ?? "in-stock",
   );
+  const [screenSizeList, setScreenSizeList] = useState<number[]>(screenSizes);
+  const [screenSizeInch, setScreenSizeInch] = useState(initial?.screenSizeInch ? String(initial.screenSizeInch) : "");
+  const [addingScreenSize, setAddingScreenSize] = useState(false);
+  const [newScreenSize, setNewScreenSize] = useState("");
+  const [creatingScreenSize, setCreatingScreenSize] = useState(false);
   const [images, setImages] = useState<string[]>(initial?.images ?? []);
   const [saving, setSaving] = useState(false);
   const showSpinner = useDelayedPending(saving, 500);
@@ -129,6 +138,31 @@ export function ProductForm({
     setAddingSubcategory(false);
   }
 
+  async function createScreenSize() {
+    const size = Number(newScreenSize);
+    if (!Number.isFinite(size) || size <= 0) {
+      showError("יש להזין גודל מסך תקין");
+      return;
+    }
+    setCreatingScreenSize(true);
+    const res = await fetch("/api/admin/screen-sizes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ size }),
+    });
+    setCreatingScreenSize(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      showError(data.error || "הוספת גודל המסך נכשלה");
+      return;
+    }
+    const { screenSizes: updated } = await res.json();
+    setScreenSizeList(updated);
+    setScreenSizeInch(String(size));
+    setNewScreenSize("");
+    setAddingScreenSize(false);
+  }
+
   async function createCategory() {
     if (!newCategoryName.trim()) {
       showError("יש להזין שם קטגוריה");
@@ -174,6 +208,7 @@ export function ProductForm({
       ...(mode === "full" ? { images } : {}),
       stockQuantity: stockQuantityForStatus(availabilityStatus, initial?.stockQuantity ?? 0),
       availabilityStatus,
+      screenSizeInch: screenSizeInch ? Number(screenSizeInch) : undefined,
     };
     const url =
       mode === "details"
@@ -392,8 +427,13 @@ export function ProductForm({
         <h2 className="mb-4 font-heading text-base font-semibold text-charcoal-900">מחיר ומלאי</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <label className="mb-1 block text-sm text-charcoal-600">מחיר (₪) *</label>
+            <label className="mb-1 block text-sm text-charcoal-600">
+              מחיר (₪) {availabilityStatus !== "call-me-back" && "*"}
+            </label>
             <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
+            {availabilityStatus === "call-me-back" && (
+              <p className="mt-1 text-xs text-charcoal-400">לא חובה במצב &quot;חזרו אליי&quot; — המחיר לא יוצג באתר.</p>
+            )}
           </div>
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">מחיר קודם (מבצע)</label>
@@ -406,6 +446,56 @@ export function ProductForm({
                 <option key={s} value={s}>{AVAILABILITY_LABELS[s]}</option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm text-charcoal-600">גודל מסך (אינץ&apos;)</label>
+            <select value={screenSizeInch} onChange={(e) => setScreenSizeInch(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm">
+              <option value="">לא רלוונטי</option>
+              {screenSizeList.map((s) => (
+                <option key={s} value={s}>{s}&quot;</option>
+              ))}
+            </select>
+            {!addingScreenSize ? (
+              <button
+                type="button"
+                onClick={() => setAddingScreenSize(true)}
+                className="mt-1.5 flex items-center gap-1 text-xs font-medium text-brand-700 hover:text-brand-800"
+              >
+                <Plus size={13} />
+                גודל חדש
+              </button>
+            ) : (
+              <div className="mt-1.5 flex items-center gap-1.5">
+                <input
+                  type="number"
+                  value={newScreenSize}
+                  onChange={(e) => setNewScreenSize(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      createScreenSize();
+                    }
+                  }}
+                  placeholder="גודל באינץ'"
+                  autoFocus
+                  className="h-9 flex-1 rounded-[var(--radius-control)] border border-sand-300 px-2.5 text-sm"
+                />
+                <Button type="button" onClick={createScreenSize} size="sm" disabled={creatingScreenSize}>
+                  {creatingScreenSize ? <Spinner size={15} /> : "הוסף"}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddingScreenSize(false);
+                    setNewScreenSize("");
+                  }}
+                  aria-label="ביטול"
+                  className="rounded-full p-1.5 text-charcoal-400 hover:bg-sand-100"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

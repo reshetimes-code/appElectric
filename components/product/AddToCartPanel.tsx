@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ShoppingBag, Zap } from "lucide-react";
+import { ShoppingBag, Zap, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/lib/context/CartContext";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -12,6 +12,7 @@ export function AddToCartPanel({ product }: { product: Product }) {
   const toast = useToast();
   const router = useRouter();
   const outOfStock = product.availabilityStatus === "out-of-stock";
+  const callMeBack = product.availabilityStatus === "call-me-back";
 
   function addToCart() {
     cart.addItem(product.id, 1);
@@ -21,6 +22,21 @@ export function AddToCartPanel({ product }: { product: Product }) {
   function buyNow() {
     cart.addItem(product.id, 1);
     router.push("/checkout");
+  }
+
+  if (callMeBack) {
+    return (
+      <Button
+        href={`https://wa.me/972500000000?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        size="lg"
+        fullWidth
+      >
+        <MessageCircle size={17} />
+        צרו קשר לגבי מוצר זה
+      </Button>
+    );
   }
 
   return (

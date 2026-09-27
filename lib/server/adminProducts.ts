@@ -8,6 +8,7 @@ import {
 import { genId, slugify } from "@/lib/utils";
 import { getAllCategories } from "@/lib/server/adminCategories";
 import { getAllBrands } from "@/lib/server/adminBrands";
+import { getAllScreenSizes } from "@/lib/server/adminScreenSizes";
 import { products as seedProducts } from "@/lib/data/products";
 import type { Product } from "@/lib/types";
 
@@ -87,6 +88,7 @@ export interface AdminProductInput {
   stockQuantity: number;
   availabilityStatus: Product["availabilityStatus"];
   warrantyText?: string;
+  screenSizeInch?: number;
 }
 
 async function buildFromInput(
@@ -119,6 +121,7 @@ async function buildFromInput(
     specGroups: [],
     featureIds: [],
     warrantyText: input.warrantyText || "אחריות יצרן לשנתיים.",
+    screenSizeInch: input.screenSizeInch,
     stockQuantity: input.stockQuantity,
     manageStock: true,
     availabilityStatus: input.availabilityStatus,
@@ -149,6 +152,7 @@ async function applyDetailOverride(product: Product, override: ProductDetailOver
     compareAtPrice: override.compareAtPrice,
     installmentsMonths: override.price >= 4000 ? 12 : override.price >= 1500 ? 6 : undefined,
     warrantyText: override.warrantyText || product.warrantyText,
+    screenSizeInch: override.screenSizeInch,
     stockQuantity: override.stockQuantity,
     availabilityStatus: override.availabilityStatus,
   };
@@ -221,7 +225,7 @@ export async function deleteAdminProduct(id: string): Promise<boolean> {
 }
 
 export async function listBrandsAndCategoriesForForm() {
-  const [brands, categories] = await Promise.all([getAllBrands(), getAllCategories()]);
+  const [brands, categories, screenSizes] = await Promise.all([getAllBrands(), getAllCategories(), getAllScreenSizes()]);
   return {
     brands: brands.map((b) => ({ id: b.id, nameHe: b.nameHe })),
     categories: categories.map((c) => ({
@@ -229,5 +233,6 @@ export async function listBrandsAndCategoriesForForm() {
       nameHe: c.nameHe,
       subcategories: c.subcategories.map((s) => ({ id: s.id, nameHe: s.nameHe })),
     })),
+    screenSizes,
   };
 }

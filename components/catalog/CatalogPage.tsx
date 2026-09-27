@@ -5,7 +5,8 @@ import { SortSelect } from "@/components/catalog/SortSelect";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { Pagination } from "@/components/catalog/Pagination";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import type { Category, Product } from "@/lib/types";
+import type { FacetCounts } from "@/components/catalog/FilterControls";
+import type { Category, Product, Brand } from "@/lib/types";
 
 const PAGE_SIZE = 12;
 
@@ -15,6 +16,9 @@ export function CatalogPage({
   breadcrumb,
   products,
   category,
+  brands,
+  screenSizes,
+  facetCounts,
   page,
   buildPageHref,
 }: {
@@ -23,6 +27,9 @@ export function CatalogPage({
   breadcrumb: { label: string; href?: string }[];
   products: Product[];
   category?: Category;
+  brands: Brand[];
+  screenSizes: number[];
+  facetCounts: FacetCounts;
   page: number;
   buildPageHref: (page: number) => string;
 }) {
@@ -40,7 +47,7 @@ export function CatalogPage({
         </div>
 
         <div className="flex gap-8">
-          <FilterPanel category={category} />
+          <FilterPanel category={category} brands={brands} screenSizes={screenSizes} facetCounts={facetCounts} />
           <div className="min-w-0 flex-1">
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-sm text-charcoal-500">{products.length} מוצרים</p>
@@ -51,7 +58,7 @@ export function CatalogPage({
           </div>
         </div>
       </Container>
-      <FilterSheet category={category} />
+      <FilterSheet category={category} brands={brands} screenSizes={screenSizes} facetCounts={facetCounts} />
     </div>
   );
 }

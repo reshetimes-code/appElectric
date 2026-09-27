@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   if (!body.nameHe?.trim() || !body.brandId || !body.categoryId || !body.subcategoryId) {
     return NextResponse.json({ error: "יש למלא את כל שדות החובה" }, { status: 400 });
   }
-  if (!Number.isFinite(body.price) || body.price <= 0) {
+  if (body.availabilityStatus !== "call-me-back" && (!Number.isFinite(body.price) || body.price <= 0)) {
     return NextResponse.json({ error: "מחיר לא תקין" }, { status: 400 });
   }
 

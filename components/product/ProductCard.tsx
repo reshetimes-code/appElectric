@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Scale, ShoppingBag } from "lucide-react";
+import { Heart, Scale, ShoppingBag, MessageCircle } from "lucide-react";
 import { ApplianceArt } from "@/components/product/ApplianceArt";
 import { AvailabilityBadge } from "@/components/product/AvailabilityBadge";
 import { Badge } from "@/components/ui/Badge";
@@ -30,6 +30,7 @@ export function ProductCard({ product, className }: { product: Product; classNam
   const active = favorites.isFavorite(product.id);
   const selectedForCompare = compare.isSelected(product.id);
   const outOfStock = product.availabilityStatus === "out-of-stock";
+  const callMeBack = product.availabilityStatus === "call-me-back";
 
   return (
     <div
@@ -77,22 +78,38 @@ export function ProductCard({ product, className }: { product: Product; classNam
         <p className="line-clamp-2 text-xs leading-relaxed text-charcoal-500">{product.shortDescriptionHe}</p>
         <div className="mt-auto flex flex-col gap-2 pt-2">
           <AvailabilityBadge status={product.availabilityStatus} />
-          <PriceTag price={product.price} compareAtPrice={product.compareAtPrice} installmentsMonths={product.installmentsMonths} size="sm" />
+          {callMeBack ? (
+            <p className="text-sm font-medium text-brand-700">צרו קשר לבירור מחיר</p>
+          ) : (
+            <PriceTag price={product.price} compareAtPrice={product.compareAtPrice} installmentsMonths={product.installmentsMonths} size="sm" />
+          )}
         </div>
 
         <div className="mt-2 flex items-center gap-2">
-          <button
-            type="button"
-            disabled={outOfStock}
-            onClick={() => {
-              cart.addItem(product.id, 1);
-              toast.show(`${product.nameHe} נוסף לסל`);
-            }}
-            className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-[var(--radius-control)] bg-charcoal-900 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:opacity-40"
-          >
-            <ShoppingBag size={15} />
-            {outOfStock ? "אזל מהמלאי" : "הוסף לסל"}
-          </button>
+          {callMeBack ? (
+            <a
+              href={`https://wa.me/972500000000?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-[var(--radius-control)] bg-charcoal-900 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+            >
+              <MessageCircle size={15} />
+              צרו קשר
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled={outOfStock}
+              onClick={() => {
+                cart.addItem(product.id, 1);
+                toast.show(`${product.nameHe} נוסף לסל`);
+              }}
+              className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-[var(--radius-control)] bg-charcoal-900 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:opacity-40"
+            >
+              <ShoppingBag size={15} />
+              {outOfStock ? "אזל מהמלאי" : "הוסף לסל"}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => {

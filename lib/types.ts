@@ -7,7 +7,8 @@ export type AvailabilityStatus =
   | "in-stock" // במלאי
   | "limited" // מלאי מוגבל
   | "personal-import" // ייבוא אישי – צרו קשר למועד אספקה
-  | "out-of-stock"; // אזל מהמלאי
+  | "out-of-stock" // אזל מהמלאי
+  | "call-me-back"; // חזרו אליי – ללא מחיר, יצירת קשר במקום קנייה
 
 export type EnergyRating =
   | "A+++"
@@ -95,6 +96,8 @@ export interface Product {
   energyRating?: EnergyRating;
   annualEnergyKwh?: number;
   noiseDb?: number;
+  /** TV/monitor screen size in inches — only relevant for the multimedia category. */
+  screenSizeInch?: number;
 
   specGroups: SpecGroup[];
   featureIds: FeatureIcon[];

@@ -11,6 +11,7 @@ export interface ProductFilters {
   priceMax?: number;
   availability?: string[];
   energyRating?: string[];
+  screenSizeInch?: number[];
   premium?: boolean;
   personalImport?: boolean;
   deals?: boolean;
@@ -47,6 +48,11 @@ export function matchesFilters(product: Product, filters: ProductFilters, catego
   if (filters.availability?.length && !filters.availability.includes(product.availabilityStatus)) return false;
   if (filters.energyRating?.length && (!product.energyRating || !filters.energyRating.includes(product.energyRating)))
     return false;
+  if (
+    filters.screenSizeInch?.length &&
+    (product.screenSizeInch == null || !filters.screenSizeInch.includes(product.screenSizeInch))
+  )
+    return false;
   if (filters.premium && !product.premium) return false;
   if (filters.personalImport && product.availabilityStatus !== "personal-import") return false;
   if (filters.deals && !product.compareAtPrice) return false;
@@ -60,6 +66,33 @@ export function matchesFilters(product: Product, filters: ProductFilters, catego
     if (!haystack.includes(q)) return false;
   }
   return true;
+}
+
+/**
+ * Per-facet product counts for the catalog sidebar (e.g. "(17) CHiQ" next to a
+ * brand checkbox) — each facet's count is computed against every *other*
+ * active filter but ignores its own, so checking one brand doesn't zero out
+ * the count next to every other brand.
+ */
+export function getFacetCounts(
+  list: Product[],
+  filters: ProductFilters,
+  categoryList: Category[] = categories,
+): { brand: Record<string, number>; screenSizeInch: Record<number, number> } {
+  const withoutBrand = { ...filters, brand: undefined };
+  const withoutScreenSize = { ...filters, screenSizeInch: undefined };
+  const brand: Record<string, number> = {};
+  const screenSizeInch: Record<number, number> = {};
+  for (const product of list) {
+    if (matchesFilters(product, withoutBrand, categoryList)) {
+      const slug = brandSlug(product.brandId);
+      brand[slug] = (brand[slug] ?? 0) + 1;
+    }
+    if (product.screenSizeInch != null && matchesFilters(product, withoutScreenSize, categoryList)) {
+      screenSizeInch[product.screenSizeInch] = (screenSizeInch[product.screenSizeInch] ?? 0) + 1;
+    }
+  }
+  return { brand, screenSizeInch };
 }
 
 export function sortProducts(list: Product[], sort: ProductFilters["sort"]) {
@@ -89,6 +122,7 @@ export function parseFilters(sp: SearchParamsLike): ProductFilters {
     const value = str(v);
     return value ? Number(value) : undefined;
   };
+  const numList = (v: string | string[] | undefined) => list(v)?.map(Number);
   return {
     subcategory: str(sp.subcategory),
     brand: list(sp.brand),
@@ -96,6 +130,7 @@ export function parseFilters(sp: SearchParamsLike): ProductFilters {
     priceMax: num(sp.priceMax),
     availability: list(sp.availability),
     energyRating: list(sp.energyRating),
+    screenSizeInch: numList(sp.screenSizeInch),
     premium: str(sp.premium) === "1",
     personalImport: str(sp.personalImport) === "1",
     deals: str(sp.deals) === "1",

@@ -80,6 +80,7 @@ export const categories: Category[] = [
       { id: "tv-75plus", slug: "large-screens-75", nameHe: 'מסכים ״75+' },
       { id: "tv-oled", slug: "oled", nameHe: "OLED" },
       { id: "tv-qled", slug: "qled", nameHe: "QLED" },
+      { id: "tv-miniled", slug: "mini-led", nameHe: "Mini-LED" },
       { id: "soundbars", slug: "soundbars", nameHe: "סאונדבארים" },
     ],
   },

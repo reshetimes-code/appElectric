@@ -51,7 +51,7 @@ export function productJsonLd(product: Product) {
       priceCurrency: "ILS",
       price: product.price,
       availability:
-        product.availabilityStatus === "out-of-stock"
+        product.availabilityStatus === "out-of-stock" || product.availabilityStatus === "call-me-back"
           ? "https://schema.org/OutOfStock"
           : "https://schema.org/InStock",
     },

@@ -43,6 +43,7 @@ export const AVAILABILITY_LABELS: Record<string, string> = {
   limited: "מלאי מוגבל",
   "personal-import": "ייבוא אישי – צרו קשר למועד אספקה",
   "out-of-stock": "אזל מהמלאי",
+  "call-me-back": "חזרו אליי",
 };
 
 export const AVAILABILITY_TONE: Record<string, "success" | "warning" | "info" | "muted"> = {
@@ -51,4 +52,5 @@ export const AVAILABILITY_TONE: Record<string, "success" | "warning" | "info" | 
   limited: "warning",
   "personal-import": "info",
   "out-of-stock": "muted",
+  "call-me-back": "info",
 };

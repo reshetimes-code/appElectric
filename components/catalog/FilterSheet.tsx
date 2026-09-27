@@ -2,11 +2,21 @@
 
 import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
-import { FilterControls } from "@/components/catalog/FilterControls";
+import { FilterControls, type FacetCounts } from "@/components/catalog/FilterControls";
 import { useFilterParams } from "@/lib/hooks/useFilterParams";
-import type { Category } from "@/lib/types";
+import type { Category, Brand } from "@/lib/types";
 
-export function FilterSheet({ category }: { category?: Category }) {
+export function FilterSheet({
+  category,
+  brands,
+  screenSizes,
+  facetCounts,
+}: {
+  category?: Category;
+  brands: Brand[];
+  screenSizes: number[];
+  facetCounts: FacetCounts;
+}) {
   const [open, setOpen] = useState(false);
   const { activeCount } = useFilterParams();
 
@@ -32,7 +42,7 @@ export function FilterSheet({ category }: { category?: Category }) {
                 <X size={20} />
               </button>
             </div>
-            <FilterControls category={category} />
+            <FilterControls category={category} brands={brands} screenSizes={screenSizes} facetCounts={facetCounts} />
             <button
               type="button"
               onClick={() => setOpen(false)}

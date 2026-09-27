@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
-import { getProducts, parseFilters } from "@/lib/repo/products";
+import { getProducts, parseFilters, getFacetCounts } from "@/lib/repo/products";
 import { getAllProducts } from "@/lib/server/adminProducts";
 import { getAllCategories } from "@/lib/server/adminCategories";
+import { getAllBrands } from "@/lib/server/adminBrands";
+import { getAllScreenSizes } from "@/lib/server/adminScreenSizes";
 
 export const metadata: Metadata = { title: "תוצאות חיפוש" };
 
@@ -13,8 +15,14 @@ export default async function SearchPage({
 }) {
   const sp = await searchParams;
   const filters = parseFilters(sp);
-  const [allProducts, allCategories] = await Promise.all([getAllProducts(), getAllCategories()]);
+  const [allProducts, allCategories, brands, screenSizes] = await Promise.all([
+    getAllProducts(),
+    getAllCategories(),
+    getAllBrands(),
+    getAllScreenSizes(),
+  ]);
   const products = getProducts(filters, allProducts, allCategories);
+  const facetCounts = getFacetCounts(allProducts, filters, allCategories);
   const page = sp.page ? Number(Array.isArray(sp.page) ? sp.page[0] : sp.page) : 1;
   const q = Array.isArray(sp.q) ? sp.q[0] : sp.q ?? "";
 
@@ -32,6 +40,9 @@ export default async function SearchPage({
       description={!q ? "הקלידו מונח חיפוש בשורת החיפוש למעלה." : undefined}
       breadcrumb={[{ label: "חיפוש" }]}
       products={products}
+      brands={brands}
+      screenSizes={screenSizes}
+      facetCounts={facetCounts}
       page={page}
       buildPageHref={buildPageHref}
     />

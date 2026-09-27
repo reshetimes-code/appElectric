@@ -20,6 +20,7 @@ export function useFilterParams() {
       priceMax: get("priceMax") ? Number(get("priceMax")) : undefined,
       availability: getList("availability"),
       energyRating: getList("energyRating"),
+      screenSizeInch: getList("screenSizeInch")?.map(Number),
       premium: get("premium") === "1",
       personalImport: get("personalImport") === "1",
       deals: get("deals") === "1",
@@ -37,6 +38,7 @@ export function useFilterParams() {
     if (filters.priceMin != null || filters.priceMax != null) n++;
     if (filters.availability?.length) n += filters.availability.length;
     if (filters.energyRating?.length) n += filters.energyRating.length;
+    if (filters.screenSizeInch?.length) n += filters.screenSizeInch.length;
     if (filters.premium) n++;
     if (filters.personalImport) n++;
     if (filters.deals) n++;

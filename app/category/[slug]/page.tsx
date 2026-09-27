@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
 import { categories } from "@/lib/data/categories";
 import { getCategoryBySlug, getAllCategories } from "@/lib/server/adminCategories";
-import { getProducts, parseFilters } from "@/lib/repo/products";
+import { getProducts, parseFilters, getFacetCounts } from "@/lib/repo/products";
 import { getAllProducts } from "@/lib/server/adminProducts";
+import { getAllBrands } from "@/lib/server/adminBrands";
+import { getAllScreenSizes } from "@/lib/server/adminScreenSizes";
 
 // Categories can now be created ad-hoc by an admin (from the product form),
 // stored in Firestore rather than in code — same reason app/product/[slug]/page.tsx
@@ -42,8 +44,14 @@ export default async function CategoryDetailPage({
 
   const sp = await searchParams;
   const filters = { ...parseFilters(sp), category: slug };
-  const [allProducts, allCategories] = await Promise.all([getAllProducts(), getAllCategories()]);
+  const [allProducts, allCategories, brands, screenSizes] = await Promise.all([
+    getAllProducts(),
+    getAllCategories(),
+    getAllBrands(),
+    getAllScreenSizes(),
+  ]);
   const products = getProducts(filters, allProducts, allCategories);
+  const facetCounts = getFacetCounts(allProducts, filters, allCategories);
   const page = sp.page ? Number(Array.isArray(sp.page) ? sp.page[0] : sp.page) : 1;
 
   const buildPageHref = (p: number) => {
@@ -64,6 +72,9 @@ export default async function CategoryDetailPage({
       breadcrumb={[{ label: category.nameHe }]}
       products={products}
       category={category}
+      brands={brands}
+      screenSizes={screenSizes}
+      facetCounts={facetCounts}
       page={page}
       buildPageHref={buildPageHref}
     />

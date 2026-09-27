@@ -20,6 +20,7 @@ export interface ProductDetailOverride {
   stockQuantity: number;
   availabilityStatus: Product["availabilityStatus"];
   warrantyText?: string;
+  screenSizeInch?: number;
 }
 
 /** Per-product detail overrides, keyed by product id — used for the 68 seed

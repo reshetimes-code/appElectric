@@ -1,16 +1,25 @@
 "use client";
 
 import { useFilterParams } from "@/lib/hooks/useFilterParams";
-import { brands } from "@/lib/data/brands";
 import { getPriceBounds } from "@/lib/repo/products";
 import { AVAILABILITY_LABELS } from "@/lib/utils";
-import type { Category } from "@/lib/types";
+import type { Category, Brand } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const AVAILABILITY_KEYS = ["immediate", "in-stock", "limited", "personal-import", "out-of-stock"];
+const AVAILABILITY_KEYS = ["immediate", "in-stock", "limited", "personal-import", "out-of-stock", "call-me-back"];
 const ENERGY_KEYS = ["A+++", "A++", "A+", "A", "B", "C"];
 
-function CheckRow({ checked, onChange, label }: { checked: boolean; onChange: () => void; label: string }) {
+function CheckRow({
+  checked,
+  onChange,
+  label,
+  count,
+}: {
+  checked: boolean;
+  onChange: () => void;
+  label: string;
+  count?: number;
+}) {
   return (
     <label className="flex cursor-pointer items-center gap-2.5 py-1.5 text-sm text-charcoal-700">
       <input
@@ -19,6 +28,7 @@ function CheckRow({ checked, onChange, label }: { checked: boolean; onChange: ()
         onChange={onChange}
         className="h-4 w-4 rounded border-sand-400 text-brand-600 focus:ring-brand-500"
       />
+      {count != null && <span className="text-xs text-charcoal-400">({count})</span>}
       {label}
     </label>
   );
@@ -33,9 +43,29 @@ function FilterGroup({ title, children }: { title: string; children: React.React
   );
 }
 
-export function FilterControls({ category }: { category?: Category }) {
+export interface FacetCounts {
+  brand: Record<string, number>;
+  screenSizeInch: Record<number, number>;
+}
+
+export function FilterControls({
+  category,
+  brands,
+  screenSizes,
+  facetCounts,
+}: {
+  category?: Category;
+  brands: Brand[];
+  screenSizes: number[];
+  facetCounts: FacetCounts;
+}) {
   const { filters, toggleListValue, setParam, clearAll, activeCount } = useFilterParams();
   const priceBounds = getPriceBounds();
+
+  const sortedBrands = [...brands]
+    .filter((b) => (facetCounts.brand[b.slug] ?? 0) > 0)
+    .sort((a, b) => a.nameHe.localeCompare(b.nameHe));
+  const availableScreenSizes = screenSizes.filter((s) => (facetCounts.screenSizeInch[s] ?? 0) > 0);
 
   return (
     <div>
@@ -61,11 +91,33 @@ export function FilterControls({ category }: { category?: Category }) {
         </FilterGroup>
       )}
 
-      <FilterGroup title="מותג">
-        {brands.map((b) => (
-          <CheckRow key={b.id} checked={!!filters.brand?.includes(b.slug)} onChange={() => toggleListValue("brand", b.slug)} label={b.nameHe} />
-        ))}
-      </FilterGroup>
+      {sortedBrands.length > 0 && (
+        <FilterGroup title="מותג">
+          {sortedBrands.map((b) => (
+            <CheckRow
+              key={b.id}
+              checked={!!filters.brand?.includes(b.slug)}
+              onChange={() => toggleListValue("brand", b.slug)}
+              label={b.nameHe}
+              count={facetCounts.brand[b.slug]}
+            />
+          ))}
+        </FilterGroup>
+      )}
+
+      {availableScreenSizes.length > 0 && (
+        <FilterGroup title="גודל מסך">
+          {availableScreenSizes.map((size) => (
+            <CheckRow
+              key={size}
+              checked={!!filters.screenSizeInch?.includes(size)}
+              onChange={() => toggleListValue("screenSizeInch", String(size))}
+              label={`${size}"`}
+              count={facetCounts.screenSizeInch[size]}
+            />
+          ))}
+        </FilterGroup>
+      )}
 
       <FilterGroup title="טווח מחיר">
         <div className="flex items-center gap-2">
