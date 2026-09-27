@@ -97,7 +97,7 @@ export function Header() {
       </div>
 
       <nav className="relative hidden border-t border-sand-200 lg:block">
-        <Container className="flex h-12 items-center gap-7">
+        <Container className="flex h-12 items-center gap-7 overflow-x-auto">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -105,16 +105,20 @@ export function Header() {
               onMouseEnter={() => setActiveMenu(cat.id)}
               onFocus={() => setActiveMenu(cat.id)}
               className={cn(
-                "text-sm font-medium transition-colors",
+                "shrink-0 whitespace-nowrap text-sm font-medium transition-colors",
                 activeMenu === cat.id ? "text-brand-700" : "text-charcoal-700 hover:text-brand-700",
               )}
             >
               <Link href={`/category/${cat.slug}`}>{cat.nameHe}</Link>
             </button>
           ))}
-          <span className="mx-1 h-4 w-px bg-sand-300" />
-          {SECONDARY_NAV_LINKS.slice(0, 5).map((link) => (
-            <Link key={link.href} href={link.href} className="text-sm font-medium text-charcoal-600 hover:text-brand-700">
+          <span className="mx-1 h-4 w-px shrink-0 bg-sand-300" />
+          {SECONDARY_NAV_LINKS.slice(0, 1).map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="shrink-0 whitespace-nowrap text-sm font-medium text-charcoal-600 hover:text-brand-700"
+            >
               {link.label}
             </Link>
           ))}

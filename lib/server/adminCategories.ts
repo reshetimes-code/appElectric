@@ -7,6 +7,16 @@ import type { Category } from "@/lib/types";
 
 const FILE = "admin-categories.json";
 
+// Stray/duplicate categories created while testing the "add category" flow from
+// the product form (e.g. a category that already exists as a subcategory under
+// a fixed department). Hidden here rather than deleted from the store so no
+// admin-entered data is lost, and any product already filed under them keeps working.
+const HIDDEN_ADMIN_CATEGORY_IDS = new Set([
+  "admin-cat-id-mtvi66vq-46520t276p4n1v2v3f0m5x49", // קטגוריית בדיקה חיה
+  "admin-cat-id-mtvim7bk-373l1v623q1f4d3p2f1k350f", // טלוויזיה (already a subcategory of multimedia)
+  "admin-cat-id-mufcq3r0-16056a1u2a3z434b47343x16", // כיריים אינדוקציה (already a subcategory of cooking)
+]);
+
 /**
  * Categories created ad-hoc by an admin from the product form (in addition to
  * the fixed catalog structure in lib/data/categories.ts). Each starts with
@@ -15,7 +25,8 @@ const FILE = "admin-categories.json";
  * products on top of the seed catalog.
  */
 export async function getAdminCategories(): Promise<Category[]> {
-  return readJson<Category[]>(FILE, []);
+  const all = await readJson<Category[]>(FILE, []);
+  return all.filter((c) => !HIDDEN_ADMIN_CATEGORY_IDS.has(c.id));
 }
 
 /** Static catalog categories + admin-added ones, each with any admin-added
