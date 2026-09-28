@@ -57,6 +57,7 @@ export function AddToCartPanel({ product }: { product: Product }) {
         rel="noopener noreferrer"
         variant="secondary"
         fullWidth
+        className="border-red-600 bg-red-600 text-white hover:border-red-700 hover:bg-red-700"
       >
         ייעוץ VIP בוואטסאפ על מוצר זה
       </Button>
