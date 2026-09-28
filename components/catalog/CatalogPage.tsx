@@ -3,6 +3,7 @@ import { FilterPanel } from "@/components/catalog/FilterPanel";
 import { FilterSheet } from "@/components/catalog/FilterSheet";
 import { SortSelect } from "@/components/catalog/SortSelect";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
+import { ResultsPendingOverlay } from "@/components/catalog/ResultsPendingOverlay";
 import { Pagination } from "@/components/catalog/Pagination";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import type { FacetCounts } from "@/components/catalog/FilterControls";
@@ -48,7 +49,8 @@ export function CatalogPage({
 
         <div className="flex gap-8">
           <FilterPanel category={category} brands={brands} screenSizes={screenSizes} facetCounts={facetCounts} />
-          <div className="min-w-0 flex-1">
+          <div className="relative min-w-0 flex-1">
+            <ResultsPendingOverlay />
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-sm text-charcoal-500">{products.length} מוצרים</p>
               <SortSelect />

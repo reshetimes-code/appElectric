@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useTransition } from "react";
 import type { ProductFilters } from "@/lib/repo/products";
 
 /** Reads/writes catalog filters to the URL query string so they survive refresh & are shareable. */
@@ -9,6 +9,7 @@ export function useFilterParams() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
   const filters: ProductFilters = useMemo(() => {
     const get = (key: string) => searchParams.get(key) ?? undefined;
@@ -57,7 +58,9 @@ export function useFilterParams() {
       } else {
         params.set(key, String(value));
       }
-      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      startTransition(() => {
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      });
     },
     [pathname, router, searchParams],
   );
@@ -75,8 +78,10 @@ export function useFilterParams() {
     const params = new URLSearchParams();
     const q = searchParams.get("q");
     if (q) params.set("q", q);
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    });
   }, [pathname, router, searchParams]);
 
-  return { filters, activeCount, setParam, toggleListValue, clearAll };
+  return { filters, activeCount, setParam, toggleListValue, clearAll, isPending };
 }

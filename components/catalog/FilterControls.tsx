@@ -3,6 +3,7 @@
 import { useFilterParams } from "@/lib/hooks/useFilterParams";
 import { getPriceBounds } from "@/lib/repo/products";
 import { AVAILABILITY_LABELS } from "@/lib/utils";
+import { Spinner } from "@/components/ui/Spinner";
 import type { Category, Brand } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -59,7 +60,7 @@ export function FilterControls({
   screenSizes: number[];
   facetCounts: FacetCounts;
 }) {
-  const { filters, toggleListValue, setParam, clearAll, activeCount } = useFilterParams();
+  const { filters, toggleListValue, setParam, clearAll, activeCount, isPending } = useFilterParams();
   const priceBounds = getPriceBounds();
 
   const sortedBrands = [...brands]
@@ -68,9 +69,12 @@ export function FilterControls({
   const availableScreenSizes = screenSizes.filter((s) => (facetCounts.screenSizeInch[s] ?? 0) > 0);
 
   return (
-    <div>
+    <div className={cn("transition-opacity", isPending && "opacity-60")} aria-busy={isPending}>
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm font-semibold text-charcoal-900">סינון</p>
+        <p className="flex items-center gap-2 text-sm font-semibold text-charcoal-900">
+          סינון
+          {isPending && <Spinner size={14} className="text-brand-600" />}
+        </p>
         {activeCount > 0 && (
           <button type="button" onClick={clearAll} className="text-sm text-brand-700 hover:underline">
             נקה הכל ({activeCount})
