@@ -8,9 +8,11 @@ import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { showError, showSuccess } from "@/lib/alert";
 import { toWhatsappNumber } from "@/lib/utils";
+import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 
 export function SupplierForm() {
   const router = useRouter();
+  const { withLoading } = useGlobalLoading();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -24,11 +26,13 @@ export function SupplierForm() {
       return;
     }
     setSaving(true);
-    const res = await fetch("/api/admin/suppliers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, whatsapp: toWhatsappNumber(whatsapp) }),
-    });
+    const res = await withLoading(() =>
+      fetch("/api/admin/suppliers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, whatsapp: toWhatsappNumber(whatsapp) }),
+      }),
+    );
     setSaving(false);
     if (res.ok) {
       setName("");

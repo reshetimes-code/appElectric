@@ -7,22 +7,26 @@ import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { showError } from "@/lib/alert";
+import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 
 function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { withLoading } = useGlobalLoading();
   const showSpinner = useDelayedPending(loading, 500);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
+    const res = await withLoading(() =>
+      fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      }),
+    );
     setLoading(false);
     if (res.ok) {
       router.push(searchParams.get("next") || "/admin");

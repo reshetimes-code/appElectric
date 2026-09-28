@@ -6,9 +6,11 @@ import { Trash2 } from "lucide-react";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { confirmDelete } from "@/lib/alert";
+import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 
 export function DeleteSupplierButton({ id }: { id: string }) {
   const router = useRouter();
+  const { withLoading } = useGlobalLoading();
   const [busy, setBusy] = useState(false);
   const showSpinner = useDelayedPending(busy, 500);
 
@@ -17,7 +19,7 @@ export function DeleteSupplierButton({ id }: { id: string }) {
       onClick={async () => {
         if (!(await confirmDelete("למחוק את הספק הזה?"))) return;
         setBusy(true);
-        await fetch(`/api/admin/suppliers/${id}`, { method: "DELETE" });
+        await withLoading(() => fetch(`/api/admin/suppliers/${id}`, { method: "DELETE" }));
         setBusy(false);
         router.refresh();
       }}

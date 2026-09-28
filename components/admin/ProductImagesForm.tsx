@@ -8,20 +8,24 @@ import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { showError, showSuccess } from "@/lib/alert";
+import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 
 export function ProductImagesForm({ productId, initialImages }: { productId: string; initialImages: string[] }) {
   const router = useRouter();
+  const { withLoading } = useGlobalLoading();
   const [images, setImages] = useState<string[]>(initialImages);
   const [saving, setSaving] = useState(false);
   const showSpinner = useDelayedPending(saving, 500);
 
   async function save() {
     setSaving(true);
-    const res = await fetch(`/api/admin/products/${productId}/images`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ images }),
-    });
+    const res = await withLoading(() =>
+      fetch(`/api/admin/products/${productId}/images`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ images }),
+      }),
+    );
     setSaving(false);
     if (res.ok) {
       showSuccess("התמונות נשמרו בהצלחה");

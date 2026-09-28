@@ -11,6 +11,7 @@ import { useCart } from "@/lib/context/CartContext";
 import { useCatalog } from "@/lib/context/CatalogContext";
 import { cn, formatPrice } from "@/lib/utils";
 import { showError, showValidationErrors } from "@/lib/alert";
+import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 
 interface FormState {
   name: string;
@@ -29,6 +30,7 @@ export default function CheckoutPage() {
   const cart = useCart();
   const { getProductsByIds } = useCatalog();
   const router = useRouter();
+  const { withLoading } = useGlobalLoading();
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -62,17 +64,19 @@ export default function CheckoutPage() {
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
-    const res = await fetch("/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        lines: cart.lines,
-        subtotal: cart.subtotal,
-        deliveryOption: form.delivery === "standard" ? "משלוח סטנדרטי" : "משלוח מתואם",
-        customer: { name: form.name, phone: form.phone, email: form.email || undefined, address: form.address, city: form.city },
-        notes: form.notes || undefined,
+    const res = await withLoading(() =>
+      fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lines: cart.lines,
+          subtotal: cart.subtotal,
+          deliveryOption: form.delivery === "standard" ? "משלוח סטנדרטי" : "משלוח מתואם",
+          customer: { name: form.name, phone: form.phone, email: form.email || undefined, address: form.address, city: form.city },
+          notes: form.notes || undefined,
+        }),
       }),
-    });
+    );
     setSubmitting(false);
     if (!res.ok) {
       showError("שליחת ההזמנה נכשלה, נסו שוב");

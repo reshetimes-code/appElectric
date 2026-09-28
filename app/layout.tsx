@@ -7,6 +7,8 @@ import { CartProvider } from "@/lib/context/CartContext";
 import { FavoritesProvider } from "@/lib/context/FavoritesContext";
 import { CompareProvider } from "@/lib/context/CompareContext";
 import { CatalogProvider } from "@/lib/context/CatalogContext";
+import { GlobalLoadingProvider } from "@/lib/context/GlobalLoadingContext";
+import { GlobalLoadingOverlay } from "@/components/ui/GlobalLoadingOverlay";
 import { getAdminCategories } from "@/lib/server/adminCategories";
 import { getAdminProducts } from "@/lib/server/adminProducts";
 
@@ -51,15 +53,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="he" dir="rtl" className={`${rubik.variable} h-full`}>
       <body className="flex min-h-full flex-col bg-sand-100 font-sans antialiased">
         <ToastProvider>
-          <CatalogProvider initialCategories={initialCategories} initialProducts={initialProducts}>
-            <CartProvider>
-              <FavoritesProvider>
-                <CompareProvider>
-                  <ConditionalChrome>{children}</ConditionalChrome>
-                </CompareProvider>
-              </FavoritesProvider>
-            </CartProvider>
-          </CatalogProvider>
+          <GlobalLoadingProvider>
+            <CatalogProvider initialCategories={initialCategories} initialProducts={initialProducts}>
+              <CartProvider>
+                <FavoritesProvider>
+                  <CompareProvider>
+                    <ConditionalChrome>{children}</ConditionalChrome>
+                  </CompareProvider>
+                </FavoritesProvider>
+              </CartProvider>
+            </CatalogProvider>
+            <GlobalLoadingOverlay />
+          </GlobalLoadingProvider>
         </ToastProvider>
       </body>
     </html>

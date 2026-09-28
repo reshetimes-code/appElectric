@@ -8,10 +8,12 @@ import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { showError } from "@/lib/alert";
 import { genId, formatPrice } from "@/lib/utils";
+import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 import type { CustomerOrder, CartLine, Product } from "@/lib/types";
 
 export function OrderEditForm({ order, products }: { order: CustomerOrder; products: Product[] }) {
   const router = useRouter();
+  const { withLoading } = useGlobalLoading();
   const [name, setName] = useState(order.customer.name);
   const [phone, setPhone] = useState(order.customer.phone);
   const [email, setEmail] = useState(order.customer.email ?? "");
@@ -59,11 +61,13 @@ export function OrderEditForm({ order, products }: { order: CustomerOrder; produ
       notes: notes || undefined,
       lines,
     };
-    const res = await fetch(`/api/admin/orders/${order.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    const res = await withLoading(() =>
+      fetch(`/api/admin/orders/${order.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }),
+    );
     setSaving(false);
     if (res.ok) {
       router.push(`/admin/orders/${order.id}`);

@@ -9,6 +9,7 @@ import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { showError } from "@/lib/alert";
 import { AVAILABILITY_LABELS } from "@/lib/utils";
+import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 import type { Product } from "@/lib/types";
 
 interface FormBrand { id: string; nameHe: string }
@@ -54,6 +55,7 @@ export function ProductForm({
   mode?: "full" | "details";
 }) {
   const router = useRouter();
+  const { withLoading } = useGlobalLoading();
   const [nameHe, setNameHe] = useState(initial?.nameHe ?? "");
   const [model, setModel] = useState(initial?.model ?? "");
   const [shortDescriptionHe, setShortDescriptionHe] = useState(initial?.shortDescriptionHe ?? "");
@@ -94,11 +96,13 @@ export function ProductForm({
       return;
     }
     setCreatingBrand(true);
-    const res = await fetch("/api/admin/brands", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nameHe: newBrandName }),
-    });
+    const res = await withLoading(() =>
+      fetch("/api/admin/brands", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nameHe: newBrandName }),
+      }),
+    );
     setCreatingBrand(false);
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
@@ -118,11 +122,13 @@ export function ProductForm({
       return;
     }
     setCreatingSubcategory(true);
-    const res = await fetch("/api/admin/subcategories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ categoryId, nameHe: newSubcategoryName }),
-    });
+    const res = await withLoading(() =>
+      fetch("/api/admin/subcategories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categoryId, nameHe: newSubcategoryName }),
+      }),
+    );
     setCreatingSubcategory(false);
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
@@ -145,11 +151,13 @@ export function ProductForm({
       return;
     }
     setCreatingScreenSize(true);
-    const res = await fetch("/api/admin/screen-sizes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ size }),
-    });
+    const res = await withLoading(() =>
+      fetch("/api/admin/screen-sizes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ size }),
+      }),
+    );
     setCreatingScreenSize(false);
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
@@ -169,11 +177,13 @@ export function ProductForm({
       return;
     }
     setCreatingCategory(true);
-    const res = await fetch("/api/admin/categories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nameHe: newCategoryName }),
-    });
+    const res = await withLoading(() =>
+      fetch("/api/admin/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nameHe: newCategoryName }),
+      }),
+    );
     setCreatingCategory(false);
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
@@ -216,11 +226,13 @@ export function ProductForm({
         : productId
           ? `/api/admin/products/${productId}`
           : "/api/admin/products";
-    const res = await fetch(url, {
-      method: productId || mode === "details" ? "PATCH" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    const res = await withLoading(() =>
+      fetch(url, {
+        method: productId || mode === "details" ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }),
+    );
     setSaving(false);
     if (res.ok) {
       router.push("/admin/products");

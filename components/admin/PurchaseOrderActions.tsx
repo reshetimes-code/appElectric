@@ -10,6 +10,7 @@ import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { useToast } from "@/components/ui/ToastProvider";
 import { showEmailProviderChooser, showWhatsappRecipientChooser } from "@/lib/alert";
 import { formatPrice } from "@/lib/utils";
+import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 import type { PurchaseOrder, PurchaseOrderStatus, Supplier } from "@/lib/types";
 
 const STATUS_LABEL: Record<PurchaseOrderStatus, string> = {
@@ -48,16 +49,19 @@ function buildMessage(po: PurchaseOrder) {
 export function PurchaseOrderActions({ po, suppliers }: { po: PurchaseOrder; suppliers: Supplier[] }) {
   const router = useRouter();
   const toast = useToast();
+  const { withLoading } = useGlobalLoading();
   const [busy, setBusy] = useState(false);
   const showSpinner = useDelayedPending(busy, 500);
 
   async function setStatus(status: PurchaseOrderStatus, sentVia?: "whatsapp" | "email") {
     setBusy(true);
-    await fetch(`/api/admin/purchase-orders/${po.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, sentVia }),
-    });
+    await withLoading(() =>
+      fetch(`/api/admin/purchase-orders/${po.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, sentVia }),
+      }),
+    );
     setBusy(false);
     router.refresh();
   }

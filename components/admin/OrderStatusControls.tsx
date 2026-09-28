@@ -6,20 +6,24 @@ import { Clock3, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
+import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 import type { OrderStatus } from "@/lib/types";
 
 export function OrderStatusControls({ orderId, status }: { orderId: string; status: OrderStatus }) {
   const router = useRouter();
+  const { withLoading } = useGlobalLoading();
   const [busy, setBusy] = useState(false);
   const showSpinner = useDelayedPending(busy, 500);
 
   async function setStatus(next: OrderStatus) {
     setBusy(true);
-    await fetch(`/api/admin/orders/${orderId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: next }),
-    });
+    await withLoading(() =>
+      fetch(`/api/admin/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: next }),
+      }),
+    );
     setBusy(false);
     router.refresh();
   }

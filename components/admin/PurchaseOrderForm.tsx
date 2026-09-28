@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { showError } from "@/lib/alert";
 import { formatPrice } from "@/lib/utils";
+import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 import type { Supplier } from "@/lib/types";
 
 export interface OrderOption {
@@ -44,6 +45,7 @@ export function PurchaseOrderForm({
   initialNotes?: string;
 }) {
   const router = useRouter();
+  const { withLoading } = useGlobalLoading();
   const [supplierId, setSupplierId] = useState(suppliers[0]?.id ?? "");
   const [addFromOrder, setAddFromOrder] = useState("");
   const [items, setItems] = useState<ItemRow[]>(
@@ -95,23 +97,25 @@ export function PurchaseOrderForm({
       return;
     }
     setSaving(true);
-    const res = await fetch("/api/admin/purchase-orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        supplierId: supplier.id,
-        supplierName: supplier.name,
-        supplierEmail: supplier.email,
-        supplierWhatsapp: supplier.whatsapp,
-        items: filledItems.map((r) => ({
-          productName: r.productName,
-          costPrice: Number(r.costPrice) || 0,
-          quantity: Number(r.quantity) || 1,
-        })),
-        deliveryAddress,
-        notes: notes || undefined,
+    const res = await withLoading(() =>
+      fetch("/api/admin/purchase-orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          supplierId: supplier.id,
+          supplierName: supplier.name,
+          supplierEmail: supplier.email,
+          supplierWhatsapp: supplier.whatsapp,
+          items: filledItems.map((r) => ({
+            productName: r.productName,
+            costPrice: Number(r.costPrice) || 0,
+            quantity: Number(r.quantity) || 1,
+          })),
+          deliveryAddress,
+          notes: notes || undefined,
+        }),
       }),
-    });
+    );
     setSaving(false);
     if (res.ok) {
       const data = await res.json();
