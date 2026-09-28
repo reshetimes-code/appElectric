@@ -65,24 +65,34 @@ export async function notifyNewOrder(opts: { orderNumber: string; customerName: 
  * Popup offering a choice of webmail providers to compose in, since a plain
  * mailto: link silently does nothing on a machine with no desktop mail client
  * configured (the common case once Gmail/Outlook are used via the browser).
+ *
+ * `pdfHref`, if given, adds a "download PDF" link (opening the PO document
+ * with auto-print, see AutoPrint.tsx) so the order can be attached to
+ * whichever compose window was opened. No compose link (mailto or any
+ * webmail deep-link) can pre-attach a file — browsers don't allow it — so
+ * this is necessarily a separate, manual step; the popup says so.
  */
-export function showEmailProviderChooser(to: string, subject: string, body: string) {
+export function showEmailProviderChooser(to: string, subject: string, body: string, pdfHref?: string) {
   const encodedTo = encodeURIComponent(to);
   const encodedSubject = encodeURIComponent(subject);
   const encodedBody = encodeURIComponent(body);
-  const options: { label: string; href: string }[] = [
+  const composeOptions: { label: string; href: string }[] = [
     { label: "Gmail", href: `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSubject}&body=${encodedBody}` },
     { label: "Outlook", href: `https://outlook.live.com/mail/0/deeplink/compose?to=${encodedTo}&subject=${encodedSubject}&body=${encodedBody}` },
     { label: "אפליקציית מייל במחשב", href: `mailto:${encodedTo}?subject=${encodedSubject}&body=${encodedBody}` },
   ];
+  const linkStyle =
+    "display:block;padding:.7em 1em;border-radius:0.625rem;border:1px solid var(--color-sand-300,#e2cca4);text-decoration:none;color:var(--color-charcoal-900,#1c150f);font-weight:500;";
+  const composeHtml = composeOptions.map((o) => `<a href="${o.href}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">${o.label}</a>`).join("");
+  const pdfHtml = pdfHref
+    ? `<a href="${pdfHref}" target="_blank" rel="noopener noreferrer" style="${linkStyle}border-color:var(--color-brand-600,#3a701e);color:var(--color-brand-700,#2f591a);">הורדת ההזמנה כ-PDF (לצירוף ידני)</a>`
+    : "";
+  const note = pdfHref
+    ? `<p style="margin:.8em 0 0;font-size:.75rem;color:var(--color-charcoal-500,#63533f);">דפדפנים לא מאפשרים צירוף קובץ אוטומטי להודעת מייל — הורידו את ה-PDF ואז צרפו אותו ידנית בחלון הכתיבה שנפתח.</p>`
+    : "";
   return base.fire({
     title: "שליחה באמצעות",
-    html: `<div style="display:flex;flex-direction:column;gap:.6em;text-align:start;">${options
-      .map(
-        (o) =>
-          `<a href="${o.href}" target="_blank" rel="noopener noreferrer" style="display:block;padding:.7em 1em;border-radius:0.625rem;border:1px solid var(--color-sand-300,#e2cca4);text-decoration:none;color:var(--color-charcoal-900,#1c150f);font-weight:500;">${o.label}</a>`,
-      )
-      .join("")}</div>`,
+    html: `<div style="display:flex;flex-direction:column;gap:.6em;text-align:start;">${composeHtml}${pdfHtml}</div>${note}`,
     showConfirmButton: false,
     showCloseButton: true,
   });

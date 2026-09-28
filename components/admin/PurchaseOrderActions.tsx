@@ -68,7 +68,8 @@ export function PurchaseOrderActions({ po }: { po: PurchaseOrder }) {
   }
 
   function sendEmail() {
-    showEmailProviderChooser(po.supplierEmail, `הזמנת רכש ${po.poNumber} — AppElectric`, buildMessage(po));
+    const pdfHref = `${poDocumentLink(po)}?autoprint=1`;
+    showEmailProviderChooser(po.supplierEmail, `הזמנת רכש ${po.poNumber} — AppElectric`, buildMessage(po), pdfHref);
     if (po.status === "draft") setStatus("sent", "email");
   }
 

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getPurchaseOrderById } from "@/lib/server/purchaseOrders";
 import { formatPrice } from "@/lib/utils";
 import { PrintButton } from "@/components/po/PrintButton";
+import { AutoPrint } from "@/components/po/AutoPrint";
 
 export const metadata: Metadata = {
   title: "הזמנת רכש",
@@ -40,6 +41,7 @@ export default async function PurchaseOrderDocumentPage({ params }: { params: Pr
         }
       `}</style>
       <div id="po-doc" className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-8 sm:py-12">
+        <AutoPrint />
         <div className="flex items-center justify-between gap-4 print:hidden">
           <Image src="/logo.png" alt="AppElectric" width={150} height={34} className="h-8 w-auto" priority />
           <PrintButton />
