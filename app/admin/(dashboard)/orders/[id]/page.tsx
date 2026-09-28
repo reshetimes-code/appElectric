@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { getOrderById } from "@/lib/server/orders";
 import { getAllProducts } from "@/lib/server/adminProducts";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
@@ -7,7 +6,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/utils";
 import { OrderStatusControls } from "@/components/admin/OrderStatusControls";
-import { PackagePlus, Pencil } from "lucide-react";
+import { OrderLineItems } from "@/components/admin/OrderLineItems";
+import { Pencil } from "lucide-react";
 import type { OrderStatus } from "@/lib/types";
 
 const STATUS_LABEL: Record<OrderStatus, string> = { new: "חדשה", processing: "בטיפול", fulfilled: "טופלה" };
@@ -75,32 +75,16 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
       <div className="rounded-[var(--radius-card)] border border-sand-300 bg-white p-6">
         <h2 className="mb-3 font-heading text-sm font-semibold text-charcoal-900">פריטים בהזמנה</h2>
-        <div className="flex flex-col divide-y divide-sand-200">
-          {order.lines.map((line) => {
-            const product = productMap.get(line.productId);
-            const name = product?.nameHe ?? "מוצר לא ידוע";
-            const poParams = new URLSearchParams({
-              productName: `${name} × ${line.quantity}`,
-              deliveryAddress: address,
-              notes: `עבור הזמנת לקוח ${order.orderNumber} (${order.customer.name}, ${order.customer.phone})`,
-            });
-            return (
-              <div key={line.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-charcoal-900">{name} × {line.quantity}</p>
-                  {product && <p className="text-xs text-charcoal-500">{formatPrice(product.price)} ליחידה</p>}
-                </div>
-                <Link
-                  href={`/admin/purchase-orders/new?${poParams.toString()}`}
-                  className="flex items-center gap-1.5 rounded-full border border-brand-600 px-3 py-1.5 text-xs font-medium text-brand-700 hover:bg-brand-50"
-                >
-                  <PackagePlus size={14} />
-                  הזמן מהספק
-                </Link>
-              </div>
-            );
-          })}
-        </div>
+        <OrderLineItems
+          items={order.lines.map((line) => ({
+            lineId: line.id,
+            name: productMap.get(line.productId)?.nameHe ?? "מוצר לא ידוע",
+            quantity: line.quantity,
+            unitPrice: line.priceOverride ?? productMap.get(line.productId)?.price,
+          }))}
+          deliveryAddress={address}
+          notesFor={() => `עבור הזמנת לקוח ${order.orderNumber} (${order.customer.name}, ${order.customer.phone})`}
+        />
         <div className="mt-3 flex justify-between border-t border-sand-200 pt-3 text-sm font-semibold text-charcoal-900">
           <span>סה&quot;כ הזמנה</span>
           <span>{formatPrice(order.subtotal)}</span>

@@ -13,6 +13,21 @@ export default async function NewPurchaseOrderPage({
   const sp = await searchParams;
   const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
 
+  let initialItems: { productName: string; quantity: number }[] | undefined;
+  const itemsParam = str(sp.items);
+  if (itemsParam) {
+    try {
+      const parsed = JSON.parse(itemsParam);
+      if (Array.isArray(parsed)) {
+        initialItems = parsed
+          .filter((it) => it && typeof it.productName === "string")
+          .map((it) => ({ productName: it.productName, quantity: Number(it.quantity) || 1 }));
+      }
+    } catch {
+      // malformed/tampered query param — fall back to the empty-form default
+    }
+  }
+
   const productMap = new Map(products.map((p) => [p.id, p]));
   const orderOptions: OrderOption[] = orders.flatMap((order) => {
     const address = `${order.customer.address}, ${order.customer.city}`;
@@ -45,6 +60,7 @@ export default async function NewPurchaseOrderPage({
         suppliers={suppliers}
         orderOptions={orderOptions}
         initialProductName={str(sp.productName)}
+        initialItems={initialItems}
         initialDeliveryAddress={str(sp.deliveryAddress)}
         initialNotes={str(sp.notes)}
       />
