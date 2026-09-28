@@ -5,7 +5,7 @@ import type { Category, Product } from "@/lib/types";
 
 export interface ProductFilters {
   category?: string; // category slug
-  subcategory?: string; // subcategory slug
+  subcategory?: string[]; // subcategory slugs
   brand?: string[]; // brand slugs
   priceMin?: number;
   priceMax?: number;
@@ -36,11 +36,16 @@ function categorySlug(categoryId: string, categoryList: Category[] = categories)
 export function matchesFilters(product: Product, filters: ProductFilters, categoryList: Category[] = categories): boolean {
   if (!product.active) return false;
   if (filters.category && categorySlug(product.categoryId, categoryList) !== filters.category) return false;
-  if (filters.subcategory && product.subcategoryId !== filters.subcategory) {
-    // subcategory ids are stable slugs used directly (see categories.ts subcategory.id)
+  if (filters.subcategory?.length) {
     const category = categoryList.find((c) => c.id === product.categoryId);
-    const sub = category?.subcategories.find((s) => s.slug === filters.subcategory);
-    if (!sub || sub.id !== product.subcategoryId) return false;
+    // subcategory ids are stable slugs used directly (see categories.ts subcategory.id),
+    // but some products may still reference a subcategory by slug directly.
+    const matches = filters.subcategory.some((slug) => {
+      if (product.subcategoryId === slug) return true;
+      const sub = category?.subcategories.find((s) => s.slug === slug);
+      return !!sub && sub.id === product.subcategoryId;
+    });
+    if (!matches) return false;
   }
   if (filters.brand?.length && !filters.brand.includes(brandSlug(product.brandId))) return false;
   if (filters.priceMin != null && product.price < filters.priceMin) return false;
@@ -124,7 +129,7 @@ export function parseFilters(sp: SearchParamsLike): ProductFilters {
   };
   const numList = (v: string | string[] | undefined) => list(v)?.map(Number);
   return {
-    subcategory: str(sp.subcategory),
+    subcategory: list(sp.subcategory),
     brand: list(sp.brand),
     priceMin: num(sp.priceMin),
     priceMax: num(sp.priceMax),

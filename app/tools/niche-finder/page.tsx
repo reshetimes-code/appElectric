@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { categories } from "@/lib/data/categories";
 import { findByNiche } from "@/lib/repo/products";
+import { showValidationErrors } from "@/lib/alert";
 import type { Product } from "@/lib/types";
 
 export default function NicheFinderPage() {
@@ -20,6 +21,17 @@ export default function NicheFinderPage() {
 
   function search(e: React.FormEvent) {
     e.preventDefault();
+
+    const errors: string[] = [];
+    if (!width || Number.isNaN(width) || width <= 0) errors.push("יש להזין רוחב תקין (גדול מ-0) במילימטרים.");
+    if (height != null && (Number.isNaN(height) || height <= 0)) errors.push("גובה חייב להיות מספר חיובי במילימטרים.");
+    if (depth != null && (Number.isNaN(depth) || depth <= 0)) errors.push("עומק חייב להיות מספר חיובי במילימטרים.");
+    if (Number.isNaN(tolerance) || tolerance < 0) errors.push("סבילות חייבת להיות מספר אפס או חיובי.");
+    if (errors.length > 0) {
+      showValidationErrors(errors);
+      return;
+    }
+
     setResults(
       findByNiche({
         widthMm: width,

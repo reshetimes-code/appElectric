@@ -37,7 +37,7 @@ function CheckRow({
 function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="border-b border-sand-200 py-5 first:pt-0 last:border-none">
-      <p className="mb-2 text-sm font-semibold text-charcoal-900">{title}</p>
+      <p className="mb-2 break-keep text-sm font-semibold text-charcoal-900">{title}</p>
       {children}
     </div>
   );
@@ -83,8 +83,8 @@ export function FilterControls({
           {category.subcategories.map((sub) => (
             <CheckRow
               key={sub.id}
-              checked={filters.subcategory === sub.slug}
-              onChange={() => setParam("subcategory", filters.subcategory === sub.slug ? undefined : sub.slug)}
+              checked={!!filters.subcategory?.includes(sub.slug)}
+              onChange={() => toggleListValue("subcategory", sub.slug)}
               label={sub.nameHe}
             />
           ))}

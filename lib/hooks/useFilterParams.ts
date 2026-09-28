@@ -14,7 +14,7 @@ export function useFilterParams() {
     const get = (key: string) => searchParams.get(key) ?? undefined;
     const getList = (key: string) => searchParams.get(key)?.split(",").filter(Boolean);
     return {
-      subcategory: get("subcategory"),
+      subcategory: getList("subcategory"),
       brand: getList("brand"),
       priceMin: get("priceMin") ? Number(get("priceMin")) : undefined,
       priceMax: get("priceMax") ? Number(get("priceMax")) : undefined,
@@ -33,7 +33,7 @@ export function useFilterParams() {
 
   const activeCount = useMemo(() => {
     let n = 0;
-    if (filters.subcategory) n++;
+    if (filters.subcategory?.length) n += filters.subcategory.length;
     if (filters.brand?.length) n += filters.brand.length;
     if (filters.priceMin != null || filters.priceMax != null) n++;
     if (filters.availability?.length) n += filters.availability.length;
