@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { useToast } from "@/components/ui/ToastProvider";
+import { showEmailProviderChooser } from "@/lib/alert";
 import { formatPrice } from "@/lib/utils";
 import type { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types";
 
@@ -67,9 +68,7 @@ export function PurchaseOrderActions({ po }: { po: PurchaseOrder }) {
   }
 
   function sendEmail() {
-    const subject = encodeURIComponent(`הזמנת רכש ${po.poNumber} — AppElectric`);
-    const body = encodeURIComponent(buildMessage(po));
-    window.location.href = `mailto:${po.supplierEmail}?subject=${subject}&body=${body}`;
+    showEmailProviderChooser(po.supplierEmail, `הזמנת רכש ${po.poNumber} — AppElectric`, buildMessage(po));
     if (po.status === "draft") setStatus("sent", "email");
   }
 

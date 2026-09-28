@@ -61,6 +61,33 @@ export async function notifyNewOrder(opts: { orderNumber: string; customerName: 
   return result.isConfirmed;
 }
 
+/**
+ * Popup offering a choice of webmail providers to compose in, since a plain
+ * mailto: link silently does nothing on a machine with no desktop mail client
+ * configured (the common case once Gmail/Outlook are used via the browser).
+ */
+export function showEmailProviderChooser(to: string, subject: string, body: string) {
+  const encodedTo = encodeURIComponent(to);
+  const encodedSubject = encodeURIComponent(subject);
+  const encodedBody = encodeURIComponent(body);
+  const options: { label: string; href: string }[] = [
+    { label: "Gmail", href: `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSubject}&body=${encodedBody}` },
+    { label: "Outlook", href: `https://outlook.live.com/mail/0/deeplink/compose?to=${encodedTo}&subject=${encodedSubject}&body=${encodedBody}` },
+    { label: "אפליקציית מייל במחשב", href: `mailto:${encodedTo}?subject=${encodedSubject}&body=${encodedBody}` },
+  ];
+  return base.fire({
+    title: "שליחה באמצעות",
+    html: `<div style="display:flex;flex-direction:column;gap:.6em;text-align:start;">${options
+      .map(
+        (o) =>
+          `<a href="${o.href}" target="_blank" rel="noopener noreferrer" style="display:block;padding:.7em 1em;border-radius:0.625rem;border:1px solid var(--color-sand-300,#e2cca4);text-decoration:none;color:var(--color-charcoal-900,#1c150f);font-weight:500;">${o.label}</a>`,
+      )
+      .join("")}</div>`,
+    showConfirmButton: false,
+    showCloseButton: true,
+  });
+}
+
 /** Replaces window.confirm() for a destructive action; resolves true if the user confirmed. */
 export async function confirmDelete(message: string, title = "לאשר מחיקה?") {
   const result = await base.fire({
