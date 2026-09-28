@@ -9,6 +9,7 @@ import { genId, slugify } from "@/lib/utils";
 import { getAllCategories } from "@/lib/server/adminCategories";
 import { getAllBrands } from "@/lib/server/adminBrands";
 import { getAllScreenSizes } from "@/lib/server/adminScreenSizes";
+import { getHiddenSeedProductIds, hideSeedProduct } from "@/lib/server/hiddenSeedProducts";
 import { products as seedProducts } from "@/lib/data/products";
 import type { Product } from "@/lib/types";
 
@@ -32,15 +33,19 @@ export async function getAdminProductBySlug(slug: string): Promise<Product | und
  * products, for use in Server Components/pages. This is what customers see.
  */
 export async function getAllProducts(): Promise<Product[]> {
-  const [imageOverrides, detailOverrides] = await Promise.all([
+  const [imageOverrides, detailOverrides, hiddenIds] = await Promise.all([
     getProductImageOverrides(),
     getProductDetailOverrides(),
+    getHiddenSeedProductIds(),
   ]);
+  const hidden = new Set(hiddenIds);
   const seedWithOverrides = await Promise.all(
-    seedProducts.map(async (p) => {
-      const withDetails = detailOverrides[p.id] ? await applyDetailOverride(p, detailOverrides[p.id]) : p;
-      return imageOverrides[p.id] ? { ...withDetails, images: imageOverrides[p.id] } : withDetails;
-    }),
+    seedProducts
+      .filter((p) => !hidden.has(p.id))
+      .map(async (p) => {
+        const withDetails = detailOverrides[p.id] ? await applyDetailOverride(p, detailOverrides[p.id]) : p;
+        return imageOverrides[p.id] ? { ...withDetails, images: imageOverrides[p.id] } : withDetails;
+      }),
   );
   return [...seedWithOverrides, ...(await getAdminProducts())];
 }
@@ -222,6 +227,20 @@ export async function deleteAdminProduct(id: string): Promise<boolean> {
   const changed = next.length !== all.length;
   if (changed) await writeJson(FILE, next);
   return changed;
+}
+
+/**
+ * Deletes any product, whichever kind it is: an admin-added product's own
+ * record is removed outright; a seed product (lib/data/products.ts) can't be
+ * removed from code, so it's hidden instead — see hiddenSeedProducts.ts.
+ */
+export async function deleteAnyProduct(id: string): Promise<boolean> {
+  if (isSeedId(id)) {
+    if (!seedProducts.some((p) => p.id === id)) return false;
+    await hideSeedProduct(id);
+    return true;
+  }
+  return deleteAdminProduct(id);
 }
 
 export async function listBrandsAndCategoriesForForm() {

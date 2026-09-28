@@ -76,3 +76,11 @@ export async function updateOrder(id: string, patch: OrderEditInput): Promise<Cu
   );
   return updated;
 }
+
+export async function deleteOrder(id: string): Promise<boolean> {
+  const all = await readJson<CustomerOrder[]>(FILE, []);
+  const next = all.filter((o) => o.id !== id);
+  const changed = next.length !== all.length;
+  if (changed) await writeJson(FILE, next);
+  return changed;
+}

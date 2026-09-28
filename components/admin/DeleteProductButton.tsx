@@ -7,7 +7,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { confirmDelete } from "@/lib/alert";
 
-export function DeleteProductButton({ id }: { id: string }) {
+export function DeleteProductButton({ id, isSeed = false }: { id: string; isSeed?: boolean }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const showSpinner = useDelayedPending(busy, 500);
@@ -15,7 +15,10 @@ export function DeleteProductButton({ id }: { id: string }) {
   return (
     <button
       onClick={async () => {
-        if (!(await confirmDelete("למחוק את המוצר הזה?"))) return;
+        const message = isSeed
+          ? "להסיר את מוצר הדמו הזה מהקטלוג? (הוא יוסתר מהאתר, לא יימחק מהמערכת)"
+          : "למחוק את המוצר הזה?";
+        if (!(await confirmDelete(message))) return;
         setBusy(true);
         await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
         setBusy(false);

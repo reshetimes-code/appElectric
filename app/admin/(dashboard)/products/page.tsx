@@ -69,13 +69,11 @@ export default async function AdminProductsPage() {
                   </Link>
                 )}
                 {isAdminOwned && (
-                  <>
-                    <Link href={`/admin/products/${p.id}/edit`} className="text-sm text-charcoal-600 hover:underline">
-                      עריכה מלאה
-                    </Link>
-                    <DeleteProductButton id={p.id} />
-                  </>
+                  <Link href={`/admin/products/${p.id}/edit`} className="text-sm text-charcoal-600 hover:underline">
+                    עריכה מלאה
+                  </Link>
                 )}
+                <DeleteProductButton id={p.id} isSeed={!isAdminOwned} />
               </div>
             </div>
           );

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { DeleteEntityButton } from "@/components/admin/DeleteEntityButton";
 import { getOrders } from "@/lib/server/orders";
 import { formatPrice } from "@/lib/utils";
 import type { OrderStatus } from "@/lib/types";
@@ -34,19 +35,26 @@ export default async function AdminOrdersPage() {
       ) : (
         <div className="overflow-hidden rounded-[var(--radius-card)] border border-sand-300 bg-white">
           {orders.map((o) => (
-            <Link
+            <div
               key={o.id}
-              href={`/admin/orders/${o.id}`}
-              className="flex flex-col gap-2 border-b border-sand-200 p-4 last:border-none hover:bg-sand-50 sm:flex-row sm:items-center sm:gap-4"
+              className="relative flex flex-col gap-2 border-b border-sand-200 p-4 last:border-none hover:bg-sand-50 sm:flex-row sm:items-center sm:gap-4"
             >
-              <span dir="ltr" className="text-sm font-semibold text-charcoal-900 sm:w-28 sm:shrink-0">{o.orderNumber}</span>
-              <div className="min-w-0 flex-1">
+              <Link href={`/admin/orders/${o.id}`} className="absolute inset-0" aria-label={o.orderNumber} />
+              <span dir="ltr" className="pointer-events-none text-sm font-semibold text-charcoal-900 sm:w-28 sm:shrink-0">{o.orderNumber}</span>
+              <div className="pointer-events-none min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-charcoal-900">{o.customer.name}</p>
                 <p className="text-xs text-charcoal-500">{o.lines.length} פריטים · {new Date(o.createdAt).toLocaleDateString("he-IL")}</p>
               </div>
-              <span className="text-sm font-semibold text-charcoal-900 sm:w-24 sm:shrink-0">{formatPrice(o.subtotal)}</span>
-              <Badge tone={STATUS_TONE[o.status]}>{STATUS_LABEL[o.status]}</Badge>
-            </Link>
+              <span className="pointer-events-none text-sm font-semibold text-charcoal-900 sm:w-24 sm:shrink-0">{formatPrice(o.subtotal)}</span>
+              <div className="pointer-events-none">
+                <Badge tone={STATUS_TONE[o.status]}>{STATUS_LABEL[o.status]}</Badge>
+              </div>
+              <DeleteEntityButton
+                endpoint={`/api/admin/orders/${o.id}`}
+                confirmMessage={`למחוק את הזמנה ${o.orderNumber}?`}
+                label="מחיקת הזמנה"
+              />
+            </div>
           ))}
         </div>
       )}

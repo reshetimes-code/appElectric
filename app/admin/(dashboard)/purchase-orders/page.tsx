@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { DeleteEntityButton } from "@/components/admin/DeleteEntityButton";
 import { getPurchaseOrders } from "@/lib/server/purchaseOrders";
 import { formatPrice } from "@/lib/utils";
 import type { PurchaseOrderStatus } from "@/lib/types";
@@ -46,19 +47,26 @@ export default async function AdminPurchaseOrdersPage() {
             const total = po.items.reduce((sum, item) => sum + item.costPrice * item.quantity, 0);
             const productLabel = po.items.length === 1 ? po.items[0].productName : `${po.items.length} מוצרים`;
             return (
-              <Link
+              <div
                 key={po.id}
-                href={`/admin/purchase-orders/${po.id}`}
-                className="flex flex-wrap items-center gap-3 border-b border-sand-200 p-4 last:border-none hover:bg-sand-50"
+                className="relative flex flex-wrap items-center gap-3 border-b border-sand-200 p-4 last:border-none hover:bg-sand-50"
               >
-                <span dir="ltr" className="w-24 shrink-0 text-sm font-semibold text-charcoal-900">{po.poNumber}</span>
-                <div className="min-w-0 flex-1">
+                <Link href={`/admin/purchase-orders/${po.id}`} className="absolute inset-0" aria-label={po.poNumber} />
+                <span dir="ltr" className="pointer-events-none w-24 shrink-0 text-sm font-semibold text-charcoal-900">{po.poNumber}</span>
+                <div className="pointer-events-none min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-charcoal-900">{productLabel}</p>
                   <p className="text-xs text-charcoal-500">ספק: {po.supplierName}</p>
                 </div>
-                <span className="w-24 shrink-0 text-sm text-charcoal-600">{formatPrice(total)}</span>
-                <Badge tone={STATUS_TONE[po.status]}>{STATUS_LABEL[po.status]}</Badge>
-              </Link>
+                <span className="pointer-events-none w-24 shrink-0 text-sm text-charcoal-600">{formatPrice(total)}</span>
+                <div className="pointer-events-none">
+                  <Badge tone={STATUS_TONE[po.status]}>{STATUS_LABEL[po.status]}</Badge>
+                </div>
+                <DeleteEntityButton
+                  endpoint={`/api/admin/purchase-orders/${po.id}`}
+                  confirmMessage={`למחוק את הזמנת רכש ${po.poNumber}?`}
+                  label="מחיקת הזמנת רכש"
+                />
+              </div>
             );
           })}
         </div>
