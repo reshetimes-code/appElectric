@@ -1,16 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Clock3, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
+import { useLoadedRefresh } from "@/lib/hooks/useLoadedRefresh";
 import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 import type { OrderStatus } from "@/lib/types";
 
 export function OrderStatusControls({ orderId, status }: { orderId: string; status: OrderStatus }) {
-  const router = useRouter();
+  const refresh = useLoadedRefresh();
   const { withLoading } = useGlobalLoading();
   const [busy, setBusy] = useState(false);
   const showSpinner = useDelayedPending(busy, 500);
@@ -25,7 +25,7 @@ export function OrderStatusControls({ orderId, status }: { orderId: string; stat
       }),
     );
     setBusy(false);
-    router.refresh();
+    refresh();
   }
 
   return (

@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { MessageCircle, Mail, Link2, CheckCircle2, PackageCheck, Info } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
+import { useLoadedRefresh } from "@/lib/hooks/useLoadedRefresh";
 import { useToast } from "@/components/ui/ToastProvider";
 import { showEmailProviderChooser, showWhatsappRecipientChooser } from "@/lib/alert";
 import { formatPrice } from "@/lib/utils";
@@ -47,7 +47,7 @@ function buildMessage(po: PurchaseOrder) {
 }
 
 export function PurchaseOrderActions({ po, suppliers }: { po: PurchaseOrder; suppliers: Supplier[] }) {
-  const router = useRouter();
+  const refresh = useLoadedRefresh();
   const toast = useToast();
   const { withLoading } = useGlobalLoading();
   const [busy, setBusy] = useState(false);
@@ -63,7 +63,7 @@ export function PurchaseOrderActions({ po, suppliers }: { po: PurchaseOrder; sup
       }),
     );
     setBusy(false);
-    router.refresh();
+    refresh();
   }
 
   function sendWhatsapp() {

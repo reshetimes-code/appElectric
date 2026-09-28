@@ -11,12 +11,22 @@ interface GlobalLoadingContextValue {
    * tell something is happening. Multiple concurrent calls stack correctly:
    * the overlay stays up until the last one finishes. */
   withLoading: <T>(action: () => Promise<T>) => Promise<T>;
+  /** Manual start/stop pair for a step withLoading can't wrap directly —
+   * namely a router.refresh(), which returns no promise. Prefer
+   * useLoadedRefresh() (lib/hooks/useLoadedRefresh.ts), which pairs these
+   * with a transition so the overlay stays up until the refreshed data has
+   * actually rendered, not just until the request that triggered it fires. */
+  begin: () => void;
+  end: () => void;
 }
 
 const GlobalLoadingContext = createContext<GlobalLoadingContextValue | null>(null);
 
 export function GlobalLoadingProvider({ children }: { children: ReactNode }) {
   const [count, setCount] = useState(0);
+
+  const begin = useCallback(() => setCount((c) => c + 1), []);
+  const end = useCallback(() => setCount((c) => c - 1), []);
 
   const withLoading = useCallback(async <T,>(action: () => Promise<T>): Promise<T> => {
     setCount((c) => c + 1);
@@ -27,7 +37,7 @@ export function GlobalLoadingProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  return <GlobalLoadingContext.Provider value={{ isLoading: count > 0, withLoading }}>{children}</GlobalLoadingContext.Provider>;
+  return <GlobalLoadingContext.Provider value={{ isLoading: count > 0, withLoading, begin, end }}>{children}</GlobalLoadingContext.Provider>;
 }
 
 export function useGlobalLoading() {

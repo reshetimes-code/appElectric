@@ -1,15 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
+import { useLoadedRefresh } from "@/lib/hooks/useLoadedRefresh";
 import { confirmDelete } from "@/lib/alert";
 import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 
 export function DeleteProductButton({ id, isSeed = false }: { id: string; isSeed?: boolean }) {
-  const router = useRouter();
+  const refresh = useLoadedRefresh();
   const { withLoading } = useGlobalLoading();
   const [busy, setBusy] = useState(false);
   const showSpinner = useDelayedPending(busy, 500);
@@ -24,7 +24,7 @@ export function DeleteProductButton({ id, isSeed = false }: { id: string; isSeed
         setBusy(true);
         await withLoading(() => fetch(`/api/admin/products/${id}`, { method: "DELETE" }));
         setBusy(false);
-        router.refresh();
+        refresh();
       }}
       disabled={busy}
       aria-label="מחיקת מוצר"

@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
+import { useLoadedRefresh } from "@/lib/hooks/useLoadedRefresh";
 import { showError, showSuccess } from "@/lib/alert";
 import { toWhatsappNumber } from "@/lib/utils";
 import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 
 export function SupplierForm() {
-  const router = useRouter();
+  const refresh = useLoadedRefresh();
   const { withLoading } = useGlobalLoading();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -39,7 +39,7 @@ export function SupplierForm() {
       setEmail("");
       setWhatsapp("");
       showSuccess("הספק נוסף בהצלחה");
-      router.refresh();
+      refresh();
     } else {
       const data = await res.json().catch(() => ({}));
       showError(data.error || "שמירה נכשלה");

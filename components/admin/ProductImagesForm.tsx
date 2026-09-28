@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
+import { useLoadedRefresh } from "@/lib/hooks/useLoadedRefresh";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { showError, showSuccess } from "@/lib/alert";
 import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
 
 export function ProductImagesForm({ productId, initialImages }: { productId: string; initialImages: string[] }) {
-  const router = useRouter();
+  const refresh = useLoadedRefresh();
   const { withLoading } = useGlobalLoading();
   const [images, setImages] = useState<string[]>(initialImages);
   const [saving, setSaving] = useState(false);
@@ -29,7 +29,7 @@ export function ProductImagesForm({ productId, initialImages }: { productId: str
     setSaving(false);
     if (res.ok) {
       showSuccess("התמונות נשמרו בהצלחה");
-      router.refresh();
+      refresh();
     } else {
       const data = await res.json().catch(() => ({}));
       showError(data.error || "השמירה נכשלה");
