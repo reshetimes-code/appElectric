@@ -20,10 +20,25 @@ const CatalogContext = createContext<CatalogContextValue | null>(null);
  * once from the public /api/products and /api/categories endpoints) so
  * client-only flows — cart/favorites/compare, and the storefront nav — can
  * resolve/display an admin-added product or category just like a seed one.
+ *
+ * The root layout fetches the same admin data server-side and passes it as
+ * `initialProducts`/`initialCategories`, so the nav/department cards render
+ * with the full catalog on first paint instead of only the static seed
+ * catalog for a beat — which used to show as a visible pop-in on every
+ * refresh once real admin categories existed. The client-side fetch below
+ * still runs so the data stays live if an admin changes something mid-visit.
  */
-export function CatalogProvider({ children }: { children: ReactNode }) {
-  const [adminProducts, setAdminProducts] = useState<Product[]>([]);
-  const [adminCategories, setAdminCategories] = useState<Category[]>([]);
+export function CatalogProvider({
+  children,
+  initialProducts = [],
+  initialCategories = [],
+}: {
+  children: ReactNode;
+  initialProducts?: Product[];
+  initialCategories?: Category[];
+}) {
+  const [adminProducts, setAdminProducts] = useState<Product[]>(initialProducts);
+  const [adminCategories, setAdminCategories] = useState<Category[]>(initialCategories);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {

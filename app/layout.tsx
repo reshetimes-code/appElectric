@@ -7,6 +7,8 @@ import { CartProvider } from "@/lib/context/CartContext";
 import { FavoritesProvider } from "@/lib/context/FavoritesContext";
 import { CompareProvider } from "@/lib/context/CompareContext";
 import { CatalogProvider } from "@/lib/context/CatalogContext";
+import { getAdminCategories } from "@/lib/server/adminCategories";
+import { getAdminProducts } from "@/lib/server/adminProducts";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -29,12 +31,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Every page's data ultimately comes from Firestore and can be edited by an
+// admin at any time (see the force-dynamic notes on category/product pages),
+// and the root layout below now reads it too (for the nav/department cards).
+// Forcing the whole app dynamic here means nothing gets statically prerendered
+// at build time — avoiding a build-time Firestore dependency for pages like
+// /brand/[slug] that don't otherwise need one, and keeping every page's data
+// as fresh as the ones that already opted into this individually.
+export const dynamic = "force-dynamic";
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Fetched server-side (and merged with the static seed catalog inside
+  // CatalogProvider) so the header nav / department cards show admin-added
+  // categories and products on first paint — see the comment in
+  // CatalogContext.tsx for why this matters.
+  const [initialCategories, initialProducts] = await Promise.all([getAdminCategories(), getAdminProducts()]);
+
   return (
     <html lang="he" dir="rtl" className={`${rubik.variable} h-full`}>
       <body className="flex min-h-full flex-col bg-sand-100 font-sans antialiased">
         <ToastProvider>
-          <CatalogProvider>
+          <CatalogProvider initialCategories={initialCategories} initialProducts={initialProducts}>
             <CartProvider>
               <FavoritesProvider>
                 <CompareProvider>
