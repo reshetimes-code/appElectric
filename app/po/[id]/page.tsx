@@ -5,6 +5,7 @@ import { getPurchaseOrderById } from "@/lib/server/purchaseOrders";
 import { formatPrice } from "@/lib/utils";
 import { PrintButton } from "@/components/po/PrintButton";
 import { AutoPrint } from "@/components/po/AutoPrint";
+import { LogoLetterhead } from "@/components/ui/LogoLetterhead";
 
 export const metadata: Metadata = {
   title: "הזמנת רכש",
@@ -42,14 +43,18 @@ export default async function PurchaseOrderDocumentPage({ params }: { params: Pr
       `}</style>
       <div id="po-doc" className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-8 sm:py-12">
         <AutoPrint />
-        <div className="flex items-center justify-between gap-4 print:hidden">
-          <Image src="/logo.png" alt="AppElectric" width={150} height={34} className="h-8 w-auto" priority />
+        <div className="flex items-start justify-between gap-4 print:hidden">
+          <div>
+            <Image src="/logo.png" alt="AppElectric" width={150} height={34} className="h-8 w-auto" priority />
+            <LogoLetterhead className="mt-1 text-charcoal-500" />
+          </div>
           <PrintButton />
         </div>
 
         <div className="rounded-[var(--radius-card)] border border-sand-300 bg-white p-6 sm:p-8 print:border-0 print:p-0">
-          <div className="mb-5 hidden items-center justify-between border-b border-sand-200 pb-4 print:flex">
+          <div className="mb-5 hidden flex-col items-center border-b border-sand-200 pb-4 print:flex">
             <Image src="/logo.png" alt="AppElectric" width={150} height={34} className="h-8 w-auto" />
+            <LogoLetterhead className="mt-1 text-center text-charcoal-500" />
           </div>
 
           <div className="flex flex-wrap items-start justify-between gap-3 border-b border-sand-200 pb-5">

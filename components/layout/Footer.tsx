@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { FOOTER_LINK_GROUPS } from "@/lib/nav";
 import { PHONE_DISPLAY, PHONE_TEL } from "@/lib/siteConfig";
+import { LogoLetterhead } from "@/components/ui/LogoLetterhead";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 function InstagramGlyph() {
@@ -29,6 +30,7 @@ export function Footer() {
       <Container className="grid grid-cols-2 gap-10 py-14 sm:grid-cols-3 lg:grid-cols-6">
         <div className="col-span-2 lg:col-span-2">
           <Image src="/logo.png" alt="AppElectric" width={140} height={32} className="h-8 w-auto brightness-0 invert" />
+          <LogoLetterhead className="mt-2 text-charcoal-400" />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-charcoal-400">
             מכשירי חשמל ומטבח פרימיום, ייבוא אישי ושירות VIP אישי — מהייעוץ הראשוני ועד ההתקנה בבית.
           </p>
