@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { showError, showSuccess } from "@/lib/alert";
+import { toWhatsappNumber } from "@/lib/utils";
 
 export function SupplierForm() {
   const router = useRouter();
@@ -19,14 +20,14 @@ export function SupplierForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !/^\S+@\S+\.\S+$/.test(email) || !/^\d{9,15}$/.test(whatsapp.replace(/[\s-+]/g, ""))) {
-      showError("יש למלא שם, מייל תקין ומספר וואטסאפ תקין (עם קידומת מדינה, ללא +)");
+      showError("יש למלא שם, מייל תקין ומספר וואטסאפ תקין (למשל 0501234567)");
       return;
     }
     setSaving(true);
     const res = await fetch("/api/admin/suppliers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, whatsapp: whatsapp.replace(/[\s-+]/g, "") }),
+      body: JSON.stringify({ name, email, whatsapp: toWhatsappNumber(whatsapp) }),
     });
     setSaving(false);
     if (res.ok) {
@@ -53,8 +54,8 @@ export function SupplierForm() {
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} dir="ltr" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
       </div>
       <div>
-        <label className="mb-1 block text-sm text-charcoal-600">וואטסאפ (קידומת מדינה, ללא +)</label>
-        <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} dir="ltr" placeholder="972501234567" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
+        <label className="mb-1 block text-sm text-charcoal-600">וואטסאפ (מספר ישראלי רגיל)</label>
+        <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} dir="ltr" placeholder="0501234567" className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
       </div>
       <Button type="submit" disabled={saving}>
         {showSpinner ? <Spinner size={16} /> : <UserPlus size={16} />}

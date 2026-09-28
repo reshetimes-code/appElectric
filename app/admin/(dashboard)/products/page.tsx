@@ -9,7 +9,7 @@ import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
 
 export default async function AdminProductsPage() {
   const adminProducts = await getAdminProducts();
-  const allProducts = await getAllProducts();
+  const allProducts = [...(await getAllProducts())].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
   return (
     <div className="flex flex-col gap-6">
