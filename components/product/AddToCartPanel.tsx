@@ -27,7 +27,7 @@ export function AddToCartPanel({ product }: { product: Product }) {
   if (callMeBack) {
     return (
       <Button
-        href={`https://wa.me/972500000000?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
+        href={`https://wa.me/972524094468?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
         target="_blank"
         rel="noopener noreferrer"
         size="lg"

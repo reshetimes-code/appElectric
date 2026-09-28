@@ -20,7 +20,7 @@ export function StickyBuyBar({ product }: { product: Product }) {
       </div>
       {callMeBack ? (
         <a
-          href={`https://wa.me/972500000000?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
+          href={`https://wa.me/972524094468?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex h-12 shrink-0 items-center gap-2 rounded-full bg-brand-600 px-6 text-sm font-medium text-white"

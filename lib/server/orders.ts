@@ -46,10 +46,30 @@ export async function createOrder(input: OrderInput): Promise<CustomerOrder> {
 }
 
 export async function updateOrderStatus(id: string, status: OrderStatus): Promise<CustomerOrder | undefined> {
+  return updateOrder(id, { status });
+}
+
+export interface OrderEditInput {
+  status?: OrderStatus;
+  deliveryOption?: string;
+  notes?: string;
+  customer?: { name: string; phone: string; email?: string; address: string; city: string };
+  lines?: CartLine[];
+}
+
+export async function updateOrder(id: string, patch: OrderEditInput): Promise<CustomerOrder | undefined> {
   const all = await readJson<CustomerOrder[]>(FILE, []);
   const existing = all.find((o) => o.id === id);
   if (!existing) return undefined;
-  const updated = { ...existing, status };
+
+  let subtotal = existing.subtotal;
+  if (patch.lines) {
+    const products = await getAllProducts();
+    const priceMap = new Map(products.map((p) => [p.id, p.price]));
+    subtotal = patch.lines.reduce((sum, line) => sum + (priceMap.get(line.productId) ?? 0) * line.quantity, 0);
+  }
+
+  const updated: CustomerOrder = { ...existing, ...patch, subtotal };
   await writeJson(
     FILE,
     all.map((o) => (o.id === id ? updated : o)),

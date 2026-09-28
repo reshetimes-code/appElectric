@@ -15,7 +15,7 @@ const rubik = Rubik({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://appelectric.example"),
+  metadataBase: new URL("https://appelectric.co.il"),
   title: {
     default: "AppElectric — מכשירי חשמל ומטבח פרימיום",
     template: "%s | AppElectric",

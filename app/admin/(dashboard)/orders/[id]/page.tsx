@@ -4,9 +4,10 @@ import { getOrderById } from "@/lib/server/orders";
 import { getAllProducts } from "@/lib/server/adminProducts";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/utils";
 import { OrderStatusControls } from "@/components/admin/OrderStatusControls";
-import { PackagePlus } from "lucide-react";
+import { PackagePlus, Pencil } from "lucide-react";
 import type { OrderStatus } from "@/lib/types";
 
 const STATUS_LABEL: Record<OrderStatus, string> = { new: "חדשה", processing: "בטיפול", fulfilled: "טופלה" };
@@ -29,7 +30,13 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <h1 dir="ltr" className="text-end font-heading text-2xl font-semibold text-charcoal-900">{order.orderNumber}</h1>
           <p className="mt-1 text-sm text-charcoal-500">נוצרה ב-{new Date(order.createdAt).toLocaleDateString("he-IL")}</p>
         </div>
-        <Badge tone={STATUS_TONE[order.status]}>{STATUS_LABEL[order.status]}</Badge>
+        <div className="flex items-center gap-3">
+          <Badge tone={STATUS_TONE[order.status]}>{STATUS_LABEL[order.status]}</Badge>
+          <Button href={`/admin/orders/${order.id}/edit`} variant="secondary" size="sm">
+            <Pencil size={14} />
+            עריכה
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-[var(--radius-card)] border border-sand-300 bg-white p-6">
