@@ -18,16 +18,16 @@ export default async function AdminDashboardPage() {
   const newOrders = orders.filter((o) => o.status === "new");
 
   const cards = [
-    { href: "/admin/orders", label: "הזמנות חדשות", value: newOrders.length, icon: ShoppingBag },
     { href: "/admin/products", label: "מוצרים בקטלוג", value: totalProducts, icon: Package },
     { href: "/admin/suppliers", label: "ספקים", value: suppliers.length, icon: Truck },
     { href: "/admin/purchase-orders", label: "הזמנות רכש פתוחות", value: openPOs.length, icon: ClipboardList },
+    { href: "/admin/orders", label: "הזמנות חדשות", value: newOrders.length, icon: ShoppingBag },
     { href: "/admin/products", label: "מוצרים במלאי נמוך", value: lowStock.length, icon: AlertTriangle },
   ];
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-semibold text-charcoal-900">דשבורד</h1>
+      <h1 className="font-heading text-2xl font-semibold text-charcoal-900">לוח בקרה</h1>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {cards.map((c) => (

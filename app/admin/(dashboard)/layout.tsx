@@ -13,7 +13,7 @@ import { OrderNotificationBell } from "@/components/admin/OrderNotificationBell"
 export const dynamic = "force-dynamic";
 
 const NAV = [
-  { href: "/admin", label: "דשבורד", icon: LayoutDashboard },
+  { href: "/admin", label: "לוח בקרה", icon: LayoutDashboard },
   { href: "/admin/orders", label: "הזמנות", icon: ShoppingBag },
   { href: "/admin/products", label: "מוצרים", icon: Package },
   { href: "/admin/suppliers", label: "ספקים", icon: Truck },
@@ -23,12 +23,12 @@ const NAV = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
-      <aside className="hidden w-60 shrink-0 flex-col border-e border-sand-300 bg-charcoal-950 p-5 text-charcoal-200 lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-e border-sand-300 bg-charcoal-950 p-5 text-charcoal-200 lg:flex">
         <div className="mb-6 flex items-center justify-between gap-2">
           <p className="font-heading text-lg font-semibold text-white">ניהול AppElectric</p>
           <OrderNotificationBell className="text-charcoal-200 hover:text-white" />
         </div>
-        <nav className="flex flex-1 flex-col gap-1">
+        <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
           {NAV.map((item) => (
             <Link
               key={item.href}

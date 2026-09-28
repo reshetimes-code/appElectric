@@ -15,6 +15,9 @@ const HIDDEN_ADMIN_CATEGORY_IDS = new Set([
   "admin-cat-id-mtvi66vq-46520t276p4n1v2v3f0m5x49", // קטגוריית בדיקה חיה
   "admin-cat-id-mtvim7bk-373l1v623q1f4d3p2f1k350f", // טלוויזיה (already a subcategory of multimedia)
   "admin-cat-id-mufcq3r0-16056a1u2a3z434b47343x16", // כיריים אינדוקציה (already a subcategory of cooking)
+  "admin-cat-id-mu44kqtu-0b5g1y6f28356o0m4m624f25", // קולטי אדים — removed from nav on request
+  "admin-cat-id-mugvk5c9-60441x464i504x6l1v2f2l3d", // כיריים אינדוקציה (duplicate) — removed from nav on request
+  "admin-cat-id-mugvqkmm-5p715e3l39446t0a0r6h0k70", // תנור משולב — removed from nav on request
 ]);
 
 /**

@@ -69,7 +69,7 @@ export const categories: Category[] = [
   {
     id: "multimedia",
     slug: "multimedia",
-    nameHe: "מולטימדיה",
+    nameHe: "טלוויזיות",
     departmentId: "multimedia",
     image: PHOTOS.multimedia,
     filterKind: "multimedia",
