@@ -1,11 +1,33 @@
 import { readJson, writeJson } from "@/lib/server/fileStore";
 import { genId } from "@/lib/utils";
-import type { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types";
+import type { PurchaseOrder, PurchaseOrderItem, PurchaseOrderStatus } from "@/lib/types";
 
 const FILE = "purchase-orders.json";
 
+// Purchase orders used to hold a single product (flat productName/costPrice/
+// quantity fields) before multi-item orders were supported. Existing records
+// in Firestore are still in that shape — this upgrades them to `items` on
+// read, without touching what's stored, so old orders keep displaying and
+// sending correctly.
+type StoredPurchaseOrder = Omit<PurchaseOrder, "items"> & {
+  items?: PurchaseOrderItem[];
+  productName?: string;
+  costPrice?: number;
+  quantity?: number;
+};
+
+function normalize(raw: StoredPurchaseOrder): PurchaseOrder {
+  if (raw.items?.length) return raw as PurchaseOrder;
+  const { productName, costPrice, quantity, ...rest } = raw;
+  return {
+    ...rest,
+    items: [{ productName: productName ?? "", costPrice: costPrice ?? 0, quantity: quantity ?? 1 }],
+  };
+}
+
 export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
-  return (await readJson<PurchaseOrder[]>(FILE, [])).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  const all = await readJson<StoredPurchaseOrder[]>(FILE, []);
+  return all.map(normalize).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }
 
 export async function getPurchaseOrderById(id: string): Promise<PurchaseOrder | undefined> {
@@ -17,9 +39,7 @@ export interface PurchaseOrderInput {
   supplierName: string;
   supplierEmail: string;
   supplierWhatsapp: string;
-  productName: string;
-  costPrice: number;
-  quantity: number;
+  items: PurchaseOrderItem[];
   deliveryAddress: string;
   notes?: string;
 }
@@ -27,7 +47,7 @@ export interface PurchaseOrderInput {
 let poCounter = 1000;
 
 export async function createPurchaseOrder(input: PurchaseOrderInput): Promise<PurchaseOrder> {
-  const all = await readJson<PurchaseOrder[]>(FILE, []);
+  const all = await readJson<StoredPurchaseOrder[]>(FILE, []);
   poCounter = Math.max(poCounter, all.length + 1000);
   const now = new Date().toISOString();
   const po: PurchaseOrder = {
@@ -47,10 +67,10 @@ export async function updatePurchaseOrderStatus(
   status: PurchaseOrderStatus,
   sentVia?: "whatsapp" | "email",
 ): Promise<PurchaseOrder | undefined> {
-  const all = await readJson<PurchaseOrder[]>(FILE, []);
+  const all = await readJson<StoredPurchaseOrder[]>(FILE, []);
   const existing = all.find((po) => po.id === id);
   if (!existing) return undefined;
-  const updated: PurchaseOrder = {
+  const updated: StoredPurchaseOrder = {
     ...existing,
     status,
     updatedAt: new Date().toISOString(),
@@ -61,11 +81,11 @@ export async function updatePurchaseOrderStatus(
     FILE,
     all.map((po) => (po.id === id ? updated : po)),
   );
-  return updated;
+  return normalize(updated);
 }
 
 export async function deletePurchaseOrder(id: string): Promise<boolean> {
-  const all = await readJson<PurchaseOrder[]>(FILE, []);
+  const all = await readJson<StoredPurchaseOrder[]>(FILE, []);
   const next = all.filter((po) => po.id !== id);
   const changed = next.length !== all.length;
   if (changed) await writeJson(FILE, next);

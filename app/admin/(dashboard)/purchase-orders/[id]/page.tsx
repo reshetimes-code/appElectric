@@ -8,6 +8,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
   const { id } = await params;
   const po = await getPurchaseOrderById(id);
   if (!po) notFound();
+  const total = po.items.reduce((sum, item) => sum + item.costPrice * item.quantity, 0);
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
@@ -28,21 +29,22 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
             <dd dir="ltr" className="text-end text-sm text-charcoal-900">{po.supplierEmail}</dd>
             <dd dir="ltr" className="text-end text-sm text-charcoal-900">{po.supplierWhatsapp}</dd>
           </div>
-          <div>
-            <dt className="text-xs text-charcoal-400">מוצר</dt>
-            <dd className="text-sm font-medium text-charcoal-900">{po.productName}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-charcoal-400">כמות</dt>
-            <dd className="text-sm text-charcoal-900">{po.quantity}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-charcoal-400">מחיר עלות ליחידה</dt>
-            <dd className="text-sm text-charcoal-900">{formatPrice(po.costPrice)}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-charcoal-400">סה&quot;כ</dt>
-            <dd className="text-sm font-semibold text-charcoal-900">{formatPrice(po.costPrice * po.quantity)}</dd>
+          <div className="sm:col-span-2">
+            <dt className="mb-2 text-xs text-charcoal-400">מוצרים</dt>
+            <dd>
+              <div className="overflow-hidden rounded-[var(--radius-control)] border border-sand-200">
+                {po.items.map((item, i) => (
+                  <div key={i} className="flex items-center justify-between gap-3 border-b border-sand-200 p-3 text-sm last:border-none">
+                    <span className="font-medium text-charcoal-900">{item.productName}</span>
+                    <span className="shrink-0 text-charcoal-500">{item.quantity} × {formatPrice(item.costPrice)}</span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between gap-3 bg-sand-50 p-3 text-sm font-semibold text-charcoal-900">
+                  <span>סה&quot;כ</span>
+                  <span>{formatPrice(total)}</span>
+                </div>
+              </div>
+            </dd>
           </div>
           <div className="sm:col-span-2">
             <dt className="text-xs text-charcoal-400">כתובת להספקה</dt>

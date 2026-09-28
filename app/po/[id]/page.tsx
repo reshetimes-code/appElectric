@@ -22,7 +22,7 @@ export default async function PurchaseOrderDocumentPage({ params }: { params: Pr
   const po = await getPurchaseOrderById(id);
   if (!po) notFound();
 
-  const total = po.costPrice * po.quantity;
+  const total = po.items.reduce((sum, item) => sum + item.costPrice * item.quantity, 0);
 
   return (
     <>
@@ -65,22 +65,36 @@ export default async function PurchaseOrderDocumentPage({ params }: { params: Pr
               <dt className="text-xs text-charcoal-400">ספק</dt>
               <dd className="text-sm font-medium text-charcoal-900">{po.supplierName}</dd>
             </div>
-            <div>
-              <dt className="text-xs text-charcoal-400">מוצר</dt>
-              <dd className="text-sm font-medium text-charcoal-900">{po.productName}</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-charcoal-400">כמות</dt>
-              <dd className="text-sm text-charcoal-900">{po.quantity}</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-charcoal-400">מחיר עלות ליחידה</dt>
-              <dd className="text-sm text-charcoal-900">{formatPrice(po.costPrice)}</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-charcoal-400">סה&quot;כ לתשלום</dt>
-              <dd className="text-base font-semibold text-charcoal-900">{formatPrice(total)}</dd>
-            </div>
+          </dl>
+
+          <table className="mt-5 w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-sand-300 text-start text-xs text-charcoal-400">
+                <th className="pb-2 text-start font-normal">מוצר</th>
+                <th className="pb-2 text-start font-normal">כמות</th>
+                <th className="pb-2 text-start font-normal">מחיר ליחידה</th>
+                <th className="pb-2 text-start font-normal">סה&quot;כ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {po.items.map((item, i) => (
+                <tr key={i} className="border-b border-sand-200">
+                  <td className="py-2 pe-2 font-medium text-charcoal-900">{item.productName}</td>
+                  <td className="py-2 pe-2 text-charcoal-700">{item.quantity}</td>
+                  <td className="py-2 pe-2 text-charcoal-700">{formatPrice(item.costPrice)}</td>
+                  <td className="py-2 text-charcoal-700">{formatPrice(item.costPrice * item.quantity)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colSpan={3} className="pt-3 text-end text-sm font-semibold text-charcoal-900">סה&quot;כ לתשלום</td>
+                <td className="pt-3 text-base font-semibold text-charcoal-900">{formatPrice(total)}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <dt className="text-xs text-charcoal-400">כתובת להספקה</dt>
               <dd className="text-sm text-charcoal-900">{po.deliveryAddress}</dd>

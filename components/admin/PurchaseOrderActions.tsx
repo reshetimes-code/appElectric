@@ -30,10 +30,11 @@ function poDocumentLink(po: PurchaseOrder) {
 }
 
 function buildMessage(po: PurchaseOrder) {
+  const total = po.items.reduce((sum, item) => sum + item.costPrice * item.quantity, 0);
   return [
     `הזמנת רכש ${po.poNumber} מ-AppElectric`,
-    `מוצר: ${po.productName} (כמות: ${po.quantity})`,
-    `סה"כ: ${formatPrice(po.costPrice * po.quantity)}`,
+    ...po.items.map((item) => `מוצר: ${item.productName} (כמות: ${item.quantity})`),
+    `סה"כ: ${formatPrice(total)}`,
     "",
     `למסמך ההזמנה המלא: ${poDocumentLink(po)}`,
     "",

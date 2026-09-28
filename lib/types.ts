@@ -254,6 +254,12 @@ export interface Supplier {
 
 export type PurchaseOrderStatus = "draft" | "sent" | "confirmed" | "shipped";
 
+export interface PurchaseOrderItem {
+  productName: string;
+  costPrice: number;
+  quantity: number;
+}
+
 export interface PurchaseOrder {
   id: string;
   poNumber: string;
@@ -261,10 +267,8 @@ export interface PurchaseOrder {
   supplierName: string;
   supplierEmail: string;
   supplierWhatsapp: string;
-  productName: string;
-  costPrice: number;
+  items: PurchaseOrderItem[];
   deliveryAddress: string;
-  quantity: number;
   notes?: string;
   status: PurchaseOrderStatus;
   createdAt: string;

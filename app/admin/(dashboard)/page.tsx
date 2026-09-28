@@ -79,7 +79,7 @@ export default async function AdminDashboardPage() {
             {purchaseOrders.slice(0, 5).map((po) => (
               <Link key={po.id} href={`/admin/purchase-orders/${po.id}`} className="flex items-center justify-between border-b border-sand-200 p-4 text-sm last:border-none hover:bg-sand-50">
                 <span dir="ltr" className="font-medium text-charcoal-900">{po.poNumber}</span>
-                <span className="text-charcoal-600">{po.productName}</span>
+                <span className="text-charcoal-600">{po.items.length === 1 ? po.items[0].productName : `${po.items.length} מוצרים`}</span>
                 <span className="text-charcoal-500">{po.supplierName}</span>
               </Link>
             ))}

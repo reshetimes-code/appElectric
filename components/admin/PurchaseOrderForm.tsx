@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Send } from "lucide-react";
+import { Send, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { showError } from "@/lib/alert";
+import { formatPrice } from "@/lib/utils";
 import type { Supplier } from "@/lib/types";
 
 export interface OrderOption {
@@ -16,6 +17,17 @@ export interface OrderOption {
   quantity: number;
   deliveryAddress: string;
   notes: string;
+}
+
+interface ItemRow {
+  key: string;
+  productName: string;
+  costPrice: string;
+  quantity: string;
+}
+
+function emptyRow(): ItemRow {
+  return { key: crypto.randomUUID(), productName: "", costPrice: "", quantity: "1" };
 }
 
 export function PurchaseOrderForm({
@@ -33,33 +45,53 @@ export function PurchaseOrderForm({
 }) {
   const router = useRouter();
   const [supplierId, setSupplierId] = useState(suppliers[0]?.id ?? "");
-  const [sourceOrder, setSourceOrder] = useState("");
-  const [productName, setProductName] = useState(initialProductName);
-  const [costPrice, setCostPrice] = useState("");
-  const [quantity, setQuantity] = useState("1");
+  const [addFromOrder, setAddFromOrder] = useState("");
+  const [items, setItems] = useState<ItemRow[]>(
+    initialProductName ? [{ key: crypto.randomUUID(), productName: initialProductName, costPrice: "", quantity: "1" }] : [emptyRow()],
+  );
   const [deliveryAddress, setDeliveryAddress] = useState(initialDeliveryAddress);
   const [notes, setNotes] = useState(initialNotes);
   const [saving, setSaving] = useState(false);
   const showSpinner = useDelayedPending(saving, 500);
 
-  function applyOrderOption(value: string) {
-    setSourceOrder(value);
+  // Multiple products can go into one purchase order (e.g. several line
+  // items from the same customer order, all shipping to the same address) —
+  // picking an option here appends a row instead of replacing the form, so
+  // the dropdown can be used again and again to build up the list.
+  function addFromOrderOption(value: string) {
+    setAddFromOrder("");
     const opt = orderOptions.find((o) => o.value === value);
     if (!opt) return;
-    // Fills in everything the customer order tells us — cost price is left
-    // untouched since only the admin knows what the supplier actually charges.
-    setProductName(opt.productName);
-    setQuantity(String(opt.quantity));
-    setDeliveryAddress(opt.deliveryAddress);
-    setNotes(opt.notes);
+    setItems((rows) => {
+      const withoutBlankFirst = rows.length === 1 && !rows[0].productName.trim() ? [] : rows;
+      return [...withoutBlankFirst, { key: crypto.randomUUID(), productName: opt.productName, costPrice: "", quantity: String(opt.quantity) }];
+    });
+    // Only prefill address/notes the first time something is added, so it
+    // doesn't clobber edits made after adding earlier items.
+    if (!deliveryAddress.trim()) setDeliveryAddress(opt.deliveryAddress);
+    if (!notes.trim()) setNotes(opt.notes);
+  }
+
+  function addBlankRow() {
+    setItems((rows) => [...rows, emptyRow()]);
+  }
+
+  function removeRow(key: string) {
+    setItems((rows) => (rows.length > 1 ? rows.filter((r) => r.key !== key) : rows));
+  }
+
+  function updateRow(key: string, patch: Partial<ItemRow>) {
+    setItems((rows) => rows.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   }
 
   const supplier = suppliers.find((s) => s.id === supplierId);
+  const total = items.reduce((sum, r) => sum + (Number(r.costPrice) || 0) * (Number(r.quantity) || 1), 0);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!supplier || !productName.trim() || !deliveryAddress.trim()) {
-      showError("יש למלא ספק, שם מוצר וכתובת להספקה");
+    const filledItems = items.filter((r) => r.productName.trim());
+    if (!supplier || filledItems.length === 0 || !deliveryAddress.trim()) {
+      showError("יש למלא ספק, לפחות מוצר אחד וכתובת להספקה");
       return;
     }
     setSaving(true);
@@ -71,9 +103,11 @@ export function PurchaseOrderForm({
         supplierName: supplier.name,
         supplierEmail: supplier.email,
         supplierWhatsapp: supplier.whatsapp,
-        productName,
-        costPrice: Number(costPrice) || 0,
-        quantity: Number(quantity) || 1,
+        items: filledItems.map((r) => ({
+          productName: r.productName,
+          costPrice: Number(r.costPrice) || 0,
+          quantity: Number(r.quantity) || 1,
+        })),
         deliveryAddress,
         notes: notes || undefined,
       }),
@@ -92,19 +126,19 @@ export function PurchaseOrderForm({
     <form onSubmit={submit} className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-sand-300 bg-white p-6">
       {orderOptions.length > 0 && (
         <div>
-          <label className="mb-1 block text-sm text-charcoal-600">מילוי אוטומטי מהזמנת לקוח (אופציונלי)</label>
+          <label className="mb-1 block text-sm text-charcoal-600">הוספת מוצר מהזמנת לקוח (אופציונלי)</label>
           <select
-            value={sourceOrder}
-            onChange={(e) => applyOrderOption(e.target.value)}
+            value={addFromOrder}
+            onChange={(e) => addFromOrderOption(e.target.value)}
             className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm"
           >
-            <option value="">מילוי ידני</option>
+            <option value="">בחרו פריט להוספה...</option>
             {orderOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
           <p className="mt-1 text-xs text-charcoal-400">
-            בחירת פריט מהזמנת לקוח תמלא אוטומטית את שם המוצר, הכמות, כתובת ההספקה וההערות — מחיר העלות תמיד נשאר לקביעה ידנית.
+            אפשר לבחור כמה פריטים ברצף כדי לצרף כמה מוצרים לאותה הזמנת רכש — כל בחירה מוסיפה שורה חדשה. מחיר העלות תמיד נשאר לקביעה ידנית.
           </p>
         </div>
       )}
@@ -117,19 +151,67 @@ export function PurchaseOrderForm({
         </select>
       </div>
 
+      <div>
+        <label className="mb-2 block text-sm text-charcoal-600">מוצרים *</label>
+        <div className="flex flex-col gap-3">
+          {items.map((row) => (
+            <div key={row.key} className="flex flex-col gap-2 rounded-[var(--radius-control)] border border-sand-200 p-3 sm:flex-row sm:items-end">
+              <div className="flex-1">
+                <label className="mb-1 block text-xs text-charcoal-500">שם המוצר</label>
+                <input
+                  value={row.productName}
+                  onChange={(e) => updateRow(row.key, { productName: e.target.value })}
+                  className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm"
+                />
+              </div>
+              <div className="sm:w-32">
+                <label className="mb-1 block text-xs text-charcoal-500">מחיר עלות (₪)</label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={row.costPrice}
+                  onChange={(e) => updateRow(row.key, { costPrice: e.target.value })}
+                  className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm"
+                />
+              </div>
+              <div className="sm:w-24">
+                <label className="mb-1 block text-xs text-charcoal-500">כמות</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={row.quantity}
+                  onChange={(e) => updateRow(row.key, { quantity: e.target.value })}
+                  className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => removeRow(row.key)}
+                disabled={items.length === 1}
+                aria-label="הסרת מוצר"
+                className="flex h-11 w-11 shrink-0 items-center justify-center self-end rounded-[var(--radius-control)] text-charcoal-400 hover:bg-sand-100 hover:text-charcoal-800 disabled:opacity-30"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addBlankRow}
+          className="mt-2 flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline"
+        >
+          <Plus size={15} />
+          הוספת מוצר ידנית
+        </button>
+        {items.length > 1 && (
+          <p className="mt-2 text-sm text-charcoal-600">
+            סה&quot;כ: <span className="font-semibold text-charcoal-900">{formatPrice(total)}</span>
+          </p>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="sm:col-span-2">
-          <label className="mb-1 block text-sm text-charcoal-600">שם המוצר *</label>
-          <input value={productName} onChange={(e) => setProductName(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm text-charcoal-600">מחיר עלות (₪) *</label>
-          <input type="number" placeholder="0" value={costPrice} onChange={(e) => setCostPrice(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm text-charcoal-600">כמות</label>
-          <input type="number" min={1} value={quantity} onChange={(e) => setQuantity(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
-        </div>
         <div className="sm:col-span-2">
           <label className="mb-1 block text-sm text-charcoal-600">כתובת להספקה *</label>
           <input value={deliveryAddress} onChange={(e) => setDeliveryAddress(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
