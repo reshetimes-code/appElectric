@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+import { toWhatsappNumber } from "@/lib/utils";
 
 // Central SweetAlert2 wrapper, themed to match the site (RTL, brand colors,
 // same corner radius as cards/buttons) — used everywhere the app used to
@@ -95,6 +96,57 @@ export function showEmailProviderChooser(to: string, subject: string, body: stri
     html: `<div style="display:flex;flex-direction:column;gap:.6em;text-align:start;">${composeHtml}${pdfHtml}</div>${note}`,
     showConfirmButton: false,
     showCloseButton: true,
+  });
+}
+
+/**
+ * Popup for picking who to WhatsApp a message to: any contact from `recipients`
+ * (e.g. every supplier, not just the one this document was created for), or a
+ * number typed in on the spot. Each pre-set recipient is a plain wa.me link;
+ * the manual field needs a click handler to read its value, wired in didOpen.
+ */
+export function showWhatsappRecipientChooser(recipients: { label: string; whatsapp: string }[], text: string) {
+  const encodedText = encodeURIComponent(text);
+  const linkStyle =
+    "display:block;padding:.7em 1em;border-radius:0.625rem;border:1px solid var(--color-sand-300,#e2cca4);text-decoration:none;color:var(--color-charcoal-900,#1c150f);font-weight:500;";
+  const recipientsHtml = recipients
+    .filter((r) => r.whatsapp.trim())
+    .map((r) => `<a href="https://wa.me/${toWhatsappNumber(r.whatsapp)}?text=${encodedText}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">${r.label}</a>`)
+    .join("");
+  return base.fire({
+    title: "שליחה בוואטסאפ אל",
+    html: `
+      <div style="display:flex;flex-direction:column;gap:.6em;text-align:start;">
+        ${recipientsHtml}
+      </div>
+      <div style="margin-top:1em;padding-top:1em;border-top:1px solid var(--color-sand-200,#f0e3cd);text-align:start;">
+        <label style="display:block;font-size:.75rem;color:var(--color-charcoal-500,#63533f);margin-bottom:.4em;">או הזינו מספר ידנית</label>
+        <div style="display:flex;gap:.5em;">
+          <input id="wa-manual-number" type="tel" dir="ltr" placeholder="0501234567" style="flex:1;min-width:0;height:2.75rem;padding:0 .75em;border-radius:0.625rem;border:1px solid var(--color-sand-300,#e2cca4);font:inherit;" />
+          <button id="wa-manual-open" type="button" style="height:2.75rem;padding:0 1em;border-radius:0.625rem;border:none;background:var(--color-brand-600,#3a701e);color:#fff;font-weight:500;cursor:pointer;">פתיחת צ'אט</button>
+        </div>
+      </div>
+    `,
+    showConfirmButton: false,
+    showCloseButton: true,
+    didOpen: (popup) => {
+      popup.setAttribute("dir", "rtl");
+      const input = popup.querySelector<HTMLInputElement>("#wa-manual-number");
+      const button = popup.querySelector<HTMLButtonElement>("#wa-manual-open");
+      const open = () => {
+        const number = toWhatsappNumber(input?.value ?? "");
+        if (!number) return;
+        window.open(`https://wa.me/${number}?text=${encodedText}`, "_blank");
+        Swal.close();
+      };
+      button?.addEventListener("click", open);
+      input?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          open();
+        }
+      });
+    },
   });
 }
 

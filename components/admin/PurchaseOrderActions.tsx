@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/Badge";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
 import { useToast } from "@/components/ui/ToastProvider";
-import { showEmailProviderChooser } from "@/lib/alert";
+import { showEmailProviderChooser, showWhatsappRecipientChooser } from "@/lib/alert";
 import { formatPrice } from "@/lib/utils";
-import type { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types";
+import type { PurchaseOrder, PurchaseOrderStatus, Supplier } from "@/lib/types";
 
 const STATUS_LABEL: Record<PurchaseOrderStatus, string> = {
   draft: "טיוטה",
@@ -45,7 +45,7 @@ function buildMessage(po: PurchaseOrder) {
     .join("\n");
 }
 
-export function PurchaseOrderActions({ po }: { po: PurchaseOrder }) {
+export function PurchaseOrderActions({ po, suppliers }: { po: PurchaseOrder; suppliers: Supplier[] }) {
   const router = useRouter();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
@@ -63,8 +63,12 @@ export function PurchaseOrderActions({ po }: { po: PurchaseOrder }) {
   }
 
   function sendWhatsapp() {
-    const text = encodeURIComponent(buildMessage(po));
-    window.open(`https://wa.me/${po.supplierWhatsapp}?text=${text}`, "_blank");
+    // The supplier this PO was created for is listed first, but any saved
+    // supplier (or a number typed in on the spot) can be picked instead —
+    // useful when a PO ends up going to a different contact.
+    const ordered = [...suppliers].sort((a, b) => Number(b.id === po.supplierId) - Number(a.id === po.supplierId));
+    const recipients = ordered.map((s) => ({ label: `${s.name} — ${s.whatsapp}`, whatsapp: s.whatsapp }));
+    showWhatsappRecipientChooser(recipients, buildMessage(po));
     if (po.status === "draft") setStatus("sent", "whatsapp");
   }
 

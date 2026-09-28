@@ -27,6 +27,19 @@ export function slugify(input: string) {
     .replace(/^-+|-+$/g, "");
 }
 
+/**
+ * Normalizes a phone number to the country-code-first, no-leading-zero,
+ * digits-only format wa.me links require. Suppliers are sometimes entered in
+ * local Israeli format (leading 0, e.g. "0523715599") despite the form
+ * asking for a country code — this makes the number work either way instead
+ * of producing a wa.me link that silently fails to open a chat.
+ */
+export function toWhatsappNumber(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+  if (digits.startsWith("0")) return `972${digits.slice(1)}`;
+  return digits;
+}
+
 // Uses the Web Crypto API (available in the browser, Node, and edge
 // runtimes alike) instead of Math.random() — some of these ids (order
 // numbers in particular) double as an unguessable access token for public,

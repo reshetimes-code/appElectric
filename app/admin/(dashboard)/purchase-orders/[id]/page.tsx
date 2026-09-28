@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import { getPurchaseOrderById } from "@/lib/server/purchaseOrders";
+import { getSuppliers } from "@/lib/server/suppliers";
 import { PurchaseOrderActions } from "@/components/admin/PurchaseOrderActions";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { formatPrice } from "@/lib/utils";
 
 export default async function PurchaseOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const po = await getPurchaseOrderById(id);
+  const [po, suppliers] = await Promise.all([getPurchaseOrderById(id), getSuppliers()]);
   if (!po) notFound();
   const total = po.items.reduce((sum, item) => sum + item.costPrice * item.quantity, 0);
 
@@ -59,7 +60,7 @@ export default async function PurchaseOrderDetailPage({ params }: { params: Prom
         </dl>
       </div>
 
-      <PurchaseOrderActions po={po} />
+      <PurchaseOrderActions po={po} suppliers={suppliers} />
     </div>
   );
 }
