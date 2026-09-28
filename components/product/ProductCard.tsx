@@ -15,6 +15,7 @@ import { brands } from "@/lib/data/brands";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/lib/types";
 import { useToast } from "@/components/ui/ToastProvider";
+import { WHATSAPP_NUMBER } from "@/lib/siteConfig";
 
 function brandName(brandId: string) {
   return brands.find((b) => b.id === brandId)?.nameHe ?? "";
@@ -88,7 +89,7 @@ export function ProductCard({ product, className }: { product: Product; classNam
         <div className="mt-2 flex items-center gap-2">
           {callMeBack ? (
             <a
-              href={`https://wa.me/972524094468?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-[var(--radius-control)] bg-charcoal-900 text-sm font-medium text-white transition-colors hover:bg-brand-700"

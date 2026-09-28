@@ -5,6 +5,7 @@ import { ShoppingBag, Zap, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/lib/context/CartContext";
 import { useToast } from "@/components/ui/ToastProvider";
+import { WHATSAPP_NUMBER } from "@/lib/siteConfig";
 import type { Product } from "@/lib/types";
 
 export function AddToCartPanel({ product }: { product: Product }) {
@@ -27,7 +28,7 @@ export function AddToCartPanel({ product }: { product: Product }) {
   if (callMeBack) {
     return (
       <Button
-        href={`https://wa.me/972524094468?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
+        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
         target="_blank"
         rel="noopener noreferrer"
         size="lg"
@@ -52,7 +53,7 @@ export function AddToCartPanel({ product }: { product: Product }) {
         </Button>
       </div>
       <Button
-        href={`https://wa.me/972500000000?text=${encodeURIComponent(`שלום, אשמח לייעוץ VIP לגבי ${product.nameHe} דגם ${product.model}.`)}`}
+        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`שלום, אשמח לייעוץ VIP לגבי ${product.nameHe} דגם ${product.model}.`)}`}
         target="_blank"
         rel="noopener noreferrer"
         variant="secondary"

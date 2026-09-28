@@ -1,9 +1,10 @@
 import { MessageCircle } from "lucide-react";
+import { WHATSAPP_NUMBER } from "@/lib/siteConfig";
 
 export function WhatsAppFloat() {
   return (
     <a
-      href="https://wa.me/972500000000?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%99%D7%99%D7%A2%D7%95%D7%A5%20VIP"
+      href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("שלום, אשמח לייעוץ VIP")}`}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="ייעוץ VIP בוואטסאפ"

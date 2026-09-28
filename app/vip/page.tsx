@@ -5,6 +5,7 @@ import { LeadForm } from "@/components/leads/LeadForm";
 import { Button } from "@/components/ui/Button";
 import { vipServices } from "@/lib/data/vipServices";
 import { formatPrice } from "@/lib/utils";
+import { WHATSAPP_NUMBER } from "@/lib/siteConfig";
 import { MessageCircle, Wrench, Truck, Building2 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -26,7 +27,7 @@ export default function VipPage() {
             צוות ה-VIP שלנו זמין לכל שאלה — בחירת מוצר מתאים, תיאום מידות, ייבוא אישי, התקנה מקצועית ותמיכה גם אחרי הרכישה.
           </p>
           <Button
-            href="https://wa.me/972500000000?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%99%D7%99%D7%A2%D7%95%D7%A5%20VIP"
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("שלום, אשמח לייעוץ VIP")}`}
             target="_blank"
             rel="noopener noreferrer"
             size="lg"

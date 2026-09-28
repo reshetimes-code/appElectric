@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/Container";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { LeadForm } from "@/components/leads/LeadForm";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { PHONE_DISPLAY, PHONE_TEL } from "@/lib/siteConfig";
 
 export const metadata: Metadata = {
   title: "צור קשר",
@@ -24,7 +25,7 @@ export default function ContactPage() {
             <Phone size={18} className="mt-0.5 text-brand-600" />
             <div>
               <p className="text-sm font-semibold text-charcoal-900">טלפון</p>
-              <a href="tel:+972300000000" className="text-sm text-charcoal-500">03-0000000</a>
+              <a href={`tel:${PHONE_TEL}`} className="text-sm text-charcoal-500">{PHONE_DISPLAY}</a>
             </div>
           </div>
           <div className="flex items-start gap-3 rounded-[var(--radius-card)] border border-sand-300 p-4">

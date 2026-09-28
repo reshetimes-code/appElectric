@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { FOOTER_LINK_GROUPS } from "@/lib/nav";
+import { PHONE_DISPLAY, PHONE_TEL } from "@/lib/siteConfig";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 function InstagramGlyph() {
@@ -40,8 +41,8 @@ export function Footer() {
             </a>
           </div>
           <div className="mt-6 flex flex-col gap-2 text-sm text-charcoal-400">
-            <a href="tel:+972500000000" className="flex items-center gap-2 hover:text-white">
-              <Phone size={14} /> 03-0000000
+            <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 hover:text-white">
+              <Phone size={14} /> {PHONE_DISPLAY}
             </a>
             <a href="mailto:info@appelectric.co.il" className="flex items-center gap-2 hover:text-white">
               <Mail size={14} /> info@appelectric.co.il

@@ -4,6 +4,7 @@ import { ShoppingBag, MessageCircle } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/lib/context/CartContext";
 import { useToast } from "@/components/ui/ToastProvider";
+import { WHATSAPP_NUMBER } from "@/lib/siteConfig";
 import type { Product } from "@/lib/types";
 
 export function StickyBuyBar({ product }: { product: Product }) {
@@ -20,7 +21,7 @@ export function StickyBuyBar({ product }: { product: Product }) {
       </div>
       {callMeBack ? (
         <a
-          href={`https://wa.me/972524094468?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
+          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`שלום, אשמח לפרטים ומחיר לגבי ${product.nameHe} דגם ${product.model}.`)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex h-12 shrink-0 items-center gap-2 rounded-full bg-brand-600 px-6 text-sm font-medium text-white"

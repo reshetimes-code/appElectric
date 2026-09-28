@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
+import { AccessibilityWidget } from "@/components/layout/AccessibilityWidget";
 
 /**
  * The admin area (/admin/**) has its own dedicated shell (see app/admin/layout.tsx)
@@ -35,6 +36,7 @@ export function ConditionalChrome({ children }: { children: React.ReactNode }) {
       </main>
       <Footer />
       <WhatsAppFloat />
+      <AccessibilityWidget />
     </>
   );
 }
