@@ -98,7 +98,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <p className="leading-relaxed text-charcoal-600">{product.shortDescriptionHe}</p>
 
             <div className="flex flex-wrap items-center gap-3">
-              <AvailabilityBadge status={product.availabilityStatus} />
+              {product.availabilityStatus !== "call-me-back" && <AvailabilityBadge status={product.availabilityStatus} />}
               {product.energyRating && <Badge tone="success">דירוג אנרגטי {product.energyRating}</Badge>}
             </div>
             {product.supplyText && (

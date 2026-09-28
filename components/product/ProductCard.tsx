@@ -77,7 +77,7 @@ export function ProductCard({ product, className }: { product: Product; classNam
         </Link>
         <p className="line-clamp-2 text-xs leading-relaxed text-charcoal-500">{product.shortDescriptionHe}</p>
         <div className="mt-auto flex flex-col gap-2 pt-2">
-          <AvailabilityBadge status={product.availabilityStatus} />
+          {!callMeBack && <AvailabilityBadge status={product.availabilityStatus} />}
           {callMeBack ? (
             <p className="text-sm font-medium text-brand-700">צרו קשר לבירור מחיר</p>
           ) : (

@@ -6,7 +6,7 @@ import { AVAILABILITY_LABELS } from "@/lib/utils";
 import type { Category, Brand } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const AVAILABILITY_KEYS = ["immediate", "in-stock", "limited", "personal-import", "out-of-stock", "call-me-back"];
+const AVAILABILITY_KEYS = ["immediate", "in-stock", "limited", "personal-import", "out-of-stock"];
 const ENERGY_KEYS = ["A+++", "A++", "A+", "A", "B", "C"];
 
 function CheckRow({

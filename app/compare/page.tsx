@@ -89,9 +89,11 @@ export default function ComparePage() {
                       <Link href={`/product/${p.slug}`} className="block text-sm font-semibold text-charcoal-900 hover:text-brand-700">
                         {p.nameHe}
                       </Link>
-                      <div className="mt-2">
-                        <AvailabilityBadge status={p.availabilityStatus} />
-                      </div>
+                      {p.availabilityStatus !== "call-me-back" && (
+                        <div className="mt-2">
+                          <AvailabilityBadge status={p.availabilityStatus} />
+                        </div>
+                      )}
                     </div>
                   </th>
                 ))}
