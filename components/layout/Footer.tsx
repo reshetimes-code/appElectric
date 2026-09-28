@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { FOOTER_LINK_GROUPS } from "@/lib/nav";
-import { PHONE_DISPLAY, PHONE_TEL } from "@/lib/siteConfig";
+import { LEGAL_PHONE, LEGAL_ADDRESS } from "@/lib/siteConfig";
 import { LogoLetterhead } from "@/components/ui/LogoLetterhead";
 import { Phone, Mail, MapPin } from "lucide-react";
 
@@ -43,14 +43,14 @@ export function Footer() {
             </a>
           </div>
           <div className="mt-6 flex flex-col gap-2 text-sm text-charcoal-400">
-            <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 hover:text-white">
-              <Phone size={14} /> {PHONE_DISPLAY}
+            <a href={`tel:${LEGAL_PHONE}`} className="flex items-center gap-2 hover:text-white">
+              <Phone size={14} /> {LEGAL_PHONE}
             </a>
             <a href="mailto:info@appelectric.co.il" className="flex items-center gap-2 hover:text-white">
               <Mail size={14} /> info@appelectric.co.il
             </a>
             <span className="flex items-center gap-2">
-              <MapPin size={14} /> שואו-רום בתיאום מראש, גוש דן
+              <MapPin size={14} /> {LEGAL_ADDRESS}
             </span>
           </div>
         </div>
