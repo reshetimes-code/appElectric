@@ -29,12 +29,9 @@ export const categories: Category[] = [
     image: PHOTOS.cookingTwoTone,
     filterKind: "cooking",
     subcategories: [
-      { id: "built-in-ovens", slug: "built-in-ovens", nameHe: "תנורים בנויים" },
       { id: "combi-ovens", slug: "combi-ovens", nameHe: "תנורי קומבי" },
-      { id: "cooktops-induction", slug: "cooktops-induction", nameHe: "כיריים אינדוקציה" },
       { id: "cooktops-gas", slug: "cooktops-gas", nameHe: "כיריים גז" },
       { id: "cooktops-pitt", slug: "cooktops-pitt", nameHe: "PITT Cooking" },
-      { id: "hoods", slug: "hoods", nameHe: "קולטי אדים מעוצבים" },
       { id: "built-in-microwaves", slug: "built-in-microwaves", nameHe: "מיקרוגל בנוי" },
       { id: "warming-drawers", slug: "warming-drawers", nameHe: "מגירות חימום" },
       { id: "pizza-ovens", slug: "pizza-ovens", nameHe: "תנורי פיצה / טאבון יוקרה" },
