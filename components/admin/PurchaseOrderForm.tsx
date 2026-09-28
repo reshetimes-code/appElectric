@@ -35,12 +35,14 @@ export function PurchaseOrderForm({
   suppliers,
   orderOptions = [],
   initialProductName = "",
+  initialItems,
   initialDeliveryAddress = "",
   initialNotes = "",
 }: {
   suppliers: Supplier[];
   orderOptions?: OrderOption[];
   initialProductName?: string;
+  initialItems?: { productName: string; quantity: number }[];
   initialDeliveryAddress?: string;
   initialNotes?: string;
 }) {
@@ -48,9 +50,15 @@ export function PurchaseOrderForm({
   const { withLoading } = useGlobalLoading();
   const [supplierId, setSupplierId] = useState(suppliers[0]?.id ?? "");
   const [addFromOrder, setAddFromOrder] = useState("");
-  const [items, setItems] = useState<ItemRow[]>(
-    initialProductName ? [{ key: crypto.randomUUID(), productName: initialProductName, costPrice: "", quantity: "1" }] : [emptyRow()],
-  );
+  const [items, setItems] = useState<ItemRow[]>(() => {
+    if (initialItems?.length) {
+      return initialItems.map((it) => ({ key: crypto.randomUUID(), productName: it.productName, costPrice: "", quantity: String(it.quantity) }));
+    }
+    if (initialProductName) {
+      return [{ key: crypto.randomUUID(), productName: initialProductName, costPrice: "", quantity: "1" }];
+    }
+    return [emptyRow()];
+  });
   const [deliveryAddress, setDeliveryAddress] = useState(initialDeliveryAddress);
   const [notes, setNotes] = useState(initialNotes);
   const [saving, setSaving] = useState(false);
@@ -159,7 +167,7 @@ export function PurchaseOrderForm({
         <label className="mb-2 block text-sm text-charcoal-600">מוצרים *</label>
         <div className="flex flex-col gap-3">
           {items.map((row) => (
-            <div key={row.key} className="flex flex-col gap-2 rounded-[var(--radius-control)] border border-sand-200 p-3 sm:flex-row sm:items-end">
+            <div key={row.key} className="flex flex-col gap-2 rounded-[var(--radius-control)] border border-sand-200 bg-[antiquewhite] p-3 sm:flex-row sm:items-end">
               <div className="flex-1">
                 <label className="mb-1 block text-xs text-charcoal-500">שם המוצר</label>
                 <input
