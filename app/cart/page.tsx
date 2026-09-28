@@ -55,6 +55,7 @@ export default function CartPage() {
             const product = productMap.get(line.productId);
             if (!product) return null;
             const servicesTotal = line.services.reduce((s, sv) => s + sv.price, 0);
+            const unitPrice = line.priceOverride ?? product.price;
             return (
               <div key={line.id} className="flex gap-4 rounded-[var(--radius-card)] border border-sand-300 p-4">
                 <Link href={`/product/${product.slug}`} className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg">
@@ -104,7 +105,7 @@ export default function CartPage() {
                       </button>
                     </div>
                     <p className="font-heading text-sm font-semibold text-charcoal-900">
-                      {formatPrice((product.price + servicesTotal) * line.quantity)}
+                      {formatPrice((unitPrice + servicesTotal) * line.quantity)}
                     </p>
                   </div>
                 </div>

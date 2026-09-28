@@ -7,12 +7,12 @@ import { useToast } from "@/components/ui/ToastProvider";
 
 export function AddBundleButton({
   bundleId,
-  productIds,
+  items,
   bundleName,
   disabled,
 }: {
   bundleId: string;
-  productIds: string[];
+  items: { productId: string; price: number }[];
   bundleName: string;
   disabled?: boolean;
 }) {
@@ -24,7 +24,7 @@ export function AddBundleButton({
       size="lg"
       disabled={disabled}
       onClick={() => {
-        cart.addBundle(bundleId, productIds);
+        cart.addBundle(bundleId, items);
         toast.show(`${bundleName} נוסף לסל`);
       }}
     >

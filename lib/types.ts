@@ -164,17 +164,17 @@ export interface Brand {
 
 export interface BundleItem {
   productId: string;
+  price: number; // admin-set price for this product within this bundle — not the product's own catalog price
 }
 
 export interface Bundle {
   id: string;
   slug: string;
   nameHe: string;
-  description: string;
-  heroImage: string;
-  productIds: string[];
-  bundlePrice: number;
+  description?: string;
+  items: BundleItem[];
   active: boolean;
+  createdAt: string;
 }
 
 export interface Testimonial {
@@ -204,6 +204,7 @@ export interface CartLine {
   quantity: number;
   services: CartServiceSelection[];
   bundleId?: string;
+  priceOverride?: number; // set when added via a bundle, whose per-item price replaces the product's own catalog price
 }
 
 export type OrderStatus = "new" | "processing" | "fulfilled";

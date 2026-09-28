@@ -1,6 +1,5 @@
 export const SECONDARY_NAV_LINKS = [
-  { href: "/shop?premium=1", label: "סט פרמיום" },
-  { href: "/bundles", label: "מארזי מבצע" },
+  { href: "/bundles", label: "סט פרמיום" },
   { href: "/personal-import", label: "ייבוא אישי" },
   { href: "/vip", label: "שירותי VIP" },
   { href: "/tools/niche-finder", label: "מציאת מידה לנישה" },
@@ -14,8 +13,7 @@ export const FOOTER_LINK_GROUPS = [
     title: "קניה",
     links: [
       { href: "/shop", label: "כל המוצרים" },
-      { href: "/bundles", label: "מארזי מבצע" },
-      { href: "/shop?premium=1", label: "סט פרמיום" },
+      { href: "/bundles", label: "סט פרמיום" },
       { href: "/personal-import", label: "ייבוא אישי" },
       { href: "/trade-in", label: "טרייד-אין" },
     ],

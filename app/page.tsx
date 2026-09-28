@@ -27,7 +27,7 @@ export default function Home() {
         <Container className="flex flex-col gap-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <SectionHeading eyebrow="קולקציה נבחרת" title="קולקציית הפרימיום" description="מוצרים נבחרים בקפידה על ידי צוות ה-VIP שלנו." />
-            <Button href="/shop?premium=1" variant="secondary">כל הקולקציה</Button>
+            <Button href="/bundles" variant="secondary">כל הקולקציה</Button>
           </div>
           <ProductRail products={featured} />
         </Container>

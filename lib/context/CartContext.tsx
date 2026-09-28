@@ -10,7 +10,7 @@ interface CartContextValue {
   lines: CartLine[];
   hydrated: boolean;
   addItem: (productId: string, quantity?: number, services?: CartServiceSelection[]) => void;
-  addBundle: (bundleId: string, productIds: string[]) => void;
+  addBundle: (bundleId: string, items: { productId: string; price: number }[]) => void;
   removeLine: (lineId: string) => void;
   setQuantity: (lineId: string, quantity: number) => void;
   clear: () => void;
@@ -37,15 +37,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const addBundle: CartContextValue["addBundle"] = (bundleId, productIds) => {
+  const addBundle: CartContextValue["addBundle"] = (bundleId, items) => {
     setLines((prev) => [
       ...prev,
-      ...productIds.map((productId) => ({
+      ...items.map(({ productId, price }) => ({
         id: genId("line"),
         productId,
         quantity: 1,
         services: [] as CartServiceSelection[],
         bundleId,
+        priceOverride: price,
       })),
     ]);
   };
@@ -65,7 +66,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const product = productMap.get(line.productId);
       if (!product) continue;
       count += line.quantity;
-      subtotal += product.price * line.quantity;
+      subtotal += (line.priceOverride ?? product.price) * line.quantity;
       subtotal += line.services.reduce((sum, s) => sum + s.price, 0) * line.quantity;
     }
     return { count, subtotal };

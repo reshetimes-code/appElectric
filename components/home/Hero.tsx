@@ -24,7 +24,7 @@ export function Hero() {
           קירור, בישול, כביסה ומולטימדיה ממיטב המותגים העולמיים — עם ייעוץ אישי, ייבוא ייעודי והתקנה מקצועית מקצה לקצה.
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
-          <Button href="/shop?premium=1" size="lg">
+          <Button href="/bundles" size="lg">
             לקולקציית הפרימיום
           </Button>
           <Button href="/vip" variant="outline-light" size="lg">

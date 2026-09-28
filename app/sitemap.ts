@@ -2,9 +2,16 @@ import type { MetadataRoute } from "next";
 import { products } from "@/lib/data/products";
 import { categories } from "@/lib/data/categories";
 import { brands } from "@/lib/data/brands";
-import { bundles } from "@/lib/data/bundles";
+import { getActiveBundles } from "@/lib/server/adminBundles";
 
-const BASE_URL = "https://appelectric.example";
+const BASE_URL = "https://appelectric.co.il";
+
+// Metadata routes like this aren't children of the root layout, so its
+// app-wide force-dynamic doesn't cover this file — without repeating it
+// here, Next tries to prerender the sitemap at build time, which fails with
+// no Firestore credentials available in the build environment (see the
+// force-dynamic comment in app/layout.tsx for the same underlying reason).
+export const dynamic = "force-dynamic";
 
 const STATIC_ROUTES = [
   "",
@@ -27,7 +34,9 @@ const STATIC_ROUTES = [
   "/accessibility",
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const bundles = await getActiveBundles();
+
   const entries: MetadataRoute.Sitemap = STATIC_ROUTES.map((path) => ({
     url: `${BASE_URL}${path}`,
     changeFrequency: "weekly",

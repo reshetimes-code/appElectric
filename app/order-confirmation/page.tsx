@@ -60,7 +60,7 @@ function OrderConfirmationContent() {
             return (
               <li key={line.id} className="flex justify-between">
                 <span>{product.nameHe} × {line.quantity}</span>
-                <span>{formatPrice(product.price * line.quantity)}</span>
+                <span>{formatPrice((line.priceOverride ?? product.price) * line.quantity)}</span>
               </li>
             );
           })}
