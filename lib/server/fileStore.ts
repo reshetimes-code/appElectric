@@ -28,15 +28,57 @@ function docIdFor(filename: string): string {
   return filename.endsWith(".json") ? filename.slice(0, -".json".length) : filename;
 }
 
+// Firestore caps a single document at 1MB, and a whole collection (e.g. every
+// admin product) is stored as one value — once the catalog grew past that,
+// every product save failed with "exceeds the maximum allowed size". Values
+// whose JSON is larger than INLINE_LIMIT are therefore split across several
+// documents: the main doc holds {chunks: n} and the pieces live in
+// "<id>__c0".."<id>__c<n-1>". Small values keep the original {data} shape, so
+// existing documents keep working unchanged. The limit is in characters, kept
+// well under 1MB because Hebrew text takes 2 bytes per character.
+const INLINE_LIMIT = 250_000;
+const CHUNK_SIZE = 250_000;
+
+const chunkId = (docId: string, i: number) => `${docId}__c${i}`;
+
 export async function readJson<T>(filename: string, fallback: T): Promise<T> {
   const docId = docIdFor(filename);
   const snap = await firestore.collection(COLLECTION).doc(docId).get();
   if (!snap.exists) return fallback;
+  const chunks = snap.data()?.chunks;
+  if (typeof chunks === "number") {
+    const parts = await Promise.all(
+      Array.from({ length: chunks }, (_, i) => firestore.collection(COLLECTION).doc(chunkId(docId, i)).get()),
+    );
+    return JSON.parse(parts.map((p) => p.data()?.text ?? "").join("")) as T;
+  }
   const data = snap.data()?.data;
   return (data === undefined ? fallback : data) as T;
 }
 
 export async function writeJson<T>(filename: string, data: T): Promise<void> {
   const docId = docIdFor(filename);
-  await firestore.collection(COLLECTION).doc(docId).set({ data });
+  const ref = firestore.collection(COLLECTION).doc(docId);
+  const json = JSON.stringify(data);
+  const previous = (await ref.get()).data()?.chunks;
+  const oldCount = typeof previous === "number" ? previous : 0;
+
+  if (json.length <= INLINE_LIMIT) {
+    const batch = firestore.batch();
+    batch.set(ref, { data });
+    for (let i = 0; i < oldCount; i++) batch.delete(firestore.collection(COLLECTION).doc(chunkId(docId, i)));
+    await batch.commit();
+    return;
+  }
+
+  const count = Math.ceil(json.length / CHUNK_SIZE);
+  const batch = firestore.batch();
+  for (let i = 0; i < count; i++) {
+    batch.set(firestore.collection(COLLECTION).doc(chunkId(docId, i)), {
+      text: json.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE),
+    });
+  }
+  batch.set(ref, { chunks: count });
+  for (let i = count; i < oldCount; i++) batch.delete(firestore.collection(COLLECTION).doc(chunkId(docId, i)));
+  await batch.commit();
 }
