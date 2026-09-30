@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { validateProductSize, saveFailedResponse } from "@/lib/server/productValidation";
 import { getAdminProducts, createAdminProduct, type AdminProductInput } from "@/lib/server/adminProducts";
 
 export async function GET() {
@@ -15,11 +16,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "מחיר לא תקין" }, { status: 400 });
   }
 
-  const product = await createAdminProduct({
-    ...body,
-    images: body.images ?? [],
-    stockQuantity: body.stockQuantity ?? 0,
-    availabilityStatus: body.availabilityStatus || "in-stock",
-  });
-  return NextResponse.json({ product }, { status: 201 });
+  const sizeError = validateProductSize(body);
+  if (sizeError) return NextResponse.json({ error: sizeError }, { status: 400 });
+
+  try {
+    const product = await createAdminProduct({
+      ...body,
+      images: body.images ?? [],
+      stockQuantity: body.stockQuantity ?? 0,
+      availabilityStatus: body.availabilityStatus || "in-stock",
+    });
+    return NextResponse.json({ product }, { status: 201 });
+  } catch (e) {
+    return saveFailedResponse(e);
+  }
 }
