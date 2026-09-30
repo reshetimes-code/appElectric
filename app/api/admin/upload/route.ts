@@ -8,11 +8,11 @@ import { genId } from "@/lib/utils";
 // so a file saved to public/uploads/ would only exist on the one container
 // instance that handled the request and vanish on the next restart/scale
 // event, or simply not be visible to other instances serving reads.
-const BUCKET = "appelectric-uploads";
+const BUCKET = "appelectric-510209-uploads";
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const MAX_SIZE = 8 * 1024 * 1024; // 8MB
+const MAX_SIZE = 25 * 1024 * 1024; // 25MB
 
-const storage = new Storage({ projectId: "appelectric" });
+const storage = new Storage({ projectId: "appelectric-510209" });
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "סוג קובץ לא נתמך — יש להעלות JPG, PNG, WEBP או GIF" }, { status: 400 });
   }
   if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: "הקובץ גדול מדי (מקסימום 8MB)" }, { status: 400 });
+    return NextResponse.json({ error: "הקובץ גדול מדי (מקסימום 25MB)" }, { status: 400 });
   }
 
   // Filename is entirely server-generated (never derived from the client's

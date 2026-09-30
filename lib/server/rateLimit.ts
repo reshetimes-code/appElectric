@@ -11,7 +11,7 @@ if (typeof window !== "undefined") {
 // whichever instance has the freshest counter). Used only on the few
 // sensitive endpoints where brute-forcing/spamming actually matters (admin
 // login, order lookup, order creation) — not on every request site-wide.
-const firestore = new Firestore({ projectId: "appelectric" });
+const firestore = new Firestore({ projectId: "appelectric-510209" });
 
 export function getClientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");

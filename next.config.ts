@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
   },
   agentRules: false,
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "storage.googleapis.com", pathname: "/appelectric-uploads/**" }],
+    remotePatterns: [{ protocol: "https", hostname: "storage.googleapis.com", pathname: "/appelectric-510209-uploads/**" }],
   },
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];

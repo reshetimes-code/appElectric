@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-const LIMITS = { nameHe: 200, model: 100, shortDescriptionHe: 500, descriptionHe: 5000 } as const;
+const LIMITS = { nameHe: 500, model: 200, shortDescriptionHe: 2000, descriptionHe: 20000 } as const;
 const LABELS = { nameHe: "שם המוצר", model: "דגם", shortDescriptionHe: "תיאור קצר", descriptionHe: "תיאור" } as const;
-const MAX_IMAGES = 12;
+const MAX_IMAGES = 30;
 
 /** Returns a Hebrew message telling the admin which field is too long / too many, or null when fine. */
 export function validateProductSize(body: Partial<Record<keyof typeof LIMITS, string>> & { images?: string[] }): string | null {

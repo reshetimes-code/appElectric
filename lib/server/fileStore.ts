@@ -22,7 +22,7 @@ const COLLECTION = "dataStore";
 // admin leaves the sale-price field blank) — without this, Firestore throws
 // "Cannot use 'undefined' as a Firestore value" and the whole write (a new
 // product, an edited product's details, ...) is silently lost.
-const firestore = new Firestore({ projectId: "appelectric", ignoreUndefinedProperties: true });
+const firestore = new Firestore({ projectId: "appelectric-510209", ignoreUndefinedProperties: true });
 
 function docIdFor(filename: string): string {
   return filename.endsWith(".json") ? filename.slice(0, -".json".length) : filename;
