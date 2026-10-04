@@ -113,7 +113,7 @@ export function Header() {
             </button>
           ))}
           <span className="mx-1 h-4 w-px shrink-0 bg-sand-300" />
-          {SECONDARY_NAV_LINKS.slice(0, 1).map((link) => (
+          {SECONDARY_NAV_LINKS.filter((l) => l.href === "/bundles" || l.href === "/catalogs").map((link) => (
             <Link
               key={link.href}
               href={link.href}
