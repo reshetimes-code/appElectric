@@ -25,6 +25,19 @@ export function useLoadedRefresh() {
     }
   }, [isPending, end]);
 
+  // The component that triggered the refresh is often the very row being
+  // deleted: when the refreshed page commits it unmounts, so the effect above
+  // never sees isPending go false and the overlay would stay up forever.
+  useEffect(
+    () => () => {
+      if (waiting.current) {
+        waiting.current = false;
+        end();
+      }
+    },
+    [end],
+  );
+
   return () => {
     waiting.current = true;
     begin();
