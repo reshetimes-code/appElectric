@@ -20,13 +20,18 @@ export function CatalogUploadForm() {
     const file = fileRef.current?.files?.[0];
     if (!title.trim()) return showError("יש להזין שורת טקסט שתופיע מעל ה-PDF");
     if (!file) return showError("יש לבחור קובץ PDF");
+    if (file.size > 30 * 1024 * 1024) {
+      return showError(`הקובץ גדול מדי (${(file.size / 1024 / 1024).toFixed(1)}MB, מקסימום 30MB). יש לכווץ את ה-PDF ולנסות שוב.`);
+    }
     const body = new FormData();
     body.set("title", title);
     body.set("file", file);
     setSaving(true);
     const res = await withLoading(() => fetch("/api/admin/catalogs", { method: "POST", body }));
     setSaving(false);
-    if (res.ok) {
+    if (res.status === 413) {
+      showError("הקובץ גדול מדי לשרת (מעל 30MB). יש לכווץ את ה-PDF ולנסות שוב.");
+    } else if (res.ok) {
       setTitle("");
       if (fileRef.current) fileRef.current.value = "";
       setFileName("");
