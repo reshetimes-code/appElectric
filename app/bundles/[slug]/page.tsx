@@ -33,6 +33,7 @@ export default async function BundleDetailPage({ params }: { params: Promise<{ s
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           <BundleCover
                     coverUrl={bundle.coverUrl}
+                    productImages={items.flatMap((it) => (it.product.images[0] ? [it.product.images[0]] : []))}
             artKinds={items.map((it) => it.product.artKind)}
             nameHe={bundle.nameHe}
             itemCount={items.length}

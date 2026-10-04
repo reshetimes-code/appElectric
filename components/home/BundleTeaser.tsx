@@ -32,6 +32,7 @@ export async function BundleTeaser() {
               >
                 <BundleCover
                     coverUrl={bundle.coverUrl}
+                    productImages={items.flatMap((it) => (it.product.images[0] ? [it.product.images[0]] : []))}
                   artKinds={items.map((it) => it.product.artKind)}
                   nameHe={bundle.nameHe}
                   itemCount={items.length}
