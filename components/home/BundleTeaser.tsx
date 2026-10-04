@@ -7,7 +7,6 @@ import { getActiveBundles, resolveBundleItems } from "@/lib/server/adminBundles"
 import { getAllProducts } from "@/lib/server/adminProducts";
 import { getSiteContent } from "@/lib/server/siteContent";
 import { siteImage, siteText } from "@/lib/siteContent";
-import { formatPrice } from "@/lib/utils";
 
 export async function BundleTeaser() {
   const [bundles, allProducts, c] = await Promise.all([getActiveBundles(), getAllProducts(), getSiteContent()]);
@@ -22,7 +21,7 @@ export async function BundleTeaser() {
         <SectionHeading eyebrow={siteText(c, "bundles.eyebrow")} title={siteText(c, "bundles.title")} description={siteText(c, "bundles.description")} />
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           {active.map((bundle) => {
-            const { items, combined, total, savings } = resolveBundleItems(bundle, productMap);
+            const { items } = resolveBundleItems(bundle, productMap);
             if (items.length === 0) return null;
             return (
               <Link
@@ -40,13 +39,7 @@ export async function BundleTeaser() {
                 />
                 <div className="flex flex-1 flex-col gap-2 p-5">
                   {bundle.description && <p className="text-sm leading-relaxed text-charcoal-500">{bundle.description}</p>}
-                  <div className="mt-auto flex items-end justify-between pt-3">
-                    <div>
-                      {savings > 0 && <p className="text-xs text-charcoal-400 line-through">{formatPrice(combined)}</p>}
-                      <p className="font-heading text-xl font-semibold text-brand-700">{formatPrice(total)}</p>
-                    </div>
-                    {savings > 0 && <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-600">חיסכון {formatPrice(savings)}</span>}
-                  </div>
+                  <p className="mt-auto pt-3 text-sm font-medium text-brand-700">לקבלת מחיר — צרו קשר בוואטסאפ</p>
                 </div>
               </Link>
             );

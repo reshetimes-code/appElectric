@@ -6,8 +6,8 @@ import { BundleCover } from "@/components/product/BundleCover";
 import { BundleProductSlider } from "@/components/product/BundleProductSlider";
 import { getBundleBySlug, resolveBundleItems } from "@/lib/server/adminBundles";
 import { getAllProducts } from "@/lib/server/adminProducts";
-import { AddBundleButton } from "@/components/product/AddBundleButton";
-import { formatPrice } from "@/lib/utils";
+import { MessageCircle } from "lucide-react";
+import { WHATSAPP_NUMBER } from "@/lib/siteConfig";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -22,7 +22,7 @@ export default async function BundleDetailPage({ params }: { params: Promise<{ s
   if (!bundle || !bundle.active) notFound();
 
   const productMap = new Map(allProducts.map((p) => [p.id, p]));
-  const { items, combined, total, savings } = resolveBundleItems(bundle, productMap);
+  const { items } = resolveBundleItems(bundle, productMap);
   const anyOutOfStock = items.some((it) => it.product.availabilityStatus === "out-of-stock");
 
   return (
@@ -43,19 +43,17 @@ export default async function BundleDetailPage({ params }: { params: Promise<{ s
           <div className="flex flex-col gap-4">
             <h1 className="font-heading text-2xl font-semibold text-charcoal-900 sm:text-3xl">{bundle.nameHe}</h1>
             {bundle.description && <p className="leading-relaxed text-charcoal-600">{bundle.description}</p>}
-            <div className="flex items-end gap-3">
-              {savings > 0 && <span className="text-sm text-charcoal-400 line-through">{formatPrice(combined)}</span>}
-              <span className="font-heading text-3xl font-bold text-brand-700">{formatPrice(total)}</span>
-              {savings > 0 && <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-600">חיסכון {formatPrice(savings)}</span>}
-            </div>
-            <AddBundleButton
-              bundleId={bundle.id}
-              items={items.map((it) => ({ productId: it.product.id, price: it.price }))}
-              disabled={anyOutOfStock}
-              bundleName={bundle.nameHe}
-            />
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`שלום, אשמח לקבל מחיר עבור הסט "${bundle.nameHe}"`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-600 px-6 text-base font-semibold text-white hover:bg-brand-700"
+            >
+              <MessageCircle size={20} />
+              לקבלת מחיר — צרו קשר בוואטסאפ
+            </a>
             {anyOutOfStock && <p className="text-xs text-red-500">אחד המוצרים בסט אזל זמנית מהמלאי — צרו קשר לבדיקת זמינות.</p>}
-            <p className="text-xs text-charcoal-400">זמינות כל מוצר בסט נבדקת בנפרד. הסט כולל את המוצרים והמחירים המפורטים למטה בלבד.</p>
+            <p className="text-xs text-charcoal-400">זמינות כל מוצר בסט נבדקת בנפרד. הסט כולל את המוצרים המפורטים למטה בלבד.</p>
           </div>
         </div>
 
@@ -69,7 +67,6 @@ export default async function BundleDetailPage({ params }: { params: Promise<{ s
               model: it.product.model,
               image: it.product.images[0],
               artKind: it.product.artKind,
-              price: it.price,
             }))}
           />
         </div>

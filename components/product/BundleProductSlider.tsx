@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ApplianceArt, type ApplianceArtKind } from "@/components/product/ApplianceArt";
-import { formatPrice } from "@/lib/utils";
 
 export interface SliderItem {
   id: string;
@@ -14,7 +13,6 @@ export interface SliderItem {
   model: string;
   image?: string;
   artKind: ApplianceArtKind;
-  price: number;
 }
 
 export function BundleProductSlider({ items }: { items: SliderItem[] }) {
@@ -51,7 +49,6 @@ export function BundleProductSlider({ items }: { items: SliderItem[] }) {
             <div className="flex flex-col gap-1 p-4">
               <p className="line-clamp-2 min-h-10 text-sm font-medium text-charcoal-900">{it.nameHe}</p>
               {it.model && <p className="text-xs text-charcoal-500">דגם {it.model}</p>}
-              <p className="mt-1 font-heading text-lg font-semibold text-brand-700">{formatPrice(it.price)}</p>
             </div>
           </Link>
         ))}

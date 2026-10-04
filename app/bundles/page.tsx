@@ -5,7 +5,6 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { BundleCover } from "@/components/product/BundleCover";
 import { getActiveBundles, resolveBundleItems } from "@/lib/server/adminBundles";
 import { getAllProducts } from "@/lib/server/adminProducts";
-import { formatPrice } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "סטי פרימיום",
@@ -32,7 +31,7 @@ export default async function BundlesPage() {
         ) : (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {bundles.map((bundle) => {
-              const { items, combined, total, savings } = resolveBundleItems(bundle, productMap);
+              const { items } = resolveBundleItems(bundle, productMap);
               if (items.length === 0) return null;
               return (
                 <Link
@@ -50,13 +49,7 @@ export default async function BundlesPage() {
                   />
                   <div className="flex flex-1 flex-col gap-2 p-5">
                     {bundle.description && <p className="text-sm leading-relaxed text-charcoal-500">{bundle.description}</p>}
-                    <div className="mt-auto flex items-end justify-between pt-3">
-                      <div>
-                        {savings > 0 && <p className="text-xs text-charcoal-400 line-through">{formatPrice(combined)}</p>}
-                        <p className="font-heading text-xl font-semibold text-brand-700">{formatPrice(total)}</p>
-                      </div>
-                      {savings > 0 && <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-600">חיסכון {formatPrice(savings)}</span>}
-                    </div>
+                    <p className="mt-auto pt-3 text-sm font-medium text-brand-700">לקבלת מחיר — צרו קשר בוואטסאפ</p>
                   </div>
                 </Link>
               );
