@@ -5,40 +5,66 @@ import { useRouter } from "next/navigation";
 import { Upload, FileUp } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { showError } from "@/lib/alert";
-import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
+import { CATALOG_CHUNK_BYTES, CATALOG_MAX_BYTES } from "@/lib/catalogLimits";
+
+async function sendChunk(uploadId: string, index: number, slice: Blob) {
+  let lastError = "ההעלאה נכשלה";
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch(`/api/admin/catalogs/chunk?uploadId=${uploadId}&index=${index}`, { method: "POST", body: slice });
+      if (res.ok) return;
+      lastError = (await res.json().catch(() => ({}))).error || lastError;
+      if (res.status < 500) break;
+    } catch {
+      lastError = "בעיית רשת בהעלאה";
+    }
+  }
+  throw new Error(lastError);
+}
 
 export function CatalogUploadForm() {
   const router = useRouter();
-  const { withLoading } = useGlobalLoading();
   const fileRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
   const [fileName, setFileName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const file = fileRef.current?.files?.[0];
     if (!title.trim()) return showError("יש להזין שורת טקסט שתופיע מעל ה-PDF");
     if (!file) return showError("יש לבחור קובץ PDF");
-    if (file.size > 30 * 1024 * 1024) {
-      return showError(`הקובץ גדול מדי (${(file.size / 1024 / 1024).toFixed(1)}MB, מקסימום 30MB). יש לכווץ את ה-PDF ולנסות שוב.`);
+    if (file.size > CATALOG_MAX_BYTES) {
+      return showError(`הקובץ גדול מדי (${(file.size / 1024 / 1024).toFixed(1)}MB, מקסימום 500MB). יש לכווץ את ה-PDF ולנסות שוב.`);
     }
-    const body = new FormData();
-    body.set("title", title);
-    body.set("file", file);
+
+    // Sent in small slices — a single request can't carry a big file through Cloud Run.
+    const uploadId = crypto.randomUUID();
+    const total = Math.ceil(file.size / CATALOG_CHUNK_BYTES);
     setSaving(true);
-    const res = await withLoading(() => fetch("/api/admin/catalogs", { method: "POST", body }));
-    setSaving(false);
-    if (res.status === 413) {
-      showError("הקובץ גדול מדי לשרת (מעל 30MB). יש לכווץ את ה-PDF ולנסות שוב.");
-    } else if (res.ok) {
+    try {
+      for (let i = 0; i < total; i++) {
+        setProgress(Math.round((i / total) * 100));
+        const slice = file.slice(i * CATALOG_CHUNK_BYTES, (i + 1) * CATALOG_CHUNK_BYTES);
+        await sendChunk(uploadId, i, slice);
+      }
+      setProgress(100);
+      const res = await fetch("/api/admin/catalogs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uploadId, chunks: total, title }),
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "ההעלאה נכשלה");
       setTitle("");
       if (fileRef.current) fileRef.current.value = "";
       setFileName("");
       router.refresh();
-    } else {
-      const data = await res.json().catch(() => ({}));
-      showError(data.error || "ההעלאה נכשלה");
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "ההעלאה נכשלה");
+    } finally {
+      setSaving(false);
+      setProgress(0);
     }
   }
 
@@ -50,7 +76,7 @@ export function CatalogUploadForm() {
         <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={300} className="h-11 rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
       </label>
       <div className="flex flex-col gap-1 text-sm text-charcoal-600">
-        קובץ PDF (עד 30MB) *
+        קובץ PDF (עד 500MB) *
         <input
           ref={fileRef}
           type="file"
@@ -69,7 +95,7 @@ export function CatalogUploadForm() {
       </div>
       <Button type="submit" disabled={saving}>
         <Upload size={16} />
-        {saving ? "מעלה..." : "העלאה"}
+        {saving ? `מעלה... ${progress}%` : "העלאה"}
       </Button>
     </form>
   );
