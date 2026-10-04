@@ -82,19 +82,6 @@ export function FilterControls({
         )}
       </div>
 
-      {category && category.subcategories.length > 0 && (
-        <FilterGroup title="תת-קטגוריה">
-          {category.subcategories.map((sub) => (
-            <CheckRow
-              key={sub.id}
-              checked={!!filters.subcategory?.includes(sub.slug)}
-              onChange={() => toggleListValue("subcategory", sub.slug)}
-              label={sub.nameHe}
-            />
-          ))}
-        </FilterGroup>
-      )}
-
       {sortedBrands.length > 0 && (
         <FilterGroup title="מותג">
           {sortedBrands.map((b) => (
@@ -118,6 +105,19 @@ export function FilterControls({
               onChange={() => toggleListValue("screenSizeInch", String(size))}
               label={`${size}"`}
               count={facetCounts.screenSizeInch[size]}
+            />
+          ))}
+        </FilterGroup>
+      )}
+
+      {category && category.subcategories.length > 0 && (
+        <FilterGroup title="תת-קטגוריה">
+          {category.subcategories.map((sub) => (
+            <CheckRow
+              key={sub.id}
+              checked={!!filters.subcategory?.includes(sub.slug)}
+              onChange={() => toggleListValue("subcategory", sub.slug)}
+              label={sub.nameHe}
             />
           ))}
         </FilterGroup>
