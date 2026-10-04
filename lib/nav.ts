@@ -2,6 +2,7 @@ export const SECONDARY_NAV_LINKS = [
   { href: "/bundles", label: "סט פרמיום" },
   { href: "/personal-import", label: "ייבוא אישי" },
   { href: "/vip", label: "שירותי VIP" },
+  { href: "/catalogs", label: "קטלוגים" },
   { href: "/tools/niche-finder", label: "מציאת מידה לנישה" },
   { href: "/tools/energy-calculator", label: "מחשבון חיסכון באנרגיה" },
   { href: "/compare", label: "השוואת מוצרים" },
@@ -16,6 +17,7 @@ export const FOOTER_LINK_GROUPS = [
       { href: "/bundles", label: "סט פרמיום" },
       { href: "/personal-import", label: "ייבוא אישי" },
       { href: "/trade-in", label: "טרייד-אין" },
+      { href: "/catalogs", label: "קטלוגים" },
     ],
   },
   {

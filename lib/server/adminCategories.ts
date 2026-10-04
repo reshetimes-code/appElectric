@@ -18,6 +18,7 @@ const HIDDEN_ADMIN_CATEGORY_IDS = new Set([
   "admin-cat-id-mu44kqtu-0b5g1y6f28356o0m4m624f25", // קולטי אדים — removed from nav on request
   "admin-cat-id-mugvk5c9-60441x464i504x6l1v2f2l3d", // כיריים אינדוקציה (duplicate) — removed from nav on request
   "admin-cat-id-mugvqkmm-5p715e3l39446t0a0r6h0k70", // תנור משולב — removed from nav on request
+  "admin-cat-id-mujy7npb-2i596q2a60576e5c6i5n311c", // מזגנים — removed from nav on request, replaced by the catalogs page
 ]);
 
 /**

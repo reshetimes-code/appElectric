@@ -23,6 +23,7 @@ const STATIC_ROUTES = [
   "/tools/energy-calculator",
   "/tools/niche-finder",
   "/compare",
+  "/catalogs",
   "/favorites",
   "/about",
   "/contact",
