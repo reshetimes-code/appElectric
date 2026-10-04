@@ -2,6 +2,7 @@ import Image from "next/image";
 import { FileText } from "lucide-react";
 import { getCatalogs } from "@/lib/server/catalogs";
 import { CatalogUploadForm } from "@/components/admin/CatalogUploadForm";
+import { CatalogCoverButton } from "@/components/admin/CatalogCoverButton";
 import { DeleteCatalogButton } from "@/components/admin/DeleteCatalogButton";
 
 export default async function AdminCatalogsPage() {
@@ -27,6 +28,7 @@ export default async function AdminCatalogsPage() {
                   <FileText size={18} className="shrink-0 text-charcoal-400" />
                 )}
                 <p className="min-w-0 flex-1 text-sm font-medium text-charcoal-900">{c.title}</p>
+                <CatalogCoverButton id={c.id} hasCover={!!c.coverUrl} />
                 <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-sm text-brand-700 hover:underline">צפייה</a>
                 <DeleteCatalogButton id={c.id} />
               </div>

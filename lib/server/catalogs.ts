@@ -22,6 +22,13 @@ export async function addCatalog(catalog: Catalog): Promise<void> {
   await writeJson(FILE, [...all, catalog]);
 }
 
+export async function setCatalogCover(id: string, coverUrl: string): Promise<boolean> {
+  const all = await readJson<Catalog[]>(FILE, []);
+  if (!all.some((c) => c.id === id)) return false;
+  await writeJson(FILE, all.map((c) => (c.id === id ? { ...c, coverUrl } : c)));
+  return true;
+}
+
 export async function deleteCatalog(id: string): Promise<boolean> {
   const all = await readJson<Catalog[]>(FILE, []);
   const next = all.filter((c) => c.id !== id);
