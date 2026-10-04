@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { FileText, Download } from "lucide-react";
 import { Container, SectionHeading } from "@/components/ui/Container";
 import { getCatalogs } from "@/lib/server/catalogs";
@@ -18,7 +19,13 @@ export default async function CatalogsPage() {
       ) : (
         <ul className="flex flex-col gap-4">
           {catalogs.map((c) => (
-            <li key={c.id} className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-sand-300 bg-white p-5">
+            <li key={c.id} className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-sand-300 bg-white p-5 sm:flex-row sm:items-center">
+              {c.coverUrl && (
+                <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-lg bg-sand-100 sm:w-56">
+                  <Image src={c.coverUrl} alt={c.title} fill sizes="(min-width: 640px) 224px, 100vw" className="object-cover" />
+                </div>
+              )}
+              <div className="flex flex-col gap-3">
               <p className="text-base font-medium text-charcoal-900">{c.title}</p>
               <div className="flex flex-wrap items-center gap-4">
                 <a href={c.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 hover:underline">
@@ -29,6 +36,7 @@ export default async function CatalogsPage() {
                   <Download size={16} />
                   הורדה
                 </a>
+              </div>
               </div>
             </li>
           ))}

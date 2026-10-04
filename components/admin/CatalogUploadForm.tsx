@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, FileUp } from "lucide-react";
+import { Upload, FileUp, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { showError } from "@/lib/alert";
 import { CATALOG_CHUNK_BYTES, CATALOG_MAX_BYTES } from "@/lib/catalogLimits";
@@ -27,6 +27,8 @@ export function CatalogUploadForm() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
   const [fileName, setFileName] = useState("");
+  const coverRef = useRef<HTMLInputElement>(null);
+  const [coverName, setCoverName] = useState("");
   const [saving, setSaving] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -39,11 +41,23 @@ export function CatalogUploadForm() {
       return showError(`הקובץ גדול מדי (${(file.size / 1024 / 1024).toFixed(1)}MB, מקסימום 500MB). יש לכווץ את ה-PDF ולנסות שוב.`);
     }
 
+    const cover = coverRef.current?.files?.[0];
+    if (cover && !cover.type.startsWith("image/")) return showError("תמונת הנושא חייבת להיות קובץ תמונה (JPG, PNG, WEBP)");
+
     // Sent in small slices — a single request can't carry a big file through Cloud Run.
     const uploadId = crypto.randomUUID();
     const total = Math.ceil(file.size / CATALOG_CHUNK_BYTES);
     setSaving(true);
     try {
+      let coverUrl: string | undefined;
+      if (cover) {
+        const form = new FormData();
+        form.set("file", cover);
+        const up = await fetch("/api/admin/upload", { method: "POST", body: form });
+        const data = await up.json().catch(() => ({}));
+        if (!up.ok) throw new Error(data.error || "העלאת תמונת הנושא נכשלה");
+        coverUrl = data.url;
+      }
       for (let i = 0; i < total; i++) {
         setProgress(Math.round((i / total) * 100));
         const slice = file.slice(i * CATALOG_CHUNK_BYTES, (i + 1) * CATALOG_CHUNK_BYTES);
@@ -53,12 +67,14 @@ export function CatalogUploadForm() {
       const res = await fetch("/api/admin/catalogs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uploadId, chunks: total, title }),
+        body: JSON.stringify({ uploadId, chunks: total, title, coverUrl }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "ההעלאה נכשלה");
       setTitle("");
       if (fileRef.current) fileRef.current.value = "";
       setFileName("");
+      if (coverRef.current) coverRef.current.value = "";
+      setCoverName("");
       router.refresh();
     } catch (err) {
       showError(err instanceof Error ? err.message : "ההעלאה נכשלה");
@@ -75,6 +91,24 @@ export function CatalogUploadForm() {
         שורת טקסט (תופיע מעל ה-PDF) *
         <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={300} className="h-11 rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
       </label>
+      <div className="flex flex-col gap-1 text-sm text-charcoal-600">
+        תמונת נושא (אופציונלי)
+        <input
+          ref={coverRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={(e) => setCoverName(e.target.files?.[0]?.name ?? "")}
+        />
+        <button
+          type="button"
+          onClick={() => coverRef.current?.click()}
+          className="flex h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] border border-dashed border-sand-400 bg-sand-50 px-3 text-sm font-medium text-charcoal-700 hover:bg-sand-100"
+        >
+          <ImagePlus size={16} />
+          {coverName || "לחצו כאן לבחירת תמונה"}
+        </button>
+      </div>
       <div className="flex flex-col gap-1 text-sm text-charcoal-600">
         קובץ PDF (עד 500MB) *
         <input

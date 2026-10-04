@@ -7,6 +7,8 @@ export interface Catalog {
   /** The text line shown above the PDF on the public page. */
   title: string;
   url: string;
+  /** Optional cover image (uploaded to the uploads bucket) shown on the public page. */
+  coverUrl?: string;
   createdAt: string;
 }
 

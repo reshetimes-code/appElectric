@@ -9,13 +9,17 @@ const COMPOSE_LIMIT = 32; // Cloud Storage composes at most 32 objects per call
 
 /** Finalizes a chunked upload (see ./chunk/route.ts): joins the slices into one PDF and registers it. */
 export async function POST(request: Request) {
-  const body = (await request.json().catch(() => ({}))) as { uploadId?: string; chunks?: number; title?: string };
+  const body = (await request.json().catch(() => ({}))) as { uploadId?: string; chunks?: number; title?: string; coverUrl?: string };
   const title = String(body.title ?? "").trim();
   const uploadId = body.uploadId ?? "";
   const chunks = Number(body.chunks);
+  const coverUrl = body.coverUrl || undefined;
 
   if (!title) return NextResponse.json({ error: "יש להזין שורת טקסט שתופיע מעל ה-PDF" }, { status: 400 });
   if (title.length > 300) return NextResponse.json({ error: "שורת הטקסט ארוכה מדי (מקסימום 300 תווים)" }, { status: 400 });
+  if (coverUrl && !coverUrl.startsWith(`https://storage.googleapis.com/${CATALOG_BUCKET}/`)) {
+    return NextResponse.json({ error: "תמונת נושא לא תקינה" }, { status: 400 });
+  }
   if (!isValidUploadId(uploadId) || !Number.isInteger(chunks) || chunks < 1 || chunks > CATALOG_MAX_CHUNKS) {
     return NextResponse.json({ error: "בקשה לא תקינה" }, { status: 400 });
   }
@@ -54,7 +58,7 @@ export async function POST(request: Request) {
     await final.setMetadata({ contentType: "application/pdf" });
     await bucket.deleteFiles({ prefix: tmpPrefix }).catch(() => {});
 
-    const catalog = { id, title, url: `https://storage.googleapis.com/${CATALOG_BUCKET}/${filename}`, createdAt: new Date().toISOString() };
+    const catalog = { id, title, url: `https://storage.googleapis.com/${CATALOG_BUCKET}/${filename}`, coverUrl, createdAt: new Date().toISOString() };
     await addCatalog(catalog);
     return NextResponse.json({ catalog }, { status: 201 });
   } catch {
