@@ -50,7 +50,7 @@ export default async function BundleDetailPage({ params }: { params: Promise<{ s
               className="inline-flex h-12 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-600 px-6 text-base font-semibold text-white hover:bg-brand-700"
             >
               <MessageCircle size={20} />
-              לקבלת מחיר — צרו קשר בוואטסאפ
+              להצעת מחיר וצפייה במוצרים
             </a>
             {anyOutOfStock && <p className="text-xs text-red-500">אחד המוצרים בסט אזל זמנית מהמלאי — צרו קשר לבדיקת זמינות.</p>}
             <p className="text-xs text-charcoal-400">זמינות כל מוצר בסט נבדקת בנפרד. הסט כולל את המוצרים המפורטים למטה בלבד.</p>

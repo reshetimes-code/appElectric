@@ -39,7 +39,7 @@ export async function BundleTeaser() {
                 />
                 <div className="flex flex-1 flex-col gap-2 p-5">
                   {bundle.description && <p className="text-sm leading-relaxed text-charcoal-500">{bundle.description}</p>}
-                  <p className="mt-auto pt-3 text-sm font-medium text-brand-700">לקבלת מחיר — צרו קשר בוואטסאפ</p>
+                  <span className="mt-auto inline-flex h-11 items-center justify-center rounded-[var(--radius-control)] bg-brand-600 px-5 text-sm font-semibold text-white transition-colors group-hover:bg-brand-700">להצעת מחיר וצפייה במוצרים</span>
                 </div>
               </Link>
             );
