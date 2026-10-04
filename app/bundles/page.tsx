@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { BundleArt } from "@/components/product/BundleArt";
+import { BundleCover } from "@/components/product/BundleCover";
 import { getActiveBundles, resolveBundleItems } from "@/lib/server/adminBundles";
 import { getAllProducts } from "@/lib/server/adminProducts";
 import { formatPrice } from "@/lib/utils";
@@ -40,7 +40,8 @@ export default async function BundlesPage() {
                   href={`/bundles/${bundle.slug}`}
                   className="group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-sand-300 bg-sand-50"
                 >
-                  <BundleArt
+                  <BundleCover
+                    coverUrl={bundle.coverUrl}
                     artKinds={items.map((it) => it.product.artKind)}
                     nameHe={bundle.nameHe}
                     itemCount={items.length}

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Send, X } from "lucide-react";
+import Image from "next/image";
+import { Send, X, ImagePlus } from "lucide-react";
+import { MAX_BUNDLE_ITEMS } from "@/lib/bundleLimits";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useDelayedPending } from "@/lib/hooks/useDelayedPending";
@@ -36,6 +38,8 @@ export function BundleForm({
   const [description, setDescription] = useState(bundle?.description ?? "");
   const [active, setActive] = useState(bundle?.active ?? true);
   const [addProductId, setAddProductId] = useState("");
+  const [coverUrl, setCoverUrl] = useState(bundle?.coverUrl ?? "");
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [items, setItems] = useState<ItemRow[]>(
     bundle?.items.map((it) => ({ key: crypto.randomUUID(), productId: it.productId, price: String(it.price) })) ?? [],
   );
@@ -46,7 +50,7 @@ export function BundleForm({
 
   function addProduct(productId: string) {
     setAddProductId("");
-    if (!productId || items.some((r) => r.productId === productId)) return;
+    if (!productId || items.length >= MAX_BUNDLE_ITEMS || items.some((r) => r.productId === productId)) return;
     const product = productMap.get(productId);
     setItems((rows) => [...rows, { key: crypto.randomUUID(), productId, price: product ? String(product.price) : "" }]);
   }
@@ -62,6 +66,18 @@ export function BundleForm({
   const total = items.reduce((sum, r) => sum + (Number(r.price) || 0), 0);
   const availableProducts = products.filter((p) => !items.some((r) => r.productId === p.id));
 
+  async function uploadCover(file: File | undefined) {
+    if (!file) return;
+    setUploadingCover(true);
+    const form = new FormData();
+    form.set("file", file);
+    const res = await fetch("/api/admin/upload", { method: "POST", body: form }).catch(() => null);
+    const data = await res?.json().catch(() => ({}));
+    setUploadingCover(false);
+    if (res?.ok && data?.url) setCoverUrl(data.url);
+    else showError(data?.error || "העלאת התמונה נכשלה");
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!nameHe.trim() || items.length === 0) {
@@ -72,6 +88,7 @@ export function BundleForm({
     const payload = {
       nameHe,
       description: description || undefined,
+      coverUrl: coverUrl || "",
       active,
       items: items.map((r) => ({ productId: r.productId, price: Number(r.price) || 0 })),
     };
@@ -102,19 +119,41 @@ export function BundleForm({
         <label className="mb-1 block text-sm text-charcoal-600">תיאור (אופציונלי)</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="w-full rounded-[var(--radius-control)] border border-sand-300 p-3 text-sm" />
       </div>
+      <div>
+        <label className="mb-1 block text-sm text-charcoal-600">תמונה גדולה של הסט</label>
+        {coverUrl && (
+          <div className="relative mb-2 aspect-[16/10] w-full max-w-md overflow-hidden rounded-[var(--radius-control)] bg-sand-100">
+            <Image src={coverUrl} alt="תמונת הסט" fill sizes="448px" className="object-cover" />
+            <button
+              type="button"
+              onClick={() => setCoverUrl("")}
+              aria-label="הסרת התמונה"
+              className="absolute end-2 top-2 rounded-full bg-white/90 p-1.5 text-charcoal-700 hover:bg-white"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+        <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-dashed border-sand-400 bg-sand-50 px-4 text-sm font-medium text-charcoal-700 hover:bg-sand-100">
+          <ImagePlus size={16} />
+          {uploadingCover ? "מעלה..." : coverUrl ? "החלפת תמונה" : "בחירת תמונה"}
+          <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploadingCover} onChange={(e) => { uploadCover(e.target.files?.[0]); e.target.value = ""; }} />
+        </label>
+      </div>
       <label className="flex items-center gap-2 text-sm text-charcoal-700">
         <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 rounded border-sand-400 text-brand-600 focus:ring-brand-500" />
         הסט פעיל ומוצג באתר
       </label>
 
       <div>
-        <label className="mb-1 block text-sm text-charcoal-600">הוספת מוצר לסט</label>
+        <label className="mb-1 block text-sm text-charcoal-600">הוספת מוצר לסט (עד {MAX_BUNDLE_ITEMS} מוצרים)</label>
         <select
+          disabled={items.length >= MAX_BUNDLE_ITEMS}
           value={addProductId}
           onChange={(e) => addProduct(e.target.value)}
           className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm"
         >
-          <option value="">בחרו מוצר להוספה...</option>
+          <option value="">{items.length >= MAX_BUNDLE_ITEMS ? `הגעתם למקסימום של ${MAX_BUNDLE_ITEMS} מוצרים` : "בחרו מוצר להוספה..."}</option>
           {availableProducts.map((p) => (
             <option key={p.id} value={p.id}>{p.nameHe} — {formatPrice(p.price)}</option>
           ))}

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { BundleArt } from "@/components/product/BundleArt";
+import { BundleCover } from "@/components/product/BundleCover";
 import { getActiveBundles, resolveBundleItems } from "@/lib/server/adminBundles";
 import { getAllProducts } from "@/lib/server/adminProducts";
 import { getSiteContent } from "@/lib/server/siteContent";
@@ -30,7 +30,8 @@ export async function BundleTeaser() {
                 href={`/bundles/${bundle.slug}`}
                 className="group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-sand-300 bg-sand-50"
               >
-                <BundleArt
+                <BundleCover
+                    coverUrl={bundle.coverUrl}
                   artKinds={items.map((it) => it.product.artKind)}
                   nameHe={bundle.nameHe}
                   itemCount={items.length}

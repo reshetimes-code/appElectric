@@ -23,6 +23,7 @@ export async function getBundleBySlug(slug: string): Promise<Bundle | undefined>
 export interface BundleInput {
   nameHe: string;
   description?: string;
+  coverUrl?: string;
   items: BundleItem[];
   active: boolean;
 }

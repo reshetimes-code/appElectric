@@ -172,6 +172,8 @@ export interface Bundle {
   slug: string;
   nameHe: string;
   description?: string;
+  /** Large picture of the set (uploaded to the uploads bucket). */
+  coverUrl?: string;
   items: BundleItem[];
   active: boolean;
   createdAt: string;

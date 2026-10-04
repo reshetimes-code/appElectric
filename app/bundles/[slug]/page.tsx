@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { BundleArt } from "@/components/product/BundleArt";
-import { ApplianceArt } from "@/components/product/ApplianceArt";
+import { BundleCover } from "@/components/product/BundleCover";
+import { BundleProductSlider } from "@/components/product/BundleProductSlider";
 import { getBundleBySlug, resolveBundleItems } from "@/lib/server/adminBundles";
 import { getAllProducts } from "@/lib/server/adminProducts";
 import { AddBundleButton } from "@/components/product/AddBundleButton";
@@ -12,14 +11,14 @@ import { formatPrice } from "@/lib/utils";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const bundle = await getBundleBySlug(slug);
+  const bundle = await getBundleBySlug(decodeURIComponent(slug));
   if (!bundle) return {};
   return { title: bundle.nameHe, description: bundle.description };
 }
 
 export default async function BundleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [bundle, allProducts] = await Promise.all([getBundleBySlug(slug), getAllProducts()]);
+  const [bundle, allProducts] = await Promise.all([getBundleBySlug(decodeURIComponent(slug)), getAllProducts()]);
   if (!bundle || !bundle.active) notFound();
 
   const productMap = new Map(allProducts.map((p) => [p.id, p]));
@@ -32,10 +31,12 @@ export default async function BundleDetailPage({ params }: { params: Promise<{ s
         <Breadcrumbs items={[{ label: "סטי פרימיום", href: "/bundles" }, { label: bundle.nameHe }]} />
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <BundleArt
+          <BundleCover
+                    coverUrl={bundle.coverUrl}
             artKinds={items.map((it) => it.product.artKind)}
             nameHe={bundle.nameHe}
             itemCount={items.length}
+            priority
             className="aspect-[16/10] overflow-hidden rounded-[var(--radius-card)]"
           />
           <div className="flex flex-col gap-4">
@@ -59,24 +60,17 @@ export default async function BundleDetailPage({ params }: { params: Promise<{ s
 
         <div>
           <h2 className="mb-4 font-heading text-xl font-semibold text-charcoal-900">כלול בסט</h2>
-          <div className="overflow-hidden rounded-[var(--radius-card)] border border-sand-300 bg-white">
-            {items.map((it) => (
-              <div key={it.product.id} className="flex items-center gap-4 border-b border-sand-200 p-4 last:border-none">
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-sand-100">
-                  {it.product.images[0] ? (
-                    <Image src={it.product.images[0]} alt={it.product.nameHe} fill className="object-cover" />
-                  ) : (
-                    <ApplianceArt kind={it.product.artKind} className="h-full w-full" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-charcoal-900">{it.product.nameHe}</p>
-                  <p className="text-xs text-charcoal-500">דגם {it.product.model}</p>
-                </div>
-                <p className="shrink-0 text-sm font-semibold text-charcoal-900">{formatPrice(it.price)}</p>
-              </div>
-            ))}
-          </div>
+          <BundleProductSlider
+            items={items.map((it) => ({
+              id: it.product.id,
+              slug: it.product.slug,
+              nameHe: it.product.nameHe,
+              model: it.product.model,
+              image: it.product.images[0],
+              artKind: it.product.artKind,
+              price: it.price,
+            }))}
+          />
         </div>
       </Container>
     </div>
