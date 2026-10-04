@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Upload } from "lucide-react";
+import { Upload, FileUp } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { showError } from "@/lib/alert";
 import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
@@ -12,6 +12,7 @@ export function CatalogUploadForm() {
   const { withLoading } = useGlobalLoading();
   const fileRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
+  const [fileName, setFileName] = useState("");
   const [saving, setSaving] = useState(false);
 
   async function submit(e: React.FormEvent) {
@@ -28,6 +29,7 @@ export function CatalogUploadForm() {
     if (res.ok) {
       setTitle("");
       if (fileRef.current) fileRef.current.value = "";
+      setFileName("");
       router.refresh();
     } else {
       const data = await res.json().catch(() => ({}));
@@ -42,10 +44,24 @@ export function CatalogUploadForm() {
         שורת טקסט (תופיע מעל ה-PDF) *
         <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={300} className="h-11 rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
       </label>
-      <label className="flex flex-col gap-1 text-sm text-charcoal-600">
+      <div className="flex flex-col gap-1 text-sm text-charcoal-600">
         קובץ PDF (עד 30MB) *
-        <input ref={fileRef} type="file" accept="application/pdf" className="text-sm" />
-      </label>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/pdf"
+          className="hidden"
+          onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
+        />
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          className="flex h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] border border-dashed border-brand-600 bg-brand-50 px-3 text-sm font-medium text-brand-800 hover:bg-brand-100"
+        >
+          <FileUp size={16} />
+          {fileName || "לחצו כאן לבחירת קובץ PDF"}
+        </button>
+      </div>
       <Button type="submit" disabled={saving}>
         <Upload size={16} />
         {saving ? "מעלה..." : "העלאה"}
