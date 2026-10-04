@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-const LIMITS = { nameHe: 500, model: 200, shortDescriptionHe: 2000, descriptionHe: 20000 } as const;
+import { PRODUCT_LIMITS as LIMITS } from "@/lib/productLimits";
+
 const LABELS = { nameHe: "שם המוצר", model: "דגם", shortDescriptionHe: "תיאור קצר", descriptionHe: "תיאור" } as const;
 const MAX_IMAGES = 30;
 

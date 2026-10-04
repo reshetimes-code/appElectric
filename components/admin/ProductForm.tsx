@@ -10,7 +10,16 @@ import { ImageUploader } from "@/components/admin/ImageUploader";
 import { showError } from "@/lib/alert";
 import { AVAILABILITY_LABELS } from "@/lib/utils";
 import { useGlobalLoading } from "@/lib/context/GlobalLoadingContext";
+import { PRODUCT_LIMITS } from "@/lib/productLimits";
 import type { Product } from "@/lib/types";
+
+function CharCount({ length, max }: { length: number; max: number }) {
+  return (
+    <p className={`mt-1 text-xs ${length > max ? "text-red-600" : "text-charcoal-500"}`}>
+      {length.toLocaleString("he-IL")} / {max.toLocaleString("he-IL")} תווים
+    </p>
+  );
+}
 
 interface FormBrand { id: string; nameHe: string }
 interface FormCategory { id: string; nameHe: string; subcategories: { id: string; nameHe: string }[] }
@@ -266,11 +275,13 @@ export function ProductForm({
           </div>
           <div className="sm:col-span-2">
             <label className="mb-1 block text-sm text-charcoal-600">תיאור קצר</label>
-            <input value={shortDescriptionHe} onChange={(e) => setShortDescriptionHe(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
+            <textarea value={shortDescriptionHe} onChange={(e) => setShortDescriptionHe(e.target.value)} rows={3} className="w-full rounded-[var(--radius-control)] border border-sand-300 p-3 text-sm" />
+            <CharCount length={shortDescriptionHe.length} max={PRODUCT_LIMITS.shortDescriptionHe} />
           </div>
           <div className="sm:col-span-2">
             <label className="mb-1 block text-sm text-charcoal-600">תיאור מלא</label>
-            <textarea value={descriptionHe} onChange={(e) => setDescriptionHe(e.target.value)} rows={3} className="w-full rounded-[var(--radius-control)] border border-sand-300 p-3 text-sm" />
+            <textarea value={descriptionHe} onChange={(e) => setDescriptionHe(e.target.value)} rows={6} className="w-full rounded-[var(--radius-control)] border border-sand-300 p-3 text-sm" />
+            <CharCount length={descriptionHe.length} max={PRODUCT_LIMITS.descriptionHe} />
           </div>
         </div>
       </div>
