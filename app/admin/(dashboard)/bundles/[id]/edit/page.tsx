@@ -7,7 +7,7 @@ export default async function EditBundlePage({ params }: { params: Promise<{ id:
   const { id } = await params;
   const [bundle, products] = await Promise.all([getBundleById(id), getAllProducts()]);
   if (!bundle) notFound();
-  const productOptions = products.map((p) => ({ id: p.id, nameHe: p.nameHe, price: p.price }));
+  const productOptions = products.map((p) => ({ id: p.id, nameHe: p.nameHe, price: p.price, image: p.images[0] }));
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">

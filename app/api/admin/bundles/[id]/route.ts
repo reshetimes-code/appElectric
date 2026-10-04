@@ -14,7 +14,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (body.items.length > MAX_BUNDLE_ITEMS) {
     return NextResponse.json({ error: `אפשר להוסיף עד ${MAX_BUNDLE_ITEMS} מוצרים לסט` }, { status: 400 });
   }
-  if (body.coverUrl && !body.coverUrl.startsWith("https://storage.googleapis.com/appelectric-510209-uploads/")) {
+  if (body.coverUrl && !body.coverUrl.startsWith("https://storage.googleapis.com/appelectric-510209-uploads/") && !/^\/(?!\/)/.test(body.coverUrl)) {
     return NextResponse.json({ error: "תמונת הסט לא תקינה" }, { status: 400 });
   }
   const bundle = await updateBundle(id, body);
