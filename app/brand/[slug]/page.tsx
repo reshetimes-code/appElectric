@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { getSiteContent } from "@/lib/server/siteContent";
+import { siteImage, siteText } from "@/lib/siteContent";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
 import { getBrandBySlug, brands } from "@/lib/data/brands";
 import { getProducts, parseFilters, getFacetCounts } from "@/lib/repo/products";
@@ -31,6 +33,7 @@ export default async function BrandDetailPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { slug } = await params;
+  const content = await getSiteContent();
   const brand = getBrandBySlug(slug);
   if (!brand) notFound();
 
@@ -51,7 +54,7 @@ export default async function BrandDetailPage({
   return (
     <>
       <section className="relative overflow-hidden bg-charcoal-950">
-        <Image src={brand.heroImage} alt={brand.nameHe} fill sizes="100vw" className="object-cover opacity-50" />
+        <Image src={siteImage(content, `brand:${brand.slug}`, brand.heroImage)} alt={brand.nameHe} fill sizes="100vw" className="object-cover opacity-50" />
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/60 to-transparent" />
         <Container className="relative flex min-h-[280px] flex-col justify-end gap-3 py-12 text-white">
           {brand.logo && (

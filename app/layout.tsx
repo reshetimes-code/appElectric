@@ -11,6 +11,7 @@ import { GlobalLoadingProvider } from "@/lib/context/GlobalLoadingContext";
 import { GlobalLoadingOverlay } from "@/components/ui/GlobalLoadingOverlay";
 import { getAdminCategories } from "@/lib/server/adminCategories";
 import { getAdminProducts } from "@/lib/server/adminProducts";
+import { getSiteContent } from "@/lib/server/siteContent";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -47,14 +48,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // CatalogProvider) so the header nav / department cards show admin-added
   // categories and products on first paint — see the comment in
   // CatalogContext.tsx for why this matters.
-  const [initialCategories, initialProducts] = await Promise.all([getAdminCategories(), getAdminProducts()]);
+  const [initialCategories, initialProducts, siteContent] = await Promise.all([getAdminCategories(), getAdminProducts(), getSiteContent()]);
+  const categoryImages = Object.fromEntries(
+    Object.entries(siteContent.images)
+      .filter(([key]) => key.startsWith("category:"))
+      .map(([key, url]) => [key.slice("category:".length), url]),
+  );
 
   return (
     <html lang="he" dir="rtl" className={`${rubik.variable} h-full`}>
       <body className="flex min-h-full flex-col bg-sand-100 font-sans antialiased">
         <ToastProvider>
           <GlobalLoadingProvider>
-            <CatalogProvider initialCategories={initialCategories} initialProducts={initialProducts}>
+            <CatalogProvider initialCategories={initialCategories} initialProducts={initialProducts} categoryImages={categoryImages}>
               <CartProvider>
                 <FavoritesProvider>
                   <CompareProvider>

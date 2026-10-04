@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, Package, Truck, ClipboardList, ExternalLink, ShoppingBag, PackageOpen, FileText } from "lucide-react";
+import { LayoutDashboard, Package, Truck, ClipboardList, ExternalLink, ShoppingBag, PackageOpen, FileText, Palette } from "lucide-react";
 import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
 import { OrderNotificationBell } from "@/components/admin/OrderNotificationBell";
 
@@ -18,6 +18,7 @@ const NAV = [
   { href: "/admin/products", label: "מוצרים", icon: Package },
   { href: "/admin/bundles", label: "סטי פרימיום", icon: PackageOpen },
   { href: "/admin/catalogs", label: "קטלוגים", icon: FileText },
+  { href: "/admin/site-content", label: "עיצוב האתר", icon: Palette },
   { href: "/admin/suppliers", label: "ספקים", icon: Truck },
   { href: "/admin/purchase-orders", label: "הזמנות רכש", icon: ClipboardList },
 ];

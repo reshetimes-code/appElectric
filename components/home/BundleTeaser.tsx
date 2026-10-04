@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/Button";
 import { BundleArt } from "@/components/product/BundleArt";
 import { getActiveBundles, resolveBundleItems } from "@/lib/server/adminBundles";
 import { getAllProducts } from "@/lib/server/adminProducts";
+import { getSiteContent } from "@/lib/server/siteContent";
+import { siteImage, siteText } from "@/lib/siteContent";
 import { formatPrice } from "@/lib/utils";
 
 export async function BundleTeaser() {
-  const [bundles, allProducts] = await Promise.all([getActiveBundles(), getAllProducts()]);
+  const [bundles, allProducts, c] = await Promise.all([getActiveBundles(), getAllProducts(), getSiteContent()]);
   if (bundles.length === 0) return null;
 
   const productMap = new Map(allProducts.map((p) => [p.id, p]));
@@ -17,7 +19,7 @@ export async function BundleTeaser() {
   return (
     <section className="bg-white py-16 sm:py-20">
       <Container className="flex flex-col gap-8">
-        <SectionHeading eyebrow="סטי פרימיום" title="סטים משתלמים לחלל אחיד" description="שילובי מוצרים שאצרנו עבורכם, במחיר משתלם שנקבע במיוחד לכל סט." />
+        <SectionHeading eyebrow={siteText(c, "bundles.eyebrow")} title={siteText(c, "bundles.title")} description={siteText(c, "bundles.description")} />
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           {active.map((bundle) => {
             const { items, combined, total, savings } = resolveBundleItems(bundle, productMap);
@@ -49,7 +51,7 @@ export async function BundleTeaser() {
           })}
         </div>
         <Button href="/bundles" variant="secondary" className="self-start">
-          כל הסטים
+          {siteText(c, "bundles.cta")}
         </Button>
       </Container>
     </section>

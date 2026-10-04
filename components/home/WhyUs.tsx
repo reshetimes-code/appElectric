@@ -1,19 +1,22 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/Container";
+import { getSiteContent } from "@/lib/server/siteContent";
+import { siteImage, siteText } from "@/lib/siteContent";
 import { Gem, Lightbulb, HeartHandshake, Truck } from "lucide-react";
 
-const ITEMS = [
-  { icon: Gem, title: "איכות פרימיום", text: "ייבוא אישי ומותגי יוקרה נבחרים, ללא פשרות על חומרים וגימור." },
-  { icon: Lightbulb, title: "חדשנות", text: "טכנולוגיות מכשירים מתקדמות, מעודכנות לפי הדגמים האחרונים בעולם." },
-  { icon: HeartHandshake, title: "שירות ראשון", text: "ליווי אישי וייעוץ מקצועי לאורך כל התהליך — לא רק עד לתשלום." },
-  { icon: Truck, title: "לוגיסטיקה מקצועית", text: "משלוח, תיאום התקנה ואפשרות לפינוי מכשיר ישן." },
-];
+const ICONS = [Gem, Lightbulb, HeartHandshake, Truck];
 
-export function WhyUs() {
+export async function WhyUs() {
+  const c = await getSiteContent();
+  const ITEMS = ICONS.map((icon, i) => ({
+    icon,
+    title: siteText(c, `whyUs.${i + 1}.title`),
+    text: siteText(c, `whyUs.${i + 1}.text`),
+  }));
   return (
     <section className="py-16 sm:py-20">
       <Container className="flex flex-col gap-8">
-        <SectionHeading eyebrow="למה AppElectric" title="חוויית קניה ברמת שואו-רום" align="center" className="mx-auto" />
+        <SectionHeading eyebrow={siteText(c, "whyUs.eyebrow")} title={siteText(c, "whyUs.title")} align="center" className="mx-auto" />
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {ITEMS.map(({ icon: Icon, title, text }) => (
             <div key={title} className="rounded-[var(--radius-card)] border border-sand-300 bg-white p-6 text-center">

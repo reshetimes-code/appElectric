@@ -1,14 +1,17 @@
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { getSiteContent } from "@/lib/server/siteContent";
+import { siteImage, siteText } from "@/lib/siteContent";
 import { WHATSAPP_NUMBER } from "@/lib/siteConfig";
 
-export function VipCta() {
+export async function VipCta() {
+  const c = await getSiteContent();
   return (
     <section className="bg-brand-700 py-14 text-white sm:py-16">
       <Container className="flex flex-col items-center gap-5 text-center">
-        <h2 className="font-heading text-2xl font-semibold sm:text-3xl">לא בטוחים מה מתאים לכם?</h2>
+        <h2 className="font-heading text-2xl font-semibold sm:text-3xl">{siteText(c, "vipCta.title")}</h2>
         <p className="max-w-xl leading-relaxed text-brand-50">
-          קבעו ייעוץ VIP אישי — ללא עלות וללא התחייבות. נעזור לכם לבחור את המכשירים הנכונים למטבח שלכם.
+          {siteText(c, "vipCta.description")}
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Button
@@ -18,10 +21,10 @@ export function VipCta() {
             variant="dark"
             size="lg"
           >
-            שיחת WhatsApp מיידית
+            {siteText(c, "vipCta.cta1")}
           </Button>
           <Button href="/vip" variant="outline-light" size="lg">
-            השאירו פרטים
+            {siteText(c, "vipCta.cta2")}
           </Button>
         </div>
       </Container>

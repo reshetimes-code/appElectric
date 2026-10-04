@@ -12,22 +12,29 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { getFeaturedProducts } from "@/lib/repo/products";
+import { getSiteContent } from "@/lib/server/siteContent";
+import { siteText } from "@/lib/siteContent";
 import { organizationJsonLd, jsonLdScriptProps } from "@/lib/seo";
 
-export default function Home() {
+export default async function Home() {
   const featured = getFeaturedProducts(8);
+  const c = await getSiteContent();
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScriptProps(organizationJsonLd())} />
       <Hero />
       <BrandStrip />
-      <DepartmentCards />
+      <DepartmentCards
+        eyebrow={siteText(c, "departments.eyebrow")}
+        title={siteText(c, "departments.title")}
+        description={siteText(c, "departments.description")}
+      />
       <section className="bg-white py-16 sm:py-20">
         <Container className="flex flex-col gap-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <SectionHeading eyebrow="קולקציה נבחרת" title="קולקציית הפרימיום" description="מוצרים נבחרים בקפידה על ידי צוות ה-VIP שלנו." />
-            <Button href="/bundles" variant="secondary">כל הקולקציה</Button>
+            <SectionHeading eyebrow={siteText(c, "featured.eyebrow")} title={siteText(c, "featured.title")} description={siteText(c, "featured.description")} />
+            <Button href="/bundles" variant="secondary">{siteText(c, "featured.cta")}</Button>
           </div>
           <ProductRail products={featured} />
         </Container>

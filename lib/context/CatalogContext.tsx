@@ -32,10 +32,13 @@ export function CatalogProvider({
   children,
   initialProducts = [],
   initialCategories = [],
+  categoryImages = {},
 }: {
   children: ReactNode;
   initialProducts?: Product[];
   initialCategories?: Category[];
+  /** Admin-chosen category images (site-content store), keyed by category id. */
+  categoryImages?: Record<string, string>;
 }) {
   const [adminProducts, setAdminProducts] = useState<Product[]>(initialProducts);
   const [adminCategories, setAdminCategories] = useState<Category[]>(initialCategories);
@@ -62,7 +65,9 @@ export function CatalogProvider({
   }, []);
 
   const allProducts = [...staticProducts, ...adminProducts];
-  const categories = [...staticCategories, ...adminCategories];
+  const categories = [...staticCategories, ...adminCategories].map((c) =>
+    categoryImages[c.id] ? { ...c, image: categoryImages[c.id] } : c,
+  );
 
   const value: CatalogContextValue = {
     allProducts,

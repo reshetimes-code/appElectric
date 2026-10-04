@@ -6,12 +6,12 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/Container";
 import { useCatalog } from "@/lib/context/CatalogContext";
 
-export function DepartmentCards() {
+export function DepartmentCards({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
   const { categories } = useCatalog();
   return (
     <section className="py-16 sm:py-20">
       <Container className="flex flex-col gap-8">
-        <SectionHeading eyebrow="מחלקות" title="קניה לפי תחום" description="כל מחלקה אצרנית, עם מבחר ממותגי הפרימיום המובילים בעולם." />
+        <SectionHeading eyebrow={eyebrow} title={title} description={description} />
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {categories.map((cat) => (
             <Link
