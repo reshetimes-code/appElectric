@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { validateProductSize, saveFailedResponse } from "@/lib/server/productValidation";
+import { setProductCost } from "@/lib/server/productCosts";
 import { getAdminProducts, createAdminProduct, type AdminProductInput } from "@/lib/server/adminProducts";
 
 export async function GET() {
@@ -7,7 +8,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as AdminProductInput;
+  const { myCost, ...body } = (await request.json()) as AdminProductInput & { myCost?: number };
 
   if (!body.nameHe?.trim() || !body.brandId || !body.categoryId || !body.subcategoryId) {
     return NextResponse.json({ error: "יש למלא את כל שדות החובה" }, { status: 400 });
@@ -26,6 +27,7 @@ export async function POST(request: Request) {
       stockQuantity: body.stockQuantity ?? 0,
       availabilityStatus: body.availabilityStatus || "in-stock",
     });
+    await setProductCost(product.id, myCost);
     return NextResponse.json({ product }, { status: 201 });
   } catch (e) {
     return saveFailedResponse(e);

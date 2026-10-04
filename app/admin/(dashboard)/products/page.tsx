@@ -4,11 +4,13 @@ import { Plus, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { AvailabilityBadge } from "@/components/product/AvailabilityBadge";
 import { getAdminProducts, getAllProducts } from "@/lib/server/adminProducts";
+import { getProductCosts } from "@/lib/server/productCosts";
 import { formatPrice } from "@/lib/utils";
 import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
 
 export default async function AdminProductsPage() {
   const adminProducts = await getAdminProducts();
+  const costs = await getProductCosts();
   const allProducts = [...(await getAllProducts())].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
   return (
@@ -53,6 +55,11 @@ export default async function AdminProductsPage() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+                {costs[p.id] ? (
+                  <p className="text-xs text-charcoal-500 sm:w-24">עלות: {formatPrice(costs[p.id])}</p>
+                ) : (
+                  <p className="text-xs text-charcoal-300 sm:w-24">עלות: —</p>
+                )}
                 <AvailabilityBadge status={p.availabilityStatus} />
                 <p className="text-sm font-semibold text-charcoal-900 sm:w-24 sm:text-start">{formatPrice(p.price)}</p>
               </div>

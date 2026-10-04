@@ -50,6 +50,7 @@ export function ProductForm({
   categories,
   screenSizes,
   initial,
+  initialCost,
   productId,
   mode = "full",
 }: {
@@ -57,6 +58,8 @@ export function ProductForm({
   categories: FormCategory[];
   screenSizes: number[];
   initial?: Product;
+  /** The owner's private cost for this product (admin-only, never shown on the site). */
+  initialCost?: number;
   productId?: string;
   /** "full" (default): create/edit an admin-added product, images included.
    * "details": edit only the non-image fields of any product (used for the
@@ -84,6 +87,7 @@ export function ProductForm({
   const [newSubcategoryName, setNewSubcategoryName] = useState("");
   const [creatingSubcategory, setCreatingSubcategory] = useState(false);
   const [price, setPrice] = useState(initial?.price ?? 0);
+  const [myCost, setMyCost] = useState(initialCost ?? 0);
   const [compareAtPrice, setCompareAtPrice] = useState(initial?.compareAtPrice ?? 0);
   const [availabilityStatus, setAvailabilityStatus] = useState<Product["availabilityStatus"]>(
     initial?.availabilityStatus ?? "in-stock",
@@ -224,6 +228,7 @@ export function ProductForm({
       subcategoryId,
       price: Number(price),
       compareAtPrice: compareAtPrice ? Number(compareAtPrice) : undefined,
+      myCost: myCost ? Number(myCost) : undefined,
       ...(mode === "full" ? { images } : {}),
       stockQuantity: stockQuantityForStatus(availabilityStatus, initial?.stockQuantity ?? 0),
       availabilityStatus,
@@ -457,6 +462,11 @@ export function ProductForm({
             {availabilityStatus === "call-me-back" && (
               <p className="mt-1 text-xs text-charcoal-400">לא חובה במצב &quot;חזרו אליי&quot; — המחיר לא יוצג באתר.</p>
             )}
+          </div>
+          <div>
+            <label className="mb-1 block text-sm text-charcoal-600">עלות שלי (₪)</label>
+            <input type="number" value={myCost} onChange={(e) => setMyCost(Number(e.target.value))} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
+            <p className="mt-1 text-xs text-charcoal-400">פנימי — מוצג רק באדמין, לא באתר.</p>
           </div>
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">מחיר קודם (מבצע)</label>
