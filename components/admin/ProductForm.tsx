@@ -86,9 +86,9 @@ export function ProductForm({
   const [addingSubcategory, setAddingSubcategory] = useState(false);
   const [newSubcategoryName, setNewSubcategoryName] = useState("");
   const [creatingSubcategory, setCreatingSubcategory] = useState(false);
-  const [price, setPrice] = useState(initial?.price ?? 0);
-  const [myCost, setMyCost] = useState(initialCost ?? 0);
-  const [compareAtPrice, setCompareAtPrice] = useState(initial?.compareAtPrice ?? 0);
+  const [price, setPrice] = useState(initial?.price ? String(initial.price) : "");
+  const [myCost, setMyCost] = useState(initialCost ? String(initialCost) : "");
+  const [compareAtPrice, setCompareAtPrice] = useState(initial?.compareAtPrice ? String(initial.compareAtPrice) : "");
   const [availabilityStatus, setAvailabilityStatus] = useState<Product["availabilityStatus"]>(
     initial?.availabilityStatus ?? "in-stock",
   );
@@ -458,19 +458,19 @@ export function ProductForm({
             <label className="mb-1 block text-sm text-charcoal-600">
               מחיר (₪) {availabilityStatus !== "call-me-back" && "*"}
             </label>
-            <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
+            <input type="number" placeholder="0" value={price} onChange={(e) => setPrice(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
             {availabilityStatus === "call-me-back" && (
               <p className="mt-1 text-xs text-charcoal-400">לא חובה במצב &quot;חזרו אליי&quot; — המחיר לא יוצג באתר.</p>
             )}
           </div>
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">עלות שלי (₪)</label>
-            <input type="number" value={myCost} onChange={(e) => setMyCost(Number(e.target.value))} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
+            <input type="number" placeholder="0" value={myCost} onChange={(e) => setMyCost(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
             <p className="mt-1 text-xs text-charcoal-400">פנימי — מוצג רק באדמין, לא באתר.</p>
           </div>
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">מחיר קודם (מבצע)</label>
-            <input type="number" value={compareAtPrice} onChange={(e) => setCompareAtPrice(Number(e.target.value))} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
+            <input type="number" placeholder="0" value={compareAtPrice} onChange={(e) => setCompareAtPrice(e.target.value)} className="h-11 w-full rounded-[var(--radius-control)] border border-sand-300 px-3 text-sm" />
           </div>
           <div>
             <label className="mb-1 block text-sm text-charcoal-600">זמינות</label>
