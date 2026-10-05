@@ -37,22 +37,48 @@ export function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-export async function createSessionToken(): Promise<string> {
+export type AdminRole = "admin" | "worker";
+
+// Token is `${expiresAt}.${role}.${hmac}` — the role is covered by the HMAC,
+// so a worker cookie can't be edited into an admin one.
+export async function createSessionToken(role: AdminRole = "admin"): Promise<string> {
   const expiresAt = Date.now() + SESSION_TTL_MS;
-  const sig = await hmacHex(String(expiresAt));
-  return `${expiresAt}.${sig}`;
+  const sig = await hmacHex(`${expiresAt}.${role}`);
+  return `${expiresAt}.${role}.${sig}`;
+}
+
+/** Returns the session's role, or null if the token is missing/forged/expired. */
+export async function getSessionRole(token: string | undefined): Promise<AdminRole | null> {
+  if (!token) return null;
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+  const [expiresAtStr, role, sig] = parts;
+  if (role !== "admin" && role !== "worker") return null;
+  const expiresAt = Number(expiresAtStr);
+  if (!Number.isFinite(expiresAt) || Date.now() > expiresAt) return null;
+  const expected = await hmacHex(`${expiresAtStr}.${role}`);
+  return timingSafeEqual(sig, expected) ? role : null;
 }
 
 export async function verifySessionToken(token: string | undefined): Promise<boolean> {
-  if (!token) return false;
-  const dot = token.indexOf(".");
-  if (dot < 0) return false;
-  const expiresAtStr = token.slice(0, dot);
-  const sig = token.slice(dot + 1);
-  const expiresAt = Number(expiresAtStr);
-  if (!Number.isFinite(expiresAt) || Date.now() > expiresAt) return false;
-  const expected = await hmacHex(expiresAtStr);
-  return timingSafeEqual(sig, expected);
+  return (await getSessionRole(token)) !== null;
+}
+
+/** Areas a worker may open (UI pages + the API routes those pages call). */
+const WORKER_PREFIXES = [
+  "/admin/products",
+  "/admin/bundles",
+  "/api/admin/products",
+  "/api/admin/bundles",
+  "/api/admin/brands",
+  "/api/admin/categories",
+  "/api/admin/subcategories",
+  "/api/admin/screen-sizes",
+  "/api/admin/upload",
+];
+
+export function workerCanAccess(pathname: string): boolean {
+  return WORKER_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 
 export const SESSION_MAX_AGE_SECONDS = SESSION_TTL_MS / 1000;

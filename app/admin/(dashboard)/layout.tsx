@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
-import { ADMIN_NAV } from "@/components/admin/adminNav";
+import { cookies } from "next/headers";
+import { getSessionRole } from "@/lib/adminSession";
+import { navForRole } from "@/components/admin/adminNav";
 import { AdminMobileMenu } from "@/components/admin/AdminMobileMenu";
 import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
 import { OrderNotificationBell } from "@/components/admin/OrderNotificationBell";
@@ -14,15 +16,16 @@ import { OrderNotificationBell } from "@/components/admin/OrderNotificationBell"
 // under /admin to render fresh on each request instead.
 export const dynamic = "force-dynamic";
 
-const NAV = ADMIN_NAV;
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const role = (await getSessionRole((await cookies()).get("appelectric_admin")?.value)) ?? "admin";
+  const NAV = navForRole(role);
+  const isAdmin = role === "admin";
   return (
     <div className="flex min-h-screen">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-e border-sand-300 bg-charcoal-950 p-5 text-charcoal-200 lg:flex">
         <div className="mb-6 flex items-center justify-between gap-2">
           <p className="font-heading text-lg font-semibold text-white">ניהול AppElectric</p>
-          <OrderNotificationBell className="text-charcoal-200 hover:text-white" />
+          {isAdmin && <OrderNotificationBell className="text-charcoal-200 hover:text-white" />}
         </div>
         <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
           {NAV.map((item) => (
@@ -44,7 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <AdminMobileMenu />
+        <AdminMobileMenu role={role} />
         <main className="min-w-0 flex-1 p-5 sm:p-8">{children}</main>
       </div>
     </div>

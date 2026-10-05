@@ -5,6 +5,12 @@ import { checkRateLimit, getClientIp } from "@/lib/server/rateLimit";
 const ADMIN_COOKIE = "appelectric_admin";
 // Demo-only shared password. Set ADMIN_PASSWORD in .env.local to change it.
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "appelectric-admin";
+// Restricted "worker" login (products + premium bundles only). Disabled unless set.
+const WORKER_PASSWORD = process.env.WORKER_PASSWORD || "";
+
+function matches(input: string, expected: string) {
+  return expected.length > 0 && input.length === expected.length && timingSafeEqual(input, expected);
+}
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -16,13 +22,13 @@ export async function POST(request: Request) {
   }
 
   const { password } = await request.json();
-  const valid = typeof password === "string" && password.length === ADMIN_PASSWORD.length && timingSafeEqual(password, ADMIN_PASSWORD);
-  if (!valid) {
+  const role = typeof password !== "string" ? null : matches(password, ADMIN_PASSWORD) ? "admin" : matches(password, WORKER_PASSWORD) ? "worker" : null;
+  if (!role) {
     return NextResponse.json({ error: "סיסמה שגויה" }, { status: 401 });
   }
 
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(ADMIN_COOKIE, await createSessionToken(), {
+  res.cookies.set(ADMIN_COOKIE, await createSessionToken(role), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",

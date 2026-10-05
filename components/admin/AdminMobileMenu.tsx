@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ExternalLink, Menu, X } from "lucide-react";
-import { ADMIN_NAV } from "./adminNav";
+import { navForRole } from "./adminNav";
 import { AdminLogoutButton } from "./AdminLogoutButton";
 import { OrderNotificationBell } from "./OrderNotificationBell";
 
-export function AdminMobileMenu() {
+export function AdminMobileMenu({ role = "admin" }: { role?: "admin" | "worker" }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -36,7 +36,7 @@ export function AdminMobileMenu() {
           <Menu size={24} />
         </button>
         <p className="font-heading text-base font-semibold text-charcoal-900">ניהול AppElectric</p>
-        <OrderNotificationBell className="text-charcoal-700" />
+        {role === "admin" ? <OrderNotificationBell className="text-charcoal-700" /> : <span className="w-6" />}
       </div>
 
       {open && (
@@ -50,7 +50,7 @@ export function AdminMobileMenu() {
               </button>
             </div>
             <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
-              {ADMIN_NAV.map((item) => {
+              {navForRole(role).map((item) => {
                 const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
                 return (
                   <Link

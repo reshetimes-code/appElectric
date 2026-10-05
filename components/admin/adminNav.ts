@@ -10,3 +10,9 @@ export const ADMIN_NAV = [
   { href: "/admin/suppliers", label: "ספקים", icon: Truck },
   { href: "/admin/purchase-orders", label: "הזמנות רכש", icon: ClipboardList },
 ];
+
+const WORKER_HREFS = new Set(["/admin/products", "/admin/bundles"]);
+
+export function navForRole(role: "admin" | "worker") {
+  return role === "worker" ? ADMIN_NAV.filter((i) => WORKER_HREFS.has(i.href)) : ADMIN_NAV;
+}

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { verifySessionToken } from "@/lib/adminSession";
+import { getSessionRole, workerCanAccess } from "@/lib/adminSession";
 
 // Password gate for /admin — protects the admin UI and its API routes so
 // they're not wide open. The session cookie is an HMAC-signed, self-expiring
@@ -17,7 +17,14 @@ export async function middleware(request: NextRequest) {
   if (!isAdminArea && !isAdminApi) return NextResponse.next();
 
   const cookie = request.cookies.get(ADMIN_COOKIE)?.value;
-  if (await verifySessionToken(cookie)) return NextResponse.next();
+  const role = await getSessionRole(cookie);
+  if (role === "admin") return NextResponse.next();
+  if (role === "worker") {
+    if (workerCanAccess(pathname)) return NextResponse.next();
+    // Workers only get products + premium bundles; everything else bounces.
+    if (isAdminApi) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.redirect(new URL("/admin/products", request.url));
+  }
 
   if (isAdminApi) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
