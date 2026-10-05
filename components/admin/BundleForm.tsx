@@ -123,7 +123,7 @@ export function BundleForm({
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="w-full rounded-[var(--radius-control)] border border-sand-300 p-3 text-sm" />
       </div>
       <div>
-        <label className="mb-1 block text-sm text-charcoal-600">תמונה גדולה של הסט</label>
+        <label className="mb-1 block text-sm text-charcoal-600">תמונה גדולה של הסט (אופציונלי – אחרת תיווצר קולאז' אוטומטי)</label>
         {coverUrl && (
           <div className="relative mb-2 aspect-[16/10] w-full max-w-md overflow-hidden rounded-[var(--radius-control)] bg-sand-100">
             <Image src={coverUrl} alt="תמונת הסט" fill sizes="448px" className="object-cover" />
